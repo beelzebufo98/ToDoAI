@@ -4,21 +4,21 @@ public sealed class TaskEntity
 {
     public Guid Id { get; set; }
     
+    public string Title { get; set; } = default!;
+    
+    public string Description { get; set; } = default!;
+    
+    public int EstimatedMinutes { get; set; }
+    
     public int ComplexityLevel { get; set; }
     
     public int Priority { get; set; }
     
-    public string Text { get; set; } = default!;
+    public DateTimeOffset CreatedAt { get; set; }
     
-    public string Description { get; set; } = default!;
-    
-    public DateTimeOffset StartDate { get; set; }
-    
-    public DateTimeOffset EndDate { get; set; }
-    
-    public DateTimeOffset UpdatedDate { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
     
     public TaskStatus WorkStatus { get; set; } = default!;
     
-    public Guid UserId { get; set; }
+    public UserEntity UserId { get; set; }
 }

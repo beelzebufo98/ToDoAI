@@ -2,13 +2,19 @@ namespace ToDoAI.ToDoAI.Domain.Entities;
 
 public sealed class UserEntity
 {
-    public Guid UserId { get; set; }
+    public Guid Id { get; set; }
+    
+    public string UserName { get; set; } = default!;
     
     public string FirstName { get; set; } = default!;
     
-    public string LastName { get; set; } = default!;
+    public string? LastName { get; set; }
     
-    public string Email { get; set; } = default!;
+    public string? Email { get; set; }
     
     public string PasswordHash { get; set; } = default!;
+    
+    public ICollection<TaskEntity> Tasks { get; set; } = default!;
+    
+    public ICollection<StateEntity> States { get; set; } = default!;
 }
