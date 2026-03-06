@@ -32,13 +32,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="ToDoAI.Application\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Update="appsettings.Development.json">
         <DependentUpon>appsettings.json</DependentUpon>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="ToDoAI.Infrastructure\DalProviders\" />
     </ItemGroup>
 
 </Project>
