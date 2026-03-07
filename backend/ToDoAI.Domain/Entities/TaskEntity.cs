@@ -20,5 +20,7 @@ public sealed class TaskEntity
     
     public TaskStatus WorkStatus { get; set; } = default!;
     
-    public UserEntity UserId { get; set; }
+    public Guid UserId { get; set; }
+
+    public UserEntity User { get; set; } = default!;
 }

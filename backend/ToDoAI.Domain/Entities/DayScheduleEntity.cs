@@ -9,7 +9,9 @@ public sealed class DayScheduleEntity
     public int Version { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
-    
+
+    public Guid UserId { get; set; }
+
     public UserEntity User { get; set; } = default!;
 
     public ICollection<ScheduleEntity> Blocks { get; set; } = [];

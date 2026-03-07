@@ -14,7 +14,7 @@ public sealed class UserEntity
     
     public string PasswordHash { get; set; } = default!;
     
-    public ICollection<TaskEntity> Tasks { get; set; } = default!;
+    public ICollection<TaskEntity> Tasks { get; set; } = [];
     
-    public ICollection<StateEntity> States { get; set; } = default!;
+    public ICollection<StateEntity> States { get; set; } = [];
 }

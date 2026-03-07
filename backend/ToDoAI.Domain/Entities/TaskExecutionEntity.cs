@@ -3,7 +3,9 @@ namespace ToDoAI.ToDoAI.Domain.Entities;
 public sealed class TaskExecutionEntity
 {
     public Guid Id { get; set; }
-    
+
+    public Guid TaskId { get; set; }
+
     public TaskEntity Task { get; set; } = default!;
 
     public DateTimeOffset StartTime { get; set; }

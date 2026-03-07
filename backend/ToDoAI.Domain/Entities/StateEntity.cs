@@ -13,4 +13,6 @@ public sealed class StateEntity
     public DateTimeOffset UpdatedAt { get; set; }
     
     public Guid UserId { get; set; }
+
+    public UserEntity User { get; set; } = default!;
 }
