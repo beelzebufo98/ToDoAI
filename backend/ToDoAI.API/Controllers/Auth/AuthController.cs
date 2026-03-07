@@ -1,20 +1,23 @@
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
-using ToDoAI.ToDoAI.Application.Services.AccountService;
-using ToDoAI.ToDoAI.Application.Services.AccountService.Models;
+using ToDoAI.ToDoAI.Application.UseCases.CreateUser;
+using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
 
 namespace ToDoAI.ToDoAI.API.Controllers.Auth;
 
 [ApiController]
-[Route("[controller]")]
-public sealed class AuthController : ControllerBase
+[EnableCors]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/auth")]
+public sealed class AuthController : ToDoAiControllerBase
 {
-    private readonly IAccountService _accountService;
+    private readonly ICreateUserUseCase _createUserUseCase;
     private readonly ILogger<AuthController> _logger;
     
-    public AuthController(IAccountService accountService, ILogger<AuthController> logger)
+    public AuthController(ICreateUserUseCase createUserUseCase, ILogger<AuthController> logger)
     {
-        _accountService = accountService;
+        _createUserUseCase = createUserUseCase;
         _logger = logger;
     }
     
@@ -26,6 +29,7 @@ public sealed class AuthController : ControllerBase
             UserName = request.UserName,
             FirstName = request.FirstName,
             LastName = request.LastName,
+            Password = request.Password
         };
 
         return Ok();

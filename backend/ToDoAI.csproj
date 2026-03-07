@@ -7,9 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentValidation" Version="12.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.18"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.2" />
@@ -36,10 +38,6 @@
       <Content Update="appsettings.Development.json">
         <DependentUpon>appsettings.json</DependentUpon>
       </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="ToDoAI.Infrastructure\DalProviders\" />
     </ItemGroup>
 
 </Project>
