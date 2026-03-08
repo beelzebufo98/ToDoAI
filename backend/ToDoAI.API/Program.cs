@@ -1,23 +1,24 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
 using ToDoAI.ToDoAI.API.Validators;
-using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
 using ToDoAI.ToDoAI.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 string? connectionString = builder.Configuration.GetConnectionString("Default");
 
-Console.WriteLine(connectionString);
-
 builder.Services.AddDbContext<ToDoAIDbContext>(opts =>
     opts.UseNpgsql(connectionString, o =>
     {
         o.MigrationsAssembly(typeof(ToDoAIDbContext).Assembly.FullName);
         o.MigrationsHistoryTable("__EFMigrationsHistory", "ToDoAIService");
-    }));
+    })
+        .EnableSensitiveDataLogging()
+    .EnableDetailedErrors());
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped<IValidator<RegisterUserRequest>, AuthValidators>();
 builder.Services.AddFluentValidationAutoValidation();
@@ -26,7 +27,11 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ToDoAI Service API", Version = "v1" });
+    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+});
 
 var app = builder.Build();
 
@@ -46,5 +51,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 
-
+app.MapControllers();
+Console.WriteLine("App is starting...");
 app.Run();

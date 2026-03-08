@@ -1,4 +1,4 @@
-using ToDoAI.ToDoAI.Domain;
+using ToDoAI.ToDoAI.Domain.Enums;
 
 namespace ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
 
