@@ -1,4 +1,9 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
+using ToDoAI.ToDoAI.API.Validators;
+using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
 using ToDoAI.ToDoAI.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +19,8 @@ builder.Services.AddDbContext<ToDoAIDbContext>(opts =>
         o.MigrationsHistoryTable("__EFMigrationsHistory", "ToDoAIService");
     }));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
+builder.Services.AddScoped<IValidator<RegisterUserRequest>, AuthValidators>();
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddAuthentication("Bearer").AddJwtBearer();  
 builder.Services.AddAuthorization();   
 

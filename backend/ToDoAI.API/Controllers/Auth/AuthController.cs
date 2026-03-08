@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
 using ToDoAI.ToDoAI.Application.UseCases.CreateUser;
 using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
+using ErrorCodes = ToDoAI.ToDoAI.Domain.ErrorCodes;
 
 namespace ToDoAI.ToDoAI.API.Controllers.Auth;
 
@@ -22,6 +23,8 @@ public sealed class AuthController : ToDoAiControllerBase
     }
     
     [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<IActionResult> Register([FromBody]  RegisterUserRequest request)
     {
         var blRequest = new RegisterUserBlRequest
