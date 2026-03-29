@@ -4,5 +4,5 @@ namespace ToDoAI.ToDoAI.Application.UseCases.CreateUser;
 
 public interface ICreateUserUseCase
 {
-    Task CreateUserAsync(RegisterUserBlRequest user);
+    Task<RegisterUserResult> CreateUser(RegisterUserBlRequest user,  CancellationToken cancellationToken);
 }

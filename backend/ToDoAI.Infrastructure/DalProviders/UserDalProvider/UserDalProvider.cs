@@ -17,7 +17,7 @@ public sealed class UserDalProvider : IUserDalProvider
     public async Task<bool> CheckUserExists(string userName, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-        var user = await toDoAiDb.Users.FirstOrDefaultAsync(cancellationToken);
+        var user = await toDoAiDb.Users.Where(x=> String.Equals(x.UserName == userName, StringComparer.CurrentCultureIgnoreCase)).FirstOrDefaultAsync(cancellationToken);
         if (user is null)
         {
             return false;
@@ -30,25 +30,35 @@ public sealed class UserDalProvider : IUserDalProvider
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
         var userEntity = new UserEntity
         {
-            Id = Guid.NewGuid(),
+            Id = userRequest.Id,
             UserName = userRequest.UserName,
             FirstName = userRequest.FirstName,
             LastName = userRequest.LastName,
             PasswordHash = userRequest.PasswordHash,
         };
         
-        await toDoAiDb.AddRangeAsync(userEntity,  cancellationToken);
+        await toDoAiDb.AddAsync(userEntity,  cancellationToken);
     }
-
-    //TODO: доработать под дал модель
-    public async Task<UserEntity?> GetUser(string userName, CancellationToken cancellationToken)
+    
+    public async Task<LoginUserDal?> GetUser(string userName, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-        var user = await toDoAiDb.Users.FirstOrDefaultAsync(cancellationToken);
+        var user = await toDoAiDb.Users.Where(x=> String.Equals(x.UserName == userName, StringComparer.CurrentCultureIgnoreCase)).FirstOrDefaultAsync(cancellationToken);
         if (user is null)
         {
             return null;
         }
-        return user;
+        return GetLoginUserDal(user);
+    }
+    
+    private static LoginUserDal GetLoginUserDal(UserEntity user)
+    {
+        return new LoginUserDal
+        {
+            UserId = user.Id,
+            UserName = user.UserName,
+            FirstName = user.FirstName,
+            PasswordHash = user.PasswordHash,
+        };
     }
 }
