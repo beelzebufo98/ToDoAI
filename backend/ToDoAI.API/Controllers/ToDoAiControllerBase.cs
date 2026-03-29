@@ -5,17 +5,20 @@ namespace ToDoAI.ToDoAI.API.Controllers;
 
 public abstract class ToDoAiControllerBase : ControllerBase
 {
-    public ActionResult Ok<TResult>(TResult result) where TResult : class
+    [NonAction]
+    protected ActionResult Ok<TResult>(TResult result) where TResult : class
     {
         return (ActionResult) this.Ok((object) new PayloadApiResponse<TResult>(result));
     }
 
-    public ActionResult ClientError<TErrorCode>(ErrorApi<TErrorCode> error, int statusCode = 400)
+    [NonAction]
+    protected ActionResult ClientError<TErrorCode>(ErrorApi<TErrorCode> error, int statusCode = 400)
     {
         return (ActionResult) this.StatusCode(statusCode, (object) new ClientErrorApiResponse<TErrorCode>(error)); 
     }
     
-    public ActionResult ServerError() => (ActionResult) this.StatusCode(500, (object) null);
+    [NonAction]
+    protected ActionResult ServerError() => (ActionResult) this.StatusCode(500, (object) null);
 
     public class PayloadApiResponse<T> where T : class
     {

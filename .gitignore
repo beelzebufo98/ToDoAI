@@ -2,6 +2,7 @@
 *.user
 *.suo
 *.bak
+.env*
 
 backend/bin/
 backend/obj/
