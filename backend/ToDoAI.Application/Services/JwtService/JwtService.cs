@@ -26,8 +26,13 @@ public sealed class JwtService : IJwtService
             new Claim("firstName", account.FirstName),
             new Claim("id", account.UserId.ToString())
         };
+        TimeSpan tokenTtl = TimeSpan.Parse("00:01:00");
+        if (TimeSpan.TryParse(_settings.Value.TokenLifetime, out var tokenLifetime))
+        {
+            tokenTtl = tokenLifetime;
+        }
         var jwtToken = new JwtSecurityToken(
-            expires:  DateTime.UtcNow.Add(_settings.Value.TokenLifetime),
+            expires:  DateTime.UtcNow.Add(tokenTtl),
             claims: claims,
             signingCredentials: new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Value.SecretKey)),SecurityAlgorithms.HmacSha256));

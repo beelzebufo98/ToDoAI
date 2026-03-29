@@ -4,20 +4,14 @@ using Microsoft.OpenApi;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
 using ToDoAI.ToDoAI.API.Validators;
+using ToDoAI.ToDoAI.Application.DependencyInjection;
+using ToDoAI.ToDoAI.Infrastructure.DependencyInjection;
 using ToDoAI.ToDoAI.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string? connectionString = builder.Configuration.GetConnectionString("Default");
-
-builder.Services.AddDbContext<ToDoAIDbContext>(opts =>
-    opts.UseNpgsql(connectionString, o =>
-    {
-        o.MigrationsAssembly(typeof(ToDoAIDbContext).Assembly.FullName);
-        o.MigrationsHistoryTable("__EFMigrationsHistory", "ToDoAIService");
-    })
-        .EnableSensitiveDataLogging()
-    .EnableDetailedErrors());
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication(builder.Configuration);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped<IValidator<RegisterUserRequest>, AuthValidators>();
@@ -43,7 +37,8 @@ if (app.Environment.IsDevelopment())
 
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ToDoAIDbContext>();
+    var dbContextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<ToDoAIDbContext>>();
+    await using var db = await dbContextFactory.CreateDbContextAsync();
     await db.Database.MigrateAsync();
 }
 
