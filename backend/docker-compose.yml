@@ -17,13 +17,18 @@ services:
       retries: 20
 
   api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: todoai
     container_name: todoai-api
     depends_on:
       db:
         condition: service_healthy
     environment:
-      ConnectionStrings__Default: "Host=db;Port=5432;Database=ai_database;Username=postgres;Password=postgres"
+      ConnectionStrings__Default: ${CONNECTIONSTRINGS__DEFAULT}
+      AuthSettings__SecretKey: ${AUTHSETTINGS__SECRETKEY}
+      AuthSettings__TokenLifetime: ${AUTHSETTINGS__TOKENLIFETIME}
       ASPNETCORE_URLS: "http://+:5114"
       ASPNETCORE_ENVIRONMENT: "Development"
     ports:
