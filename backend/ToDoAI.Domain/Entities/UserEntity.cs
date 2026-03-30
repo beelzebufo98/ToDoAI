@@ -16,5 +16,5 @@ public sealed class UserEntity
     
     public ICollection<TaskEntity> Tasks { get; set; } = [];
     
-    public ICollection<StateEntity> States { get; set; } = [];
+    public ICollection<UserStateEntity> States { get; set; } = [];
 }

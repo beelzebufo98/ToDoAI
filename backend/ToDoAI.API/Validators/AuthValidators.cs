@@ -3,7 +3,7 @@ using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
 
 namespace ToDoAI.ToDoAI.API.Validators;
 
-public class AuthValidators : AbstractValidator<RegisterUserRequest>
+public sealed class AuthValidators : AbstractValidator<RegisterUserRequest>
 {
     public AuthValidators()
     {

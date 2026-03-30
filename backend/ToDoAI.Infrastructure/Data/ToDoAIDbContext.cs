@@ -9,7 +9,7 @@ public class ToDoAIDbContext : DbContext
     
     public virtual DbSet<UserEntity> Users { get; set; }
     
-    public virtual DbSet<StateEntity> States { get; set; }
+    public virtual DbSet<UserStateEntity> States { get; set; }
     
     public virtual DbSet<ScheduleEntity> Schedules { get; set; }
     
@@ -58,7 +58,7 @@ public class ToDoAIDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        modelBuilder.Entity<StateEntity>(entity =>
+        modelBuilder.Entity<UserStateEntity>(entity =>
         {
             entity.ToTable("States", "ToDoAIService");
         });
@@ -69,8 +69,7 @@ public class ToDoAIDbContext : DbContext
 
             entity.HasOne(s => s.Task)
                 .WithMany()
-                .HasForeignKey(s => s.TaskId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasForeignKey(s => s.TaskId);
         });
 
         modelBuilder.Entity<TaskExecutionEntity>(entity =>

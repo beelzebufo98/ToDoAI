@@ -17,15 +17,13 @@ public sealed class AuthController : ToDoAiControllerBase
 {
     private readonly ICreateUserUseCase _createUserUseCase;
     private readonly ILoginUserUseCase  _loginUserUseCase;
-    private readonly ILogger<AuthController> _logger;
     
-    public AuthController(ICreateUserUseCase createUserUseCase,
-        ILoginUserUseCase loginUserUseCase,
-        ILogger<AuthController> logger)
+    public AuthController(
+        ICreateUserUseCase createUserUseCase,
+        ILoginUserUseCase loginUserUseCase)
     {
         _createUserUseCase = createUserUseCase;
         _loginUserUseCase = loginUserUseCase;
-        _logger = logger;
     }
     
     [HttpPost("register")]
@@ -50,7 +48,7 @@ public sealed class AuthController : ToDoAiControllerBase
     }
 
     [HttpPost("login")]
-    [ProducesResponseType(StatusCodes.Status200OK,  Type = typeof(LoginUserResponse))]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
     {
@@ -65,12 +63,13 @@ public sealed class AuthController : ToDoAiControllerBase
        {
            return ClientError(new ErrorApi<ErrorCodes?>(result.Error));
        }
-
+       
+       HttpContext.Response.Cookies.Append("userToken", result.Token, new CookieOptions());
        var response = new LoginUserResponse
        {
            Token = result.Token!
        };
-       return Ok(response);
+       return Ok();
     }
     
 }

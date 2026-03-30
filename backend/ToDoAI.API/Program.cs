@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
+using ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
 using ToDoAI.ToDoAI.API.Validators;
 using ToDoAI.ToDoAI.Application.DependencyInjection;
 using ToDoAI.ToDoAI.Infrastructure.DependencyInjection;
@@ -17,8 +18,8 @@ builder.Services.AddJwtService(builder.Configuration);
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped<IValidator<RegisterUserRequest>, AuthValidators>();
+builder.Services.AddScoped<IValidator<CreateTaskRequest>, CreateTaskValidator>();
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddAuthentication("Bearer").AddJwtBearer();  
 builder.Services.AddAuthorization();   
 
 builder.Services.AddControllers();
