@@ -2,25 +2,29 @@ namespace ToDoAI.ToDoAI.Domain.Entities;
 
 public sealed class TaskEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
     
-    public string Title { get; set; } = default!;
+    public string Title { get; init; } = default!;
     
-    public string Description { get; set; } = default!;
+    public string Description { get; init; } = default!;
     
-    public int EstimatedMinutes { get; set; }
+    public int EstimatedMinutes { get; init; }
     
-    public int ComplexityLevel { get; set; }
+    public int ComplexityLevel { get; init; }
     
-    public int Priority { get; set; }
+    public int Priority { get; init; }
     
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; init; }
     
-    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset PlannedEndDate { get; init; }
     
-    public TaskStatus WorkStatus { get; set; } = default!;
+    public DateTimeOffset? ActualEndDate { get; init; }
     
-    public Guid UserId { get; set; }
+    public DateTimeOffset UpdatedAt { get; init; }
+    
+    public TaskStatus WorkStatus { get; init; }
+    
+    public Guid UserId { get; init; }
 
-    public UserEntity User { get; set; } = default!;
+    public UserEntity User { get; init; } = default!;
 }

@@ -2,8 +2,10 @@ namespace ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
 
 public sealed class AuthSettings
 {
-    public string TokenLifetime { get; set; }
+    public string AccessTokenLifetime { get; init; }
     
-    public string SecretKey { get; set; }
+    public string RefreshTokenLifetime { get; init; }
+    
+    public string SecretKey { get; init; }
     
 }

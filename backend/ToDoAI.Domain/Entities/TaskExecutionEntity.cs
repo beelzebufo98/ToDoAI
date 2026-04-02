@@ -2,18 +2,17 @@ namespace ToDoAI.ToDoAI.Domain.Entities;
 
 public sealed class TaskExecutionEntity
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public Guid TaskId { get; set; }
+    public Guid TaskId { get; init; }
 
-    public TaskEntity Task { get; set; } = default!;
+    public TaskEntity Task { get; init; } = default!;
+    
+    public int ActualMinutes { get; init; }
+    
+    public int EnergyAfter { get; init; }
+    
+    public int StressAfter { get; init; }
 
-    public DateTimeOffset StartTime { get; set; }
-    public DateTimeOffset EndTime { get; set; }
-
-    public int ActualMinutes { get; set; }
-    public int EnergyAfter { get; set; }
-    public int StressAfter { get; set; }
-
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; init; }
 }

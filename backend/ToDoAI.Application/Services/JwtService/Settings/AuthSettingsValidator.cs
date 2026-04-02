@@ -11,10 +11,16 @@ public sealed class AuthSettingsValidator : IValidateOptions<AuthSettings>
             return ValidateOptionsResult.Fail("SecretKey is required.");
         }
 
-        if (string.IsNullOrWhiteSpace(options.TokenLifetime))
+        if (string.IsNullOrWhiteSpace(options.AccessTokenLifetime))
         {
-            return ValidateOptionsResult.Fail("TokenLifetime is required.");
+            return ValidateOptionsResult.Fail("AccessTokenLifetime is required.");
         }
+
+        if (string.IsNullOrWhiteSpace(options.RefreshTokenLifetime))
+        {
+            return ValidateOptionsResult.Fail("RefreshTokenLifetime is required.");
+        }
+        
         return ValidateOptionsResult.Success;
     }
 }

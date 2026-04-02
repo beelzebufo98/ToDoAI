@@ -7,6 +7,8 @@ public sealed class DayScheduleEntity
     public DateOnly Date { get; set; }
 
     public int Version { get; set; }
+    
+    public bool IsActiveVersion { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
 

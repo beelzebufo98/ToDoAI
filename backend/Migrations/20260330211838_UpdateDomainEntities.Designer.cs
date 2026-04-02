@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ToDoAI.ToDoAI.Infrastructure.Data;
@@ -11,9 +12,11 @@ using ToDoAI.ToDoAI.Infrastructure.Data;
 namespace ToDoAI.Migrations
 {
     [DbContext(typeof(ToDoAIDbContext))]
-    partial class ToDoAIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260330211838_UpdateDomainEntities")]
+    partial class UpdateDomainEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,33 +52,6 @@ namespace ToDoAI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("DaySchedules", "ToDoAIService");
-                });
-
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.RefreshSessionEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
-
-                    b.ToTable("RefreshSessions", "ToDoAIService");
                 });
 
             modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.ScheduleEntity", b =>

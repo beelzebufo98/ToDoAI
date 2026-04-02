@@ -3,9 +3,9 @@ using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
 
 namespace ToDoAI.ToDoAI.API.Validators;
 
-public sealed class AuthValidators : AbstractValidator<RegisterUserRequest>
+public sealed class LoginValidator : AbstractValidator<LoginUserRequest>
 {
-    public AuthValidators()
+    public LoginValidator()
     {
         RuleFor(user => user.UserName)
             .NotEmpty()
@@ -16,22 +16,7 @@ public sealed class AuthValidators : AbstractValidator<RegisterUserRequest>
             .WithMessage("Username must be less than 100 characters")
             .Matches(@"^[a-zA-Z0-9_]*$")
             .WithMessage("Username can contain only letters, numbers and underscore");
-        
-        RuleFor(user => user.FirstName)
-            .NotEmpty()
-            .WithMessage("First name is required")
-            .Length(1, 100)
-            .WithMessage("First name must be between 1 and 100 characters")
-            .Matches("^[a-zA-Zа-яА-Я]+$")
-            .WithMessage("First name must contain only letters");
-        
-        RuleFor(user => user.LastName)
-            .MaximumLength(100)
-            .WithMessage("Last name must not exceed 100 characters")
-            .Matches("^[a-zA-Zа-яА-Я]*$")
-            .WithMessage("Last name must contain only letters")
-            .When(user => !string.IsNullOrEmpty(user.LastName));
-        
+    
         RuleFor(user => user.Password)
             .NotEmpty()
             .WithMessage("Password is required")

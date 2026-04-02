@@ -17,9 +17,6 @@ services:
       retries: 20
 
   api:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: todoai
     container_name: todoai-api
     depends_on:

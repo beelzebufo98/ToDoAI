@@ -9,7 +9,7 @@ public class ToDoAIDbContext : DbContext
     
     public virtual DbSet<UserEntity> Users { get; set; }
     
-    public virtual DbSet<StateEntity> States { get; set; }
+    public virtual DbSet<UserStateEntity> States { get; set; }
     
     public virtual DbSet<ScheduleEntity> Schedules { get; set; }
     
@@ -17,6 +17,7 @@ public class ToDoAIDbContext : DbContext
     
     public virtual DbSet<TaskExecutionEntity>  TaskExecutions { get; set; }
     
+    public virtual DbSet<RefreshSessionEntity>  RefreshSessions { get; set; }
     public ToDoAIDbContext(DbContextOptions<ToDoAIDbContext> options)
         : base(options) { }
 
@@ -58,7 +59,7 @@ public class ToDoAIDbContext : DbContext
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        modelBuilder.Entity<StateEntity>(entity =>
+        modelBuilder.Entity<UserStateEntity>(entity =>
         {
             entity.ToTable("States", "ToDoAIService");
         });
@@ -69,8 +70,7 @@ public class ToDoAIDbContext : DbContext
 
             entity.HasOne(s => s.Task)
                 .WithMany()
-                .HasForeignKey(s => s.TaskId)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasForeignKey(s => s.TaskId);
         });
 
         modelBuilder.Entity<TaskExecutionEntity>(entity =>
@@ -81,6 +81,14 @@ public class ToDoAIDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(te => te.TaskId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RefreshSessionEntity>(entity =>
+        {
+            entity.ToTable("RefreshSessions", "ToDoAIService");
+
+            entity.HasIndex(x => x.TokenHash)
+                .IsUnique();
         });
 
         base.OnModelCreating(modelBuilder);

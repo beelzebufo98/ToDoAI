@@ -1,9 +1,10 @@
-namespace ToDoAI.ToDoAI.Domain;
+namespace ToDoAI.ToDoAI.Domain.Enums;
 
 public enum TaskStatus
 {
-    Waiting,
-    Running,
-    Completed,
-    Deleted
+    New = 0,
+    Todo = 1,
+    Running = 2,
+    Completed = 3,
+    Deleted = 4
 }
