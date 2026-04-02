@@ -17,7 +17,7 @@ public sealed class UserDalProvider : IUserDalProvider
     public async Task<bool> CheckUserExists(string userName, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-        var user = await toDoAiDb.Users.Where(x=> String.Equals(x.UserName == userName, StringComparer.CurrentCultureIgnoreCase)).FirstOrDefaultAsync(cancellationToken);
+        var user = await toDoAiDb.Users.Where(x=> String.Equals(x.UserName, userName, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefaultAsync(cancellationToken);
         if (user is null)
         {
             return false;
@@ -44,11 +44,25 @@ public sealed class UserDalProvider : IUserDalProvider
     public async Task<LoginUserDal?> GetUser(string userName, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-        var user = await toDoAiDb.Users.Where(x=> String.Equals(x.UserName == userName, StringComparer.CurrentCultureIgnoreCase)).FirstOrDefaultAsync(cancellationToken);
+        var user = await toDoAiDb.Users
+            .Where(x => string.Equals(x.UserName, userName, StringComparison.CurrentCultureIgnoreCase))
+            .FirstOrDefaultAsync(cancellationToken);
         if (user is null)
         {
             return null;
         }
+        return GetLoginUserDal(user);
+    }
+
+    public async Task<LoginUserDal?> GetUser(Guid userId, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var user = await toDoAiDb.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+        if (user is null)
+        {
+            return null;
+        }
+
         return GetLoginUserDal(user);
     }
     

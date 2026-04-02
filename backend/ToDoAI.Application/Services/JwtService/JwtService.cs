@@ -39,8 +39,13 @@ public sealed class JwtService : IJwtService
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
 
-    public string GenerateRefreshToken()
+    public string GenerateRefreshToken(LoginUserDal account)
     {
+        var claims = new List<Claim>
+        {
+            new Claim("id", account.UserId.ToString())
+        };
+
         TimeSpan tokenTtl = TimeSpan.Parse("7.00:00:00");
         if (TimeSpan.TryParse(_settings.Value.RefreshTokenLifetime, out var refreshTokenLifetime))
         {
@@ -49,6 +54,7 @@ public sealed class JwtService : IJwtService
         
         var jwtToken =  new JwtSecurityToken(
             expires:  DateTime.UtcNow.Add(tokenTtl),
+            claims: claims,
             signingCredentials: new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Value.SecretKey)),SecurityAlgorithms.HmacSha256));
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
@@ -67,5 +73,27 @@ public sealed class JwtService : IJwtService
             }
             return builder.ToString();
         }
+    }
+
+    public Guid GetUserIdFromToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Value.SecretKey))
+        }, out _);
+
+        var userIdClaim = principal.FindFirst("id")?.Value;
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new SecurityTokenException("Token does not contain a valid user id.");
+        }
+
+        return userId;
     }
 }

@@ -6,7 +6,9 @@ public interface IJwtService
 {
     string GenerateAccessToken(LoginUserDal account);
 
-    string GenerateRefreshToken();
+    string GenerateRefreshToken(LoginUserDal account);
 
     string HashRefreshToken(string token);
+    
+    Guid GetUserIdFromToken(string token);
 }

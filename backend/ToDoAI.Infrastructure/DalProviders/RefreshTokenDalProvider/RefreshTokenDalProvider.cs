@@ -14,7 +14,7 @@ public sealed class RefreshTokenDalProvider : IRefreshTokenDalProvider
         _dbContextFactory = dbContextFactory;
     }
 
-    public async Task<RefreshTokenDal> CreateRefreshToken(RefreshTokenRequestDal refreshToken, CancellationToken cancellationToken)
+    public async Task CreateRefreshToken(RefreshTokenRequestDal refreshToken, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
@@ -29,14 +29,42 @@ public sealed class RefreshTokenDalProvider : IRefreshTokenDalProvider
 
         await toDoAiDb.RefreshSessions.AddAsync(refreshSession, cancellationToken);
         await toDoAiDb.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task<RefreshTokenDal?> GetRefreshToken(string refreshTokenHash, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var refreshSession = await toDoAiDb.RefreshSessions
+            .FirstOrDefaultAsync(x => x.TokenHash == refreshTokenHash, cancellationToken);
+
+        if (refreshSession is null)
+        {
+            return null;
+        }
 
         return new RefreshTokenDal
         {
-            Id = refreshSession.Id,
             UserId = refreshSession.UserId,
             RefreshTokenHash = refreshSession.TokenHash,
             ExpiresAt = refreshSession.ExpiresAt,
             CreatedAt = refreshSession.CreatedAt
         };
+    }
+
+    public async Task DeleteRefreshToken(string refreshTokenHash, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var refreshSession = await toDoAiDb.RefreshSessions
+            .FirstOrDefaultAsync(x => x.TokenHash == refreshTokenHash, cancellationToken);
+
+        if (refreshSession is null)
+        {
+            return;
+        }
+
+        toDoAiDb.RefreshSessions.Remove(refreshSession);
+        await toDoAiDb.SaveChangesAsync(cancellationToken);
     }
 }

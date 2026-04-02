@@ -11,6 +11,13 @@ using ToDoAI.ToDoAI.Infrastructure.DependencyInjection;
 using ToDoAI.ToDoAI.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ??
+                     ["http://localhost:3000", "http://localhost:5173"];
+
+if (allowedOrigins.Length == 0)
+{
+    allowedOrigins = ["http://localhost:3000", "http://localhost:5173"];
+}
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication(builder.Configuration);
@@ -22,6 +29,16 @@ builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginValidator>();
 builder.Services.AddScoped<IValidator<CreateTaskRequest>, CreateTaskValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddAuthorization();   
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 builder.Services.AddControllers();
 builder.Services.AddApiVersioning(options =>
@@ -60,9 +77,10 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();
 }
 
+app.UseHttpsRedirection();
+app.UseCors("Frontend");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
 
 app.MapControllers();
 Console.WriteLine("App is starting...");

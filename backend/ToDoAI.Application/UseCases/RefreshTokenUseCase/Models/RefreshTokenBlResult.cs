@@ -1,6 +1,6 @@
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider.Models;
+namespace ToDoAI.ToDoAI.Application.UseCases.RefreshTokenUseCase.Models;
 
-public sealed record RefreshTokenDal
+public sealed record RefreshTokenBlResult
 {
     public required Guid UserId { get; init; }
     

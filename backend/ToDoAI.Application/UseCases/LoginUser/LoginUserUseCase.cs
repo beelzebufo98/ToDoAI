@@ -56,7 +56,7 @@ public sealed class LoginUserUseCase : ILoginUserUseCase
         if (result == PasswordVerificationResult.Success)
         {
             var accessToken = _jwtService.GenerateAccessToken(account);
-            var refreshToken = _jwtService.GenerateRefreshToken();
+            var refreshToken = _jwtService.GenerateRefreshToken(account);
             var refreshTokenHash = _jwtService.HashRefreshToken(refreshToken);
 
             var refreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(7);
