@@ -14,10 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication(builder.Configuration);
-builder.Services.AddJwtService(builder.Configuration);
+builder.Services.AddJwtService();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped<IValidator<RegisterUserRequest>, AuthValidators>();
+builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginValidator>();
 builder.Services.AddScoped<IValidator<CreateTaskRequest>, CreateTaskValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddAuthorization();   

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
 using ToDoAI.ToDoAI.Infrastructure.Data;
 
@@ -12,6 +13,7 @@ public static class ServiceCollectionExtensions
 
         services.AddDbContextFactory<ToDoAIDbContext>(options => ConfigureDatabase(options, connectionString));
 
+        services.AddScoped<IRefreshTokenDalProvider, RefreshTokenDalProvider>();
         services.AddScoped<IUserDalProvider, UserDalProvider>();
 
         return services;

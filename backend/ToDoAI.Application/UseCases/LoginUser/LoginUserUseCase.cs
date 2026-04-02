@@ -1,8 +1,12 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using ToDoAI.ToDoAI.Application.Services.JwtService;
+using ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
 using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
 using ToDoAI.ToDoAI.Application.UseCases.LoginUser.Models;
 using ToDoAI.ToDoAI.Domain.Enums;
+using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
+using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider.Models;
 using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
 
 namespace ToDoAI.ToDoAI.Application.UseCases.LoginUser;
@@ -10,21 +14,27 @@ namespace ToDoAI.ToDoAI.Application.UseCases.LoginUser;
 public sealed class LoginUserUseCase : ILoginUserUseCase
 {
     private readonly IUserDalProvider  _userDalProvider;
+    private readonly IRefreshTokenDalProvider _refreshTokenDalProvider;
     private readonly IJwtService  _jwtService;
+    private readonly IOptions<AuthSettings> _authSettings;
     private readonly ILogger<LoginUserUseCase> _logger;
 
     public LoginUserUseCase(IUserDalProvider userDalProvider,
+        IRefreshTokenDalProvider refreshTokenDalProvider,
         IJwtService jwtService,
+        IOptions<AuthSettings> authSettings,
         ILogger<LoginUserUseCase> logger)
     {
         _userDalProvider = userDalProvider;
+        _refreshTokenDalProvider = refreshTokenDalProvider;
         _jwtService = jwtService;
+        _authSettings = authSettings;
         _logger = logger;
     }
 
     public async Task<LoginUserResult> LoginUser(LoginUserBlRequest request, CancellationToken cancellationToken)
     {
-        var account = await _userDalProvider.GetUser(request.Username, cancellationToken);
+        var account = await _userDalProvider.GetUser(request.UserName, cancellationToken);
         if (account is null)
         {
             return new LoginUserResult
@@ -45,20 +55,35 @@ public sealed class LoginUserUseCase : ILoginUserUseCase
 
         if (result == PasswordVerificationResult.Success)
         {
-            var token = _jwtService.GenerateToken(account);
+            var accessToken = _jwtService.GenerateAccessToken(account);
+            var refreshToken = _jwtService.GenerateRefreshToken();
+            var refreshTokenHash = _jwtService.HashRefreshToken(refreshToken);
+
+            var refreshTokenExpiresAt = DateTimeOffset.UtcNow.AddDays(7);
+            if (TimeSpan.TryParse(_authSettings.Value.RefreshTokenLifetime, out var refreshTokenLifetime))
+            {
+                refreshTokenExpiresAt = DateTimeOffset.UtcNow.Add(refreshTokenLifetime);
+            }
+
+            await _refreshTokenDalProvider.CreateRefreshToken(new RefreshTokenRequestDal
+            {
+                UserId = account.UserId,
+                RefreshTokenHash = refreshTokenHash,
+                ExpiresAt = refreshTokenExpiresAt,
+                CreatedAt = DateTimeOffset.UtcNow
+            }, cancellationToken);
+
             return new LoginUserResult
             {
                 Success = true,
-                Token = token
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
             };
         }
-        else
+        return new LoginUserResult
         {
-            return new LoginUserResult
-            {
-                Success = false,
-                Error = ErrorCodes.NotAuthorized
-            };
-        }
+            Success = false,
+            Error = ErrorCodes.NotAuthorized
+        };
     }
 }

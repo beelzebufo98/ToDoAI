@@ -38,6 +38,7 @@ public sealed class UserDalProvider : IUserDalProvider
         };
         
         await toDoAiDb.AddAsync(userEntity,  cancellationToken);
+        await toDoAiDb.SaveChangesAsync(cancellationToken);
     }
     
     public async Task<LoginUserDal?> GetUser(string userName, CancellationToken cancellationToken)

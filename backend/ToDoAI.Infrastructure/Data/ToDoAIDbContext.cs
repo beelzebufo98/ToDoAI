@@ -17,6 +17,7 @@ public class ToDoAIDbContext : DbContext
     
     public virtual DbSet<TaskExecutionEntity>  TaskExecutions { get; set; }
     
+    public virtual DbSet<RefreshSessionEntity>  RefreshSessions { get; set; }
     public ToDoAIDbContext(DbContextOptions<ToDoAIDbContext> options)
         : base(options) { }
 
@@ -80,6 +81,14 @@ public class ToDoAIDbContext : DbContext
                 .WithMany()
                 .HasForeignKey(te => te.TaskId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<RefreshSessionEntity>(entity =>
+        {
+            entity.ToTable("RefreshSessions", "ToDoAIService");
+
+            entity.HasIndex(x => x.TokenHash)
+                .IsUnique();
         });
 
         base.OnModelCreating(modelBuilder);

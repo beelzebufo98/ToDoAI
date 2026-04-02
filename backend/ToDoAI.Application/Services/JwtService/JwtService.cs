@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.InteropServices.JavaScript;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,7 +18,7 @@ public sealed class JwtService : IJwtService
         _settings = settings;
     }
 
-    public string GenerateToken(LoginUserDal account)
+    public string GenerateAccessToken(LoginUserDal account)
     {
         var claims = new List<Claim>
         {
@@ -27,7 +27,7 @@ public sealed class JwtService : IJwtService
             new Claim("id", account.UserId.ToString())
         };
         TimeSpan tokenTtl = TimeSpan.Parse("00:01:00");
-        if (TimeSpan.TryParse(_settings.Value.TokenLifetime, out var tokenLifetime))
+        if (TimeSpan.TryParse(_settings.Value.AccessTokenLifetime, out var tokenLifetime))
         {
             tokenTtl = tokenLifetime;
         }
@@ -37,5 +37,35 @@ public sealed class JwtService : IJwtService
             signingCredentials: new SigningCredentials(
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Value.SecretKey)),SecurityAlgorithms.HmacSha256));
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+    }
+
+    public string GenerateRefreshToken()
+    {
+        TimeSpan tokenTtl = TimeSpan.Parse("7.00:00:00");
+        if (TimeSpan.TryParse(_settings.Value.RefreshTokenLifetime, out var refreshTokenLifetime))
+        {
+            tokenTtl = refreshTokenLifetime;
+        }
+        
+        var jwtToken =  new JwtSecurityToken(
+            expires:  DateTime.UtcNow.Add(tokenTtl),
+            signingCredentials: new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_settings.Value.SecretKey)),SecurityAlgorithms.HmacSha256));
+        return new JwtSecurityTokenHandler().WriteToken(jwtToken);
+    }
+    
+    public string HashRefreshToken(string token)
+    {
+        using (SHA256 sha256Hash = SHA256.Create())
+        {
+            byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(token));
+            
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                builder.Append(bytes[i].ToString("x2"));
+            }
+            return builder.ToString();
+        }
     }
 }

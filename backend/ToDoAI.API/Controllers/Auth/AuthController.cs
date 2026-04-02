@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
+using ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
 using ToDoAI.ToDoAI.Application.UseCases.CreateUser;
 using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
 using ToDoAI.ToDoAI.Application.UseCases.LoginUser;
@@ -17,13 +19,16 @@ public sealed class AuthController : ToDoAiControllerBase
 {
     private readonly ICreateUserUseCase _createUserUseCase;
     private readonly ILoginUserUseCase  _loginUserUseCase;
+    private readonly IOptions<AuthSettings> _authSettings;
     
     public AuthController(
         ICreateUserUseCase createUserUseCase,
-        ILoginUserUseCase loginUserUseCase)
+        ILoginUserUseCase loginUserUseCase,
+        IOptions<AuthSettings> authSettings)
     {
         _createUserUseCase = createUserUseCase;
         _loginUserUseCase = loginUserUseCase;
+        _authSettings = authSettings;
     }
     
     [HttpPost("register")]
@@ -44,7 +49,7 @@ public sealed class AuthController : ToDoAiControllerBase
             return ClientError(new ErrorApi<ErrorCodes?>(result.Error));
         }
 
-        return Ok();
+        return Created();
     }
 
     [HttpPost("login")]
@@ -54,7 +59,7 @@ public sealed class AuthController : ToDoAiControllerBase
     {
         var userRequest = new LoginUserBlRequest
         {
-            Username = request.Username,
+            UserName = request.UserName,
             Password = request.Password
         };
        var result = await _loginUserUseCase.LoginUser(userRequest, cancellationToken);
@@ -63,13 +68,35 @@ public sealed class AuthController : ToDoAiControllerBase
        {
            return ClientError(new ErrorApi<ErrorCodes?>(result.Error));
        }
-       
-       HttpContext.Response.Cookies.Append("userToken", result.Token, new CookieOptions());
-       var response = new LoginUserResponse
+
+       var cookieExpiration = DateTimeOffset.UtcNow.AddMinutes(15);
+       if (TimeSpan.TryParse(_authSettings.Value.AccessTokenLifetime, out var tokenLifetime))
        {
-           Token = result.Token!
-       };
+           cookieExpiration = DateTimeOffset.UtcNow.Add(tokenLifetime);
+       }
+
+       var refreshCookieExpiration = DateTimeOffset.UtcNow.AddDays(7);
+       if (TimeSpan.TryParse(_authSettings.Value.RefreshTokenLifetime, out var refreshTokenLifetime))
+       {
+           refreshCookieExpiration = DateTimeOffset.UtcNow.Add(refreshTokenLifetime);
+       }
+
+       HttpContext.Response.Cookies.Append("accessToken", result.AccessToken!, new CookieOptions()
+       {
+           HttpOnly = true,
+           Secure = HttpContext.Request.IsHttps,
+           SameSite = SameSiteMode.Lax,
+           Expires = cookieExpiration
+       });
+
+       HttpContext.Response.Cookies.Append("refreshToken", result.RefreshToken!, new CookieOptions()
+       {
+           HttpOnly = true,
+           Secure = HttpContext.Request.IsHttps,
+           SameSite = SameSiteMode.Lax,
+           Expires = refreshCookieExpiration
+        });
+       
        return Ok();
     }
-    
 }

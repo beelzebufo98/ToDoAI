@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
 
@@ -7,21 +8,39 @@ namespace ToDoAI.ToDoAI.Infrastructure.DependencyInjection;
 
 public static class AuthExtensions
 {
-    public static IServiceCollection AddJwtService(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddJwtService(this IServiceCollection services)
     {
-        var authSettings = configuration.GetSection(nameof(AuthSettings)).Get<AuthSettings>();
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(o =>
+            .AddJwtBearer();
+
+        services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IOptions<AuthSettings>>((options, authSettings) =>
             {
-                o.TokenValidationParameters = new TokenValidationParameters
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings!.SecretKey))
+                    ClockSkew = TimeSpan.Zero,
+                    IssuerSigningKey =
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.Value.SecretKey))
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (context.Request.Cookies.TryGetValue("accessToken", out var token))
+                        {
+                            context.Token = token;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
+
         return services;
     }
 }
