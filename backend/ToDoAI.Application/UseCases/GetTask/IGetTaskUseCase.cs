@@ -6,5 +6,5 @@ public interface IGetTaskUseCase
 {
     Task<GetTaskResult> GetTask(Guid taskId, Guid userId, CancellationToken cancellationToken);
 
-    Task<GetTasksResult> GetTasks(Guid userId, CancellationToken cancellationToken);
+    Task<GetTasksResult> GetTasks(Guid userId, TaskFiltersBlRequest filters, CancellationToken cancellationToken);
 }

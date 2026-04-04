@@ -5,6 +5,7 @@ using ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
 using ToDoAI.ToDoAI.Application.UseCases.CreateTask;
 using ToDoAI.ToDoAI.Application.UseCases.CreateTask.Models;
 using ToDoAI.ToDoAI.Application.UseCases.GetTask;
+using ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
 using ToDoAI.ToDoAI.Domain.Enums;
 
 namespace ToDoAI.ToDoAI.API.Controllers.TaskController;
@@ -61,15 +62,24 @@ public sealed class TaskController : ToDoAiControllerBase
     [HttpGet("get")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetTasksResponse))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
-    public async Task<ActionResult> GetTasks(CancellationToken cancellationToken)
+    public async Task<ActionResult> GetTasks([FromQuery] TaskFiltersRequest filters, CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst("id")?.Value;
         if (!Guid.TryParse(userIdClaim, out var userId))
         {
             return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.NotAuthorized), StatusCodes.Status401Unauthorized);
         }
+
+        var filtersBl = new TaskFiltersBlRequest
+        {
+            WorkStatus = filters.WorkStatus?.GetTaskWorkStatusBlFilters(),
+            SortType = filters.SortType?.GetTaskTypeSortBl(),
+            SortBy = filters.SortBy?.GetSortByBlFilters(),
+            Page = filters.Page,
+            PageSize = filters.PageSize,
+        };
         
-        var result = await _getTaskUseCase.GetTasks(userId, cancellationToken);
+        var result = await _getTaskUseCase.GetTasks(userId, filtersBl, cancellationToken);
         var tasksResponse = result.TaskResults.Select(x => x.GetTask()).ToList();
         return Ok(new GetTasksResponse
         {

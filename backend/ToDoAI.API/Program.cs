@@ -27,9 +27,10 @@ builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddJwtService();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-builder.Services.AddScoped<IValidator<RegisterUserRequest>, AuthValidators>();
+builder.Services.AddScoped<IValidator<RegisterUserRequest>, AuthValidator>();
 builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginValidator>();
 builder.Services.AddScoped<IValidator<CreateTaskRequest>, CreateTaskValidator>();
+builder.Services.AddScoped<IValidator<TaskFiltersRequest>, TaskFiltersValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddAuthorization();   
 builder.Services.AddCors(options =>
@@ -78,7 +79,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth API v1.0");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToDoAI API v1.0");
     });
 }
 

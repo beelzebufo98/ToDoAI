@@ -32,9 +32,9 @@ public sealed class GetTaskUseCase : IGetTaskUseCase
         };
     }
 
-    public async Task<GetTasksResult> GetTasks(Guid userId, CancellationToken cancellationToken)
+    public async Task<GetTasksResult> GetTasks(Guid userId, TaskFiltersBlRequest filters, CancellationToken cancellationToken)
     {
-        var result = await _getTaskDalProvider.GetTasks(userId, cancellationToken);
+        var result = await _getTaskDalProvider.GetTasks(userId, filters, cancellationToken);
         var taskList = result.Select(GetTaskResult).ToList();
         return new GetTasksResult
         {

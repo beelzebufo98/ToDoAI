@@ -17,6 +17,9 @@ services:
       retries: 20
 
   api:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: todoai
     container_name: todoai-api
     depends_on:
@@ -25,7 +28,8 @@ services:
     environment:
       ConnectionStrings__Default: ${CONNECTIONSTRINGS__DEFAULT}
       AuthSettings__SecretKey: ${AUTHSETTINGS__SECRETKEY}
-      AuthSettings__TokenLifetime: ${AUTHSETTINGS__TOKENLIFETIME}
+      AuthSettings__AccessTokenLifetime: ${AUTHSETTINGS__ACCESSTOKENLIFETIME}
+      AuthSettings__RefreshTokenLifetime: ${AUTHSETTINGS__REFRESHTOKENLIFETIME}
       ASPNETCORE_URLS: "http://+:5114"
       ASPNETCORE_ENVIRONMENT: "Development"
     ports:
