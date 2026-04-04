@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
-using ToDoAI.ToDoAI.Domain.Entities;
-using ToDoAI.ToDoAI.Domain.Enums;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider.Models;
-using ToDoAI.ToDoAI.Infrastructure.Data;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider.Models;
+using ToDoAI.Application.UseCases.GetTask.Models;
+using ToDoAI.Domain.Entities;
+using ToDoAI.Domain.Enums;
+using ToDoAI.Infrastructure.Data;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
+namespace ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
 
 public sealed class GetTaskDalProvider : IGetTaskDalProvider
 {

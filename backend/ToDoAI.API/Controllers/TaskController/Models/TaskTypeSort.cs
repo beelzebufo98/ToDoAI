@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
+namespace ToDoAI.API.Controllers.TaskController.Models;
 
 public enum TaskTypeSort
 {

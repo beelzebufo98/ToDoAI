@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoAI.ToDoAI.Domain.Entities;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider.Models;
-using ToDoAI.ToDoAI.Infrastructure.Data;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider.Models;
+using ToDoAI.Domain.Entities;
+using ToDoAI.Infrastructure.Data;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
+namespace ToDoAI.Infrastructure.DalProviders.UserDalProvider;
 
 public sealed class UserDalProvider : IUserDalProvider
 {

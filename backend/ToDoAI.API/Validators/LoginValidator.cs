@@ -1,7 +1,7 @@
 using FluentValidation;
-using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
+using ToDoAI.API.Controllers.Auth.Models;
 
-namespace ToDoAI.ToDoAI.API.Validators;
+namespace ToDoAI.API.Validators;
 
 public sealed class LoginValidator : AbstractValidator<LoginUserRequest>
 {

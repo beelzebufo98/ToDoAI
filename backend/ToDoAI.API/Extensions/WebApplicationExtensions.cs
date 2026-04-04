@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoAI.ToDoAI.Infrastructure.Data;
+using ToDoAI.Infrastructure.Data;
 
-namespace ToDoAI.ToDoAI.API.Extensions;
+namespace ToDoAI.API.Extensions;
 
 public static class WebApplicationExtensions
 {

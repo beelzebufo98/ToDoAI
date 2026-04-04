@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
+using ToDoAI.Application.UseCases.GetTask.Models;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.GetTask;
+namespace ToDoAI.Application.UseCases.GetTask;
 
 public interface IGetTaskUseCase
 {

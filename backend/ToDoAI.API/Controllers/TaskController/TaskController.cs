@@ -1,14 +1,17 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToDoAI.ToDoAI.API.Controllers.TaskController.Mappers;
+using ToDoAI.API.Controllers.TaskController.Mappers;
+using ToDoAI.API.Controllers.TaskController.Models;
+using ToDoAI.Application.UseCases.CreateTask;
+using ToDoAI.Application.UseCases.CreateTask.Models;
+using ToDoAI.Application.UseCases.GetTask;
+using ToDoAI.Application.UseCases.GetTask.Models;
+using ToDoAI.Domain.Enums;
+using ToDoAI.ToDoAI.API.Controllers;
 using ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
-using ToDoAI.ToDoAI.Application.UseCases.CreateTask;
-using ToDoAI.ToDoAI.Application.UseCases.CreateTask.Models;
-using ToDoAI.ToDoAI.Application.UseCases.GetTask;
-using ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
-using ToDoAI.ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.API.Controllers.TaskController;
+namespace ToDoAI.API.Controllers.TaskController;
 
 [ApiController]
 [Authorize]

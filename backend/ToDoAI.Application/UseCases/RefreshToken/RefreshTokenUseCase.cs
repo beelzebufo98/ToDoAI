@@ -1,8 +1,8 @@
-using ToDoAI.ToDoAI.Application.UseCases.RefreshToken.Models;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider.Models;
+using ToDoAI.Application.UseCases.RefreshToken.Models;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.RefreshToken;
+namespace ToDoAI.Application.UseCases.RefreshToken;
 
 public sealed class RefreshTokenUseCase : IRefreshTokenUseCase
 {

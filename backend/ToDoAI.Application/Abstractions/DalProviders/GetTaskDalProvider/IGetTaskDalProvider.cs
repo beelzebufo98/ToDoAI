@@ -1,7 +1,7 @@
-using ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider.Models;
+using ToDoAI.Application.UseCases.GetTask.Models;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
+namespace ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
 
 public interface IGetTaskDalProvider
 {

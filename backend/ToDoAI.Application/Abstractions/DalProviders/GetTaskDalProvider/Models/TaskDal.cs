@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Domain.Enums;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider.Models;
+namespace ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider.Models;
 
 public sealed record TaskDal
 {

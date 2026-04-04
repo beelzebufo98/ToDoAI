@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.Application.UseCases.RefreshToken.Models;
+namespace ToDoAI.Application.UseCases.RefreshToken.Models;
 
 public sealed record RefreshTokenBlResult
 {

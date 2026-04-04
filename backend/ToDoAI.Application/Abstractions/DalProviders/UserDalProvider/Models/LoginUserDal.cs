@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider.Models;
+namespace ToDoAI.Application.Abstractions.DalProviders.UserDalProvider.Models;
 
 public sealed record LoginUserDal
 {

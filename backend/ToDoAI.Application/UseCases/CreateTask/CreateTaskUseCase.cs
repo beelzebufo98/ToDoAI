@@ -1,10 +1,10 @@
-using ToDoAI.ToDoAI.Application.UseCases.CreateTask.Models;
-using ToDoAI.ToDoAI.Domain.Enums;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider.Models;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.CreateTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.CreateTaskDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
+using ToDoAI.Application.UseCases.CreateTask.Models;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.CreateTask;
+namespace ToDoAI.Application.UseCases.CreateTask;
 
 public sealed class CreateTaskUseCase :  ICreateTaskUseCase
 {

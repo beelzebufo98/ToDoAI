@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ToDoAI.ToDoAI.API.Controllers;
+namespace ToDoAI.API.Controllers;
 
 public abstract class ToDoAiControllerBase : ControllerBase
 {

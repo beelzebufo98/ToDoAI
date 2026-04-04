@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider.Models;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
+namespace ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
 
 public interface IUserDalProvider
 {

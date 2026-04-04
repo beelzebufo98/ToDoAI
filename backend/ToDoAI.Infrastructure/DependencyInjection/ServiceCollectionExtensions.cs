@@ -1,11 +1,17 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.Data;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using ToDoAI.Application.Abstractions.DalProviders.CreateTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
+using ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider;
+using ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
+using ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
+using ToDoAI.Infrastructure.DalProviders.UserDalProvider;
+using ToDoAI.Infrastructure.Data;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DependencyInjection;
+namespace ToDoAI.Infrastructure.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {

@@ -4,10 +4,10 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider.Models;
+using ToDoAI.Application.Services.JwtService.Settings;
 
-namespace ToDoAI.ToDoAI.Application.Services.JwtService;
+namespace ToDoAI.Application.Services.JwtService;
 
 public sealed class JwtService : IJwtService
 {
