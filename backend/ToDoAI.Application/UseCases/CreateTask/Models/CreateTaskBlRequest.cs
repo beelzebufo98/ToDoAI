@@ -2,7 +2,7 @@ namespace ToDoAI.ToDoAI.Application.UseCases.CreateTask.Models;
 
 public sealed record CreateTaskBlRequest
 {
-    public required string UserName { get; init; }
+    public required Guid UserId { get; init; }
     
     public required string Title { get; init; }
     

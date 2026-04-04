@@ -12,4 +12,10 @@ public enum ErrorCodes
     
     [Description("Пользователь с таким никнеймом не существует")]
     UserDoesNotExist = 2,
+    
+    [Description("Задача отсутствует")]
+    TaskNotFound = 3,
+    
+    [Description("Нет задач по текущему пользователю")]
+    TasksNotFound = 4,
 }

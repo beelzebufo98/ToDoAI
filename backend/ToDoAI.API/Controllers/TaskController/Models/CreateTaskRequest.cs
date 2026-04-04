@@ -2,8 +2,6 @@ namespace ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
 
 public sealed class CreateTaskRequest
 {
-    public required string UserName { get; init; }
-    
     public required string Title { get; init; }
     
     public required string Description { get; init; }

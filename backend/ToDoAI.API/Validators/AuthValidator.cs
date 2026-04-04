@@ -3,9 +3,9 @@ using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
 
 namespace ToDoAI.ToDoAI.API.Validators;
 
-public sealed class AuthValidators : AbstractValidator<RegisterUserRequest>
+public sealed class AuthValidator : AbstractValidator<RegisterUserRequest>
 {
-    public AuthValidators()
+    public AuthValidator()
     {
         RuleFor(user => user.UserName)
             .NotEmpty()

@@ -17,7 +17,10 @@ public sealed class UserDalProvider : IUserDalProvider
     public async Task<bool> CheckUserExists(string userName, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-        var user = await toDoAiDb.Users.Where(x=> String.Equals(x.UserName, userName, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefaultAsync(cancellationToken);
+        var normalizedUserName = userName.ToLowerInvariant();
+        var user = await toDoAiDb.Users
+            .Where(u => u.UserName.ToLower() == normalizedUserName)
+            .FirstOrDefaultAsync(cancellationToken);
         if (user is null)
         {
             return false;
@@ -44,8 +47,9 @@ public sealed class UserDalProvider : IUserDalProvider
     public async Task<LoginUserDal?> GetUser(string userName, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var normalizedUserName = userName.ToLowerInvariant();
         var user = await toDoAiDb.Users
-            .Where(x => string.Equals(x.UserName, userName, StringComparison.CurrentCultureIgnoreCase))
+            .Where(u => u.UserName.ToLower() == normalizedUserName)
             .FirstOrDefaultAsync(cancellationToken);
         if (user is null)
         {
