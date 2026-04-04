@@ -8,8 +8,8 @@ using ToDoAI.ToDoAI.Application.UseCases.CreateUser;
 using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
 using ToDoAI.ToDoAI.Application.UseCases.LoginUser;
 using ToDoAI.ToDoAI.Application.UseCases.LoginUser.Models;
-using ToDoAI.ToDoAI.Application.UseCases.RefreshTokenUseCase;
-using ToDoAI.ToDoAI.Application.UseCases.RefreshTokenUseCase.Models;
+using ToDoAI.ToDoAI.Application.UseCases.RefreshToken;
+using ToDoAI.ToDoAI.Application.UseCases.RefreshToken.Models;
 using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
 using ErrorCodes = ToDoAI.ToDoAI.Domain.Enums.ErrorCodes;
 

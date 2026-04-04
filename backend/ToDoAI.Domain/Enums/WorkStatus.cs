@@ -1,6 +1,6 @@
 namespace ToDoAI.ToDoAI.Domain.Enums;
 
-public enum TaskStatus
+public enum WorkStatus
 {
     New = 0,
     Todo = 1,

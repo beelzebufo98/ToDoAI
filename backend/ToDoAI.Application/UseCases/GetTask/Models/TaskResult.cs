@@ -1,8 +1,8 @@
 using ToDoAI.ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Domain.Entities;
+namespace ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
 
-public sealed class TaskEntity
+public sealed record TaskResult
 {
     public Guid Id { get; init; }
     
@@ -18,17 +18,11 @@ public sealed class TaskEntity
     
     public DateTimeOffset CreatedAt { get; init; }
     
+    public DateTimeOffset UpdatedAt { get; init; }
+        
     public DateTimeOffset? ActualStartDate { get; init; }
     
     public DateTimeOffset? ActualEndDate { get; init; }
     
-    public DateTimeOffset UpdatedAt { get; init; }
-    
     public WorkStatus WorkStatus { get; init; }
-    
-    public DateTimeOffset? DeletedAt { get; init; }
-    
-    public Guid UserId { get; init; }
-
-    public UserEntity User { get; init; } = default!;
 }
