@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace ToDoAI.ToDoAI.Domain.Enums;
+namespace ToDoAI.Domain.Enums;
 
 public enum ErrorCodes
 {

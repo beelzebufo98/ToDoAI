@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Application.UseCases.CreateTask.Models;
+using ToDoAI.Application.UseCases.CreateTask.Models;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.CreateTask;
+namespace ToDoAI.Application.UseCases.CreateTask;
 
 public interface ICreateTaskUseCase
 {

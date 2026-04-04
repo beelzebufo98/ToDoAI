@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider.Models;
+namespace ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider.Models;
 
 public sealed record RefreshTokenDal
 {

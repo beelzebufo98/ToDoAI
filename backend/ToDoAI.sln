@@ -1,6 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAI", "ToDoAI.csproj", "{FE4C96A0-1D9A-4A50-9E21-7C9B78A5E35E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAI.API", "ToDoAI.API\ToDoAI.API.csproj", "{FE4C96A0-1D9A-4A50-9E21-7C9B78A5E35E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAI.Domain", "ToDoAI.Domain\ToDoAI.Domain.csproj", "{F731E93E-DDFF-46BE-AB79-16B1D3DC7CF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAI.Application", "ToDoAI.Application\ToDoAI.Application.csproj", "{C2B09408-16DE-4772-A2A4-59945463093B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAI.Infrastructure", "ToDoAI.Infrastructure\ToDoAI.Infrastructure.csproj", "{99526D2E-6C61-43A8-99D1-C58DF5AC0959}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +18,20 @@ Global
 		{FE4C96A0-1D9A-4A50-9E21-7C9B78A5E35E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE4C96A0-1D9A-4A50-9E21-7C9B78A5E35E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE4C96A0-1D9A-4A50-9E21-7C9B78A5E35E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F731E93E-DDFF-46BE-AB79-16B1D3DC7CF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F731E93E-DDFF-46BE-AB79-16B1D3DC7CF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F731E93E-DDFF-46BE-AB79-16B1D3DC7CF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F731E93E-DDFF-46BE-AB79-16B1D3DC7CF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2B09408-16DE-4772-A2A4-59945463093B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2B09408-16DE-4772-A2A4-59945463093B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2B09408-16DE-4772-A2A4-59945463093B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2B09408-16DE-4772-A2A4-59945463093B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99526D2E-6C61-43A8-99D1-C58DF5AC0959}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99526D2E-6C61-43A8-99D1-C58DF5AC0959}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99526D2E-6C61-43A8-99D1-C58DF5AC0959}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99526D2E-6C61-43A8-99D1-C58DF5AC0959}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

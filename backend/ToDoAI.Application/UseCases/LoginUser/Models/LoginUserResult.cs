@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Domain.Enums;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.LoginUser.Models;
+namespace ToDoAI.Application.UseCases.LoginUser.Models;
 
 public sealed record LoginUserResult
 {

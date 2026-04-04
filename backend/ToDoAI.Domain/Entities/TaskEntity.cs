@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Domain.Enums;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Domain.Entities;
+namespace ToDoAI.Domain.Entities;
 
 public sealed class TaskEntity
 {

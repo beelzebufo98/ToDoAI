@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoAI.ToDoAI.Domain.Entities;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider.Models;
-using ToDoAI.ToDoAI.Infrastructure.Data;
+using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider.Models;
+using ToDoAI.Domain.Entities;
+using ToDoAI.Infrastructure.Data;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
+namespace ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
 
 public sealed class RefreshTokenDalProvider : IRefreshTokenDalProvider
 {

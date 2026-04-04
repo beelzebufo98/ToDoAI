@@ -1,7 +1,7 @@
-using ToDoAI.ToDoAI.API.DependencyInjection;
-using ToDoAI.ToDoAI.API.Extensions;
-using ToDoAI.ToDoAI.Application.DependencyInjection;
-using ToDoAI.ToDoAI.Infrastructure.DependencyInjection;
+using ToDoAI.API.DependencyInjection;
+using ToDoAI.API.Extensions;
+using ToDoAI.Application.DependencyInjection;
+using ToDoAI.Infrastructure.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 

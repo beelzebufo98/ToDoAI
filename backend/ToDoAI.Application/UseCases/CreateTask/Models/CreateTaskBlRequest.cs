@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.Application.UseCases.CreateTask.Models;
+namespace ToDoAI.Application.UseCases.CreateTask.Models;
 
 public sealed record CreateTaskBlRequest
 {

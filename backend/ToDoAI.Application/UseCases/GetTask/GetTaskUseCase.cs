@@ -1,9 +1,9 @@
-using ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
-using ToDoAI.ToDoAI.Domain.Enums;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider.Models;
+using ToDoAI.Application.UseCases.GetTask.Models;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.GetTask;
+namespace ToDoAI.Application.UseCases.GetTask;
 
 public sealed class GetTaskUseCase : IGetTaskUseCase
 {

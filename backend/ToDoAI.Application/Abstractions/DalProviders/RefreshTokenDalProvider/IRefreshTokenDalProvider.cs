@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider.Models;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
+namespace ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
 
 public interface IRefreshTokenDalProvider
 {

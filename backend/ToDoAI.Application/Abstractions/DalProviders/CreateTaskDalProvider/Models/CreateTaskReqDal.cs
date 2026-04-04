@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Domain.Enums;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider.Models;
+namespace ToDoAI.Application.Abstractions.DalProviders.CreateTaskDalProvider.Models;
 
 public sealed record CreateTaskReqDal
 {
@@ -20,7 +20,7 @@ public sealed record CreateTaskReqDal
     
     public DateTimeOffset UpdatedAt { get; init; }
     
-    public WorkStatus Status { get; init; } =  WorkStatus.New;
+    public WorkStatus Status { get; init; } = WorkStatus.New;
     
     public Guid UserId { get; init; }
 }

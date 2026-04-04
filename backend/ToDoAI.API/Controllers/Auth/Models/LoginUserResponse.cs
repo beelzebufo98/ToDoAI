@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.API.Controllers.Auth.Models;
+namespace ToDoAI.API.Controllers.Auth.Models;
 
 public sealed class LoginUserResponse
 {

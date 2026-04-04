@@ -1,13 +1,15 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using ToDoAI.ToDoAI.Application.Services.JwtService;
-using ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
-using ToDoAI.ToDoAI.Application.UseCases.CreateTask;
-using ToDoAI.ToDoAI.Application.UseCases.CreateUser;
-using ToDoAI.ToDoAI.Application.UseCases.GetTask;
-using ToDoAI.ToDoAI.Application.UseCases.LoginUser;
-using ToDoAI.ToDoAI.Application.UseCases.RefreshToken;
+using ToDoAI.Application.Services.JwtService;
+using ToDoAI.Application.Services.JwtService.Settings;
+using ToDoAI.Application.UseCases.CreateTask;
+using ToDoAI.Application.UseCases.CreateUser;
+using ToDoAI.Application.UseCases.GetTask;
+using ToDoAI.Application.UseCases.LoginUser;
+using ToDoAI.Application.UseCases.RefreshToken;
 
-namespace ToDoAI.ToDoAI.Application.DependencyInjection;
+namespace ToDoAI.Application.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
