@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using ToDoAI.ToDoAI.Application.Services.JwtService;
 using ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
+using ToDoAI.ToDoAI.Application.UseCases.CreateTask;
 using ToDoAI.ToDoAI.Application.UseCases.CreateUser;
 using ToDoAI.ToDoAI.Application.UseCases.LoginUser;
 using ToDoAI.ToDoAI.Application.UseCases.RefreshTokenUseCase;
@@ -14,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICreateUserUseCase, CreateUserUseCase>();
         services.AddScoped<ILoginUserUseCase, LoginUserUseCase>();
         services.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();
+        services.AddScoped<ICreateTaskUseCase, CreateTaskUseCase>();
         services.AddScoped<IJwtService, JwtService>();
 
         services.AddSingleton<IValidateOptions<AuthSettings>, AuthSettingsValidator>();

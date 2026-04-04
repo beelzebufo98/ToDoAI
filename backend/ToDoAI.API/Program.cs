@@ -1,14 +1,17 @@
+using System.Text.Json;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
+using System.Text.Json.Serialization;
 using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
 using ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
 using ToDoAI.ToDoAI.API.Validators;
 using ToDoAI.ToDoAI.Application.DependencyInjection;
 using ToDoAI.ToDoAI.Infrastructure.DependencyInjection;
 using ToDoAI.ToDoAI.Infrastructure.Data;
+using static System.Text.Json.JsonNamingPolicy;
 
 var builder = WebApplication.CreateBuilder(args);
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ??
@@ -40,7 +43,16 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower)
+        );
+        options.JsonSerializerOptions.PropertyNamingPolicy = CamelCase;
+        options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    });
 builder.Services.AddApiVersioning(options =>
 {
     options.AssumeDefaultVersionWhenUnspecified = true;

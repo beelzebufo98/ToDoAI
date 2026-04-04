@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ToDoAI.ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider;
 using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
 using ToDoAI.ToDoAI.Infrastructure.Data;
@@ -15,6 +16,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IRefreshTokenDalProvider, RefreshTokenDalProvider>();
         services.AddScoped<IUserDalProvider, UserDalProvider>();
+        services.AddScoped<ICreateTaskDalProvider, CreateTaskDalProvider>();
 
         return services;
     }

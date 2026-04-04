@@ -3,6 +3,7 @@
 *.suo
 *.bak
 .env*
+**/appsettings.Development.json
 
 backend/bin/
 backend/obj/

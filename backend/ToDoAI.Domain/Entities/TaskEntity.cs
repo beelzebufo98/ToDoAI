@@ -1,3 +1,5 @@
+using TaskStatus = ToDoAI.ToDoAI.Domain.Enums.TaskStatus;
+
 namespace ToDoAI.ToDoAI.Domain.Entities;
 
 public sealed class TaskEntity
@@ -16,7 +18,7 @@ public sealed class TaskEntity
     
     public DateTimeOffset CreatedAt { get; init; }
     
-    public DateTimeOffset PlannedEndDate { get; init; }
+    public DateTimeOffset? ActualStartDate { get; init; }
     
     public DateTimeOffset? ActualEndDate { get; init; }
     
