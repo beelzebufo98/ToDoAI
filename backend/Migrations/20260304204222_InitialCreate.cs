@@ -200,29 +200,6 @@ namespace ToDoAI.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Schedules",
-                schema: "ToDoAIService");
-
-            migrationBuilder.DropTable(
-                name: "States",
-                schema: "ToDoAIService");
-
-            migrationBuilder.DropTable(
-                name: "TaskExecutions",
-                schema: "ToDoAIService");
-
-            migrationBuilder.DropTable(
-                name: "DaySchedules",
-                schema: "ToDoAIService");
-
-            migrationBuilder.DropTable(
-                name: "Tasks",
-                schema: "ToDoAIService");
-
-            migrationBuilder.DropTable(
-                name: "Users",
-                schema: "ToDoAIService");
         }
     }
 }
