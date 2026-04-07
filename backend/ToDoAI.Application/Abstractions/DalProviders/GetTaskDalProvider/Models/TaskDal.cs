@@ -24,5 +24,6 @@ public sealed record TaskDal
     
     public DateTimeOffset? ActualEndDate { get; init; }
     
+    //TODO: сделать в dal слое 
     public WorkStatus WorkStatus { get; init; }
 }
