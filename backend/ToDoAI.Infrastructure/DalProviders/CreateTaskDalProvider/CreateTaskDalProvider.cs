@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoAI.ToDoAI.Domain.Entities;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider.Models;
-using ToDoAI.ToDoAI.Infrastructure.Data;
+using ToDoAI.Application.Abstractions.DalProviders.CreateTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.CreateTaskDalProvider.Models;
+using ToDoAI.Domain.Entities;
+using ToDoAI.Infrastructure.Data;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider;
+namespace ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider;
 
 public sealed class CreateTaskDalProvider : ICreateTaskDalProvider
 {

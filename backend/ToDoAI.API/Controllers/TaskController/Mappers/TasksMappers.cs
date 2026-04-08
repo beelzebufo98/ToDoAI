@@ -1,7 +1,8 @@
+using ToDoAI.API.Controllers.TaskController.Models;
+using ToDoAI.Application.UseCases.GetTask.Models;
 using ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
-using ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
 
-namespace ToDoAI.ToDoAI.API.Controllers.TaskController.Mappers;
+namespace ToDoAI.API.Controllers.TaskController.Mappers;
 
 public static class TasksMappers
 {

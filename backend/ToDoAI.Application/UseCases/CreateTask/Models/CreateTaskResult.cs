@@ -1,6 +1,6 @@
-using ErrorCodes = ToDoAI.ToDoAI.Domain.Enums.ErrorCodes;
+using ErrorCodes = ToDoAI.Domain.Enums.ErrorCodes;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.CreateTask.Models;
+namespace ToDoAI.Application.UseCases.CreateTask.Models;
 
 public sealed record CreateTaskResult
 {

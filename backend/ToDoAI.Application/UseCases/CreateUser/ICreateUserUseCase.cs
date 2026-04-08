@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
+using ToDoAI.Application.UseCases.CreateUser.Models;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.CreateUser;
+namespace ToDoAI.Application.UseCases.CreateUser;
 
 public interface ICreateUserUseCase
 {

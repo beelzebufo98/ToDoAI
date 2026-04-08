@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Domain.Enums;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
+namespace ToDoAI.API.Controllers.TaskController.Models;
 
 public sealed class GetTaskResponse
 {

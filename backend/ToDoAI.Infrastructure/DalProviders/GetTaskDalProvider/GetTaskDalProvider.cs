@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
-using ToDoAI.ToDoAI.Domain.Entities;
-using ToDoAI.ToDoAI.Domain.Enums;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider.Models;
-using ToDoAI.ToDoAI.Infrastructure.Data;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider.Models;
+using ToDoAI.Application.UseCases.GetTask.Models;
+using ToDoAI.Domain.Entities;
+using ToDoAI.Domain.Enums;
+using ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider.Mappers;
+using ToDoAI.Infrastructure.Data;
 
-namespace ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
+namespace ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
 
 public sealed class GetTaskDalProvider : IGetTaskDalProvider
 {
@@ -29,7 +31,7 @@ public sealed class GetTaskDalProvider : IGetTaskDalProvider
             return null;
         }
         
-        var taskDal = GetTaskDal(task);
+        var taskDal = task.GetTaskDal();
         return taskDal;
     }
 
@@ -109,25 +111,7 @@ public sealed class GetTaskDalProvider : IGetTaskDalProvider
         query = query.Take(filters.PageSize);
 
         var tasks = await query.ToListAsync(cancellationToken);
-        var taskList = tasks.Select(GetTaskDal).ToList();
+        var taskList = tasks.Select(x => x.GetTaskDal()).ToList();
         return taskList;
-    }
-
-    private TaskDal GetTaskDal(TaskEntity taskEntity)
-    {
-        return new TaskDal
-        {
-            Id = taskEntity.Id,
-            Title = taskEntity.Title,
-            Description = taskEntity.Description,
-            EstimatedMinutes = taskEntity.EstimatedMinutes,
-            ComplexityLevel = taskEntity.ComplexityLevel,
-            Priority = taskEntity.Priority,
-            CreatedAt = taskEntity.CreatedAt,
-            UpdatedAt = taskEntity.UpdatedAt,
-            ActualStartDate = taskEntity.ActualStartDate,
-            ActualEndDate = taskEntity.ActualEndDate,
-            WorkStatus = taskEntity.WorkStatus
-        };
     }
 }

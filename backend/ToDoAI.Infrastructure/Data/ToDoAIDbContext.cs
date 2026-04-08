@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using ToDoAI.ToDoAI.Domain.Entities;
+using ToDoAI.Domain.Entities;
 
-namespace ToDoAI.ToDoAI.Infrastructure.Data;
+namespace ToDoAI.Infrastructure.Data;
 
 public class ToDoAIDbContext : DbContext
 {

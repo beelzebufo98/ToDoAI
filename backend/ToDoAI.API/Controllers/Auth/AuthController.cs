@@ -1,19 +1,21 @@
+using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
-using ToDoAI.ToDoAI.API.Controllers.Auth.Models;
-using ToDoAI.ToDoAI.Application.Services.JwtService;
-using ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
-using ToDoAI.ToDoAI.Application.UseCases.CreateUser;
-using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
-using ToDoAI.ToDoAI.Application.UseCases.LoginUser;
-using ToDoAI.ToDoAI.Application.UseCases.LoginUser.Models;
-using ToDoAI.ToDoAI.Application.UseCases.RefreshToken;
-using ToDoAI.ToDoAI.Application.UseCases.RefreshToken.Models;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
-using ErrorCodes = ToDoAI.ToDoAI.Domain.Enums.ErrorCodes;
+using Microsoft.IdentityModel.Tokens;
+using ToDoAI.API.Controllers.Auth.Models;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
+using ToDoAI.Application.Services.JwtService;
+using ToDoAI.Application.Services.JwtService.Settings;
+using ToDoAI.Application.UseCases.CreateUser;
+using ToDoAI.Application.UseCases.CreateUser.Models;
+using ToDoAI.Application.UseCases.LoginUser;
+using ToDoAI.Application.UseCases.LoginUser.Models;
+using ToDoAI.Application.UseCases.RefreshToken;
+using ToDoAI.Application.UseCases.RefreshToken.Models;
+using ToDoAI.ToDoAI.API.Controllers;
+using ErrorCodes = ToDoAI.Domain.Enums.ErrorCodes;
 
-namespace ToDoAI.ToDoAI.API.Controllers.Auth;
+namespace ToDoAI.API.Controllers.Auth;
 
 [ApiController]
 [ApiVersion("1.0")]

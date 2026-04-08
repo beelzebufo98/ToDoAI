@@ -5,6 +5,8 @@
 .env*
 **/appsettings.Development.json
 
+**/bin/
+**/obj/
 backend/bin/
 backend/obj/
 backend/.vs/

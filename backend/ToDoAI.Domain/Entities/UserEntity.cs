@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.Domain.Entities;
+namespace ToDoAI.Domain.Entities;
 
 public sealed class UserEntity
 {

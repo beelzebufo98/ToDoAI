@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.API.DependencyInjection;
+namespace ToDoAI.API.DependencyInjection;
 
 public static class CorsServiceCollectionExtensions
 {

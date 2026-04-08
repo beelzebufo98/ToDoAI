@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Application.UseCases.RefreshToken.Models;
+using ToDoAI.Application.UseCases.RefreshToken.Models;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.RefreshToken;
+namespace ToDoAI.Application.UseCases.RefreshToken;
 
 public interface IRefreshTokenUseCase
 {

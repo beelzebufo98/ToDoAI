@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
+namespace ToDoAI.Application.UseCases.CreateUser.Models;
 
 public sealed record RegisterUserBlRequest
 {

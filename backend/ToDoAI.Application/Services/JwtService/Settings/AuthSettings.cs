@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
+namespace ToDoAI.Application.Services.JwtService.Settings;
 
 public sealed class AuthSettings
 {

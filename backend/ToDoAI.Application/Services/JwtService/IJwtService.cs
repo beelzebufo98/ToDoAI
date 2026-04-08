@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider.Models;
 
-namespace ToDoAI.ToDoAI.Application.Services.JwtService;
+namespace ToDoAI.Application.Services.JwtService;
 
 public interface IJwtService
 {

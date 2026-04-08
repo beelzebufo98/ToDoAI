@@ -1,6 +1,6 @@
-using ToDoAI.ToDoAI.Application.UseCases.LoginUser.Models;
+using ToDoAI.Application.UseCases.LoginUser.Models;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.LoginUser;
+namespace ToDoAI.Application.UseCases.LoginUser;
 
 public interface ILoginUserUseCase
 {

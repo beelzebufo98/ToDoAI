@@ -1,7 +1,7 @@
 using FluentValidation;
-using ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
+using ToDoAI.API.Controllers.TaskController.Models;
 
-namespace ToDoAI.ToDoAI.API.Validators;
+namespace ToDoAI.API.Validators;
 
 public sealed class TaskFiltersValidator : AbstractValidator<TaskFiltersRequest>
 {

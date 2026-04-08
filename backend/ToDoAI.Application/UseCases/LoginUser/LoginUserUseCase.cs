@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using ToDoAI.ToDoAI.Application.Services.JwtService;
-using ToDoAI.ToDoAI.Application.Services.JwtService.Settings;
-using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
-using ToDoAI.ToDoAI.Application.UseCases.LoginUser.Models;
-using ToDoAI.ToDoAI.Domain.Enums;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider.Models;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
+using ToDoAI.Application.Services.JwtService;
+using ToDoAI.Application.Services.JwtService.Settings;
+using ToDoAI.Application.UseCases.CreateUser.Models;
+using ToDoAI.Application.UseCases.LoginUser.Models;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.LoginUser;
+namespace ToDoAI.Application.UseCases.LoginUser;
 
 public sealed class LoginUserUseCase : ILoginUserUseCase
 {

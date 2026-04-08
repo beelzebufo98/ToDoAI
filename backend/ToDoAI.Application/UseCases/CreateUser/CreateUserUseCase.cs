@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Identity;
-using ToDoAI.ToDoAI.Application.UseCases.CreateUser.Models;
-using ToDoAI.ToDoAI.Domain.Enums;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.UserDalProvider.Models;
+using Microsoft.Extensions.Logging;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider.Models;
+using ToDoAI.Application.UseCases.CreateUser.Models;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.CreateUser;
+namespace ToDoAI.Application.UseCases.CreateUser;
 
 public sealed class CreateUserUseCase : ICreateUserUseCase
 {

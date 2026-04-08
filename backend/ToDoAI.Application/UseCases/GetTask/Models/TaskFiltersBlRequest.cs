@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
+namespace ToDoAI.Application.UseCases.GetTask.Models;
 
 public sealed record TaskFiltersBlRequest
 {

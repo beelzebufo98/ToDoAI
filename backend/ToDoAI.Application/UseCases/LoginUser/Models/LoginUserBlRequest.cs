@@ -1,4 +1,4 @@
-namespace ToDoAI.ToDoAI.Application.UseCases.LoginUser.Models;
+namespace ToDoAI.Application.UseCases.LoginUser.Models;
 
 public sealed record LoginUserBlRequest()
 {

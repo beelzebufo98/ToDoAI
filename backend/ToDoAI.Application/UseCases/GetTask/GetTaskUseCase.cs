@@ -1,9 +1,10 @@
-using ToDoAI.ToDoAI.Application.UseCases.GetTask.Models;
-using ToDoAI.ToDoAI.Domain.Enums;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
-using ToDoAI.ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider.Models;
+using ToDoAI.Application.UseCases.GetTask.Mappers;
+using ToDoAI.Application.UseCases.GetTask.Models;
+using ToDoAI.Domain.Enums;
 
-namespace ToDoAI.ToDoAI.Application.UseCases.GetTask;
+namespace ToDoAI.Application.UseCases.GetTask;
 
 public sealed class GetTaskUseCase : IGetTaskUseCase
 {
@@ -25,7 +26,7 @@ public sealed class GetTaskUseCase : IGetTaskUseCase
             };
         }
         
-        var task = GetTaskResult(result);
+        var task = result.GetTaskResult();
         return new GetTaskResult
         {
             TaskResult = task
@@ -35,28 +36,10 @@ public sealed class GetTaskUseCase : IGetTaskUseCase
     public async Task<GetTasksResult> GetTasks(Guid userId, TaskFiltersBlRequest filters, CancellationToken cancellationToken)
     {
         var result = await _getTaskDalProvider.GetTasks(userId, filters, cancellationToken);
-        var taskList = result.Select(GetTaskResult).ToList();
+        var taskList = result.Select(x => x.GetTaskResult()).ToList();
         return new GetTasksResult
         {
             TaskResults = taskList
-        };
-    }
-
-    private TaskResult GetTaskResult(TaskDal taskDal)
-    {
-        return new TaskResult
-        {
-            Id = taskDal.Id,
-            Title = taskDal.Title,
-            Description = taskDal.Description,
-            EstimatedMinutes = taskDal.EstimatedMinutes,
-            ComplexityLevel = taskDal.ComplexityLevel,
-            Priority = taskDal.Priority,
-            CreatedAt = taskDal.CreatedAt,
-            UpdatedAt = taskDal.UpdatedAt,
-            ActualStartDate = taskDal.ActualStartDate,
-            ActualEndDate = taskDal.ActualEndDate,
-            WorkStatus = taskDal.WorkStatus
         };
     }
 }
