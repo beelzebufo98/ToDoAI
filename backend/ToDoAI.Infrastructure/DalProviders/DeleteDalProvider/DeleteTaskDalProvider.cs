@@ -25,7 +25,10 @@ public sealed class DeleteTaskDalProvider : IDeleteTaskDalProvider
         }
         
         task.WorkStatus = WorkStatus.Deleted;
+        task.DeletedAt = DateTimeOffset.UtcNow;
+        task.UpdatedAt = DateTimeOffset.UtcNow;
         dbContext.Update(task);
+        await dbContext.SaveChangesAsync(cancellationToken);
         
         return new DeleteTaskDal
         {

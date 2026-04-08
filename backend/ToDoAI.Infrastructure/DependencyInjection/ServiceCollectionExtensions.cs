@@ -2,12 +2,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ToDoAI.Application.Abstractions.DalProviders.CreateTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.DeleteTaskDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskStatusDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
 using ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider;
+using ToDoAI.Infrastructure.DalProviders.DeleteDalProvider;
 using ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
 using ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
+using ToDoAI.Infrastructure.DalProviders.UpdateTaskDalProvider;
+using ToDoAI.Infrastructure.DalProviders.UpdateTaskStatusDalProvider;
 using ToDoAI.Infrastructure.DalProviders.UserDalProvider;
 using ToDoAI.Infrastructure.Data;
 
@@ -25,6 +31,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserDalProvider, UserDalProvider>();
         services.AddScoped<ICreateTaskDalProvider, CreateTaskDalProvider>();
         services.AddScoped<IGetTaskDalProvider, GetTaskDalProvider>();
+        services.AddScoped<IDeleteTaskDalProvider, DeleteTaskDalProvider>();
+        services.AddScoped<IUpdateTaskDalProvider, UpdateTaskDalProvider>();
+        services.AddScoped<IUpdateTaskStatusDalProvider, UpdateTaskStatusDalProvider>();
 
         return services;
     }

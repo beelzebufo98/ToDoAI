@@ -15,7 +15,7 @@ public sealed class UpdateTaskStatusUseCase : IUpdateTaskStatusUseCase
         _updateTaskStatusDalProvider = updateTaskStatusDalProvider;
     }
     
-    public async Task<UpdateTaskStatusResult?> UpdateTaskStatus(UpdateTaskStatusBlRequest updateTaskStatusBlRequest,
+    public async Task<UpdateTaskStatusResult> UpdateTaskStatus(UpdateTaskStatusBlRequest updateTaskStatusBlRequest,
         CancellationToken cancellationToken)
     {
         var request = new UpdateTaskStatusDalRequest
@@ -47,6 +47,7 @@ public sealed class UpdateTaskStatusUseCase : IUpdateTaskStatusUseCase
         TaskWorkStatusBlFilters.Todo => TaskWorkStatusDal.Todo,
         TaskWorkStatusBlFilters.Running => TaskWorkStatusDal.Running,
         TaskWorkStatusBlFilters.Completed => TaskWorkStatusDal.Completed,
+        _ => throw new ArgumentOutOfRangeException(nameof(workStatus), workStatus, null)
     };
 
     private TaskWorkStatusBlFilters GetTaskWorkStatusBl(TaskWorkStatusDal workStatus) => workStatus switch
@@ -55,5 +56,6 @@ public sealed class UpdateTaskStatusUseCase : IUpdateTaskStatusUseCase
         TaskWorkStatusDal.Todo => TaskWorkStatusBlFilters.Todo,
         TaskWorkStatusDal.Running => TaskWorkStatusBlFilters.Running,
         TaskWorkStatusDal.Completed => TaskWorkStatusBlFilters.Completed,
+        _ => throw new ArgumentOutOfRangeException(nameof(workStatus), workStatus, null)
     };
 }

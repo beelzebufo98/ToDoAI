@@ -5,5 +5,5 @@ namespace ToDoAI.Application.UseCases.UpdateTask;
 
 public interface IUpdateTaskUseCase
 {
-    Task<GetTaskResult?> UpdateTask(UpdateTaskBlRequest request, CancellationToken cancellationToken);
+    Task<GetTaskResult> UpdateTask(UpdateTaskBlRequest request, CancellationToken cancellationToken);
 }

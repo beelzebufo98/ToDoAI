@@ -16,7 +16,7 @@ public sealed class UpdateTaskUseCase : IUpdateTaskUseCase
         _updateTaskDalProvider = updateTaskDalProvider;
     }
 
-    public async Task<GetTaskResult?> UpdateTask(UpdateTaskBlRequest request, CancellationToken cancellationToken)
+    public async Task<GetTaskResult> UpdateTask(UpdateTaskBlRequest request, CancellationToken cancellationToken)
     {
         var taskReq = new UpdateTaskDalRequest
         {

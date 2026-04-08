@@ -20,7 +20,9 @@ public sealed class UpdateTaskStatusDalProvider :  IUpdateTaskStatusDalProvider
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
         
-        var taskEntity = await dbContext.Tasks.FirstOrDefaultAsync(x => x.UserId == updateTask.UserId && x.Id ==  updateTask.TaskId);
+        var taskEntity = await dbContext.Tasks.FirstOrDefaultAsync(
+            x => x.UserId == updateTask.UserId && x.Id == updateTask.TaskId,
+            cancellationToken);
 
         if (taskEntity == null)
         {
@@ -32,19 +34,30 @@ public sealed class UpdateTaskStatusDalProvider :  IUpdateTaskStatusDalProvider
         switch (workStatus)
         {
             case WorkStatus.New:
-                taskEntity.WorkStatus = WorkStatus.Todo;
+                taskEntity.WorkStatus = WorkStatus.New;
+                taskEntity.ActualStartDate = null;
+                taskEntity.ActualEndDate = null;
                 break;
             case WorkStatus.Todo:
-                taskEntity.WorkStatus = WorkStatus.Running;
-                var dateTime = DateTimeOffset.Now;
-                taskEntity.ActualStartDate = dateTime;
+                taskEntity.WorkStatus = WorkStatus.Todo;
+                taskEntity.ActualStartDate = null;
+                taskEntity.ActualEndDate = null;
                 break;
             case WorkStatus.Running:
-                taskEntity.WorkStatus = WorkStatus.Completed;
+                taskEntity.WorkStatus = WorkStatus.Running;
+                taskEntity.ActualStartDate ??= DateTimeOffset.UtcNow;
+                taskEntity.ActualEndDate = null;
                 break;
-                
+            case WorkStatus.Completed:
+                taskEntity.WorkStatus = WorkStatus.Completed;
+                taskEntity.ActualStartDate ??= DateTimeOffset.UtcNow;
+                taskEntity.ActualEndDate = DateTimeOffset.UtcNow;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(workStatus), workStatus, null);
         }
-        
+
+        taskEntity.UpdatedAt = DateTimeOffset.UtcNow;
         await dbContext.SaveChangesAsync(cancellationToken);
         var workStatusDal = GetTaskWorkStatusDal(taskEntity.WorkStatus);
 

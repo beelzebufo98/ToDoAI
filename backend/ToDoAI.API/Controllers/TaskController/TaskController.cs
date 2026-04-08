@@ -138,10 +138,11 @@ public sealed class TaskController : ToDoAiControllerBase
         return Ok(taskResponse);
     }
 
-    [HttpPost("{taskId}/decline")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [HttpDelete("{taskId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> DeleteTask([FromRoute] string taskId, CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst("id")?.Value;
@@ -158,16 +159,20 @@ public sealed class TaskController : ToDoAiControllerBase
         var result  = await _deleteTaskUseCase.DeleteTask(taskIdReq, userId, cancellationToken);
         if (result.ErrorCode is not null)
         {
-            return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode));
+            var statusCode = result.ErrorCode == ErrorCodes.TaskNotFound
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status400BadRequest;
+            return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode), statusCode);
         }
 
-        return Ok();
+        return NoContent();
     }
 
-    [HttpPost("{taskId}/update")]
+    [HttpPatch("{taskId}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetTaskResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> UpdateTask([FromRoute] string taskId, [FromBody] UpdateTaskRequest request,
         CancellationToken cancellationToken)
     {
@@ -197,17 +202,21 @@ public sealed class TaskController : ToDoAiControllerBase
 
         if (result.ErrorCode is not null)
         {
-            return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode));
+            var statusCode = result.ErrorCode == ErrorCodes.TaskNotFound
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status400BadRequest;
+            return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode), statusCode);
         }
         
         var taskResponse = result.TaskResult.GetTask();
         return Ok(taskResponse);
     }
 
-    [HttpPost("{taskId}/status")]
+    [HttpPatch("{taskId}/status")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> UpdateStatus([FromRoute] string taskId,[FromBody] TaskStatusRequest taskStatus, CancellationToken cancellationToken)
     {
         var userIdClaim = User.FindFirst("id")?.Value;
@@ -232,9 +241,12 @@ public sealed class TaskController : ToDoAiControllerBase
         
         var result = await _updateTaskStatusUseCase.UpdateTaskStatus(request, cancellationToken);
 
-        if (result is null)
+        if (result.ErrorCode is not null)
         {
-            return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode));
+            var statusCode = result.ErrorCode == ErrorCodes.TaskNotFound
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status400BadRequest;
+            return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode), statusCode);
         }
         
         return Ok(result.WorkStatus.ToString());

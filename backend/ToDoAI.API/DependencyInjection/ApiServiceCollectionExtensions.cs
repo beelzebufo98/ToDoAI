@@ -20,6 +20,8 @@ public static class ApiServiceCollectionExtensions
         services.AddScoped<IValidator<LoginUserRequest>, LoginValidator>();
         services.AddScoped<IValidator<CreateTaskRequest>, CreateTaskValidator>();
         services.AddScoped<IValidator<TaskFiltersRequest>, TaskFiltersValidator>();
+        services.AddScoped<IValidator<UpdateTaskRequest>, UpdateTaskValidator>();
+        services.AddScoped<IValidator<TaskStatusRequest>, TaskStatusValidator>();
         services.AddFluentValidationAutoValidation();
         services.AddAuthorization();
 

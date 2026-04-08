@@ -15,7 +15,7 @@ public sealed class DeleteTaskUseCase : IDeleteTaskUseCase
     
     public async Task<DeleteTaskResult> DeleteTask(Guid taskId, Guid userId, CancellationToken cancellationToken)
     {
-        var result = await _deleteTaskDalProvider.DeleteTask(taskId, userId, cancellationToken);
+        var result = await _deleteTaskDalProvider.DeleteTask(userId, taskId, cancellationToken);
         if (result is null)
         {
             return new DeleteTaskResult
