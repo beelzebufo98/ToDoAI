@@ -26,7 +26,8 @@ public sealed class UpdateTaskUseCase : IUpdateTaskUseCase
             Description = request.Description,
             EstimatedMinutes = request.EstimatedMinutes,
             Priority = request.Priority,
-            ComplexityLevel = request.ComplexityLevel
+            ComplexityLevel = request.ComplexityLevel,
+            DeadlineAt = request.DeadlineAt
         };
         
         var result = await _updateTaskDalProvider.UpdateTask(taskReq, cancellationToken);

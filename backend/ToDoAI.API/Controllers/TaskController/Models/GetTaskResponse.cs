@@ -15,6 +15,8 @@ public sealed class GetTaskResponse
     public int ComplexityLevel { get; init; }
     
     public int Priority { get; init; }
+
+    public DateTimeOffset DeadlineAt { get; init; }
     
     public DateTimeOffset CreatedAt { get; init; }
     

@@ -23,7 +23,7 @@ namespace ToDoAI.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.DayScheduleEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.DayScheduleEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -51,7 +51,7 @@ namespace ToDoAI.Migrations
                     b.ToTable("DaySchedules", "ToDoAIService");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.RefreshSessionEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.RefreshSessionEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -78,7 +78,7 @@ namespace ToDoAI.Migrations
                     b.ToTable("RefreshSessions", "ToDoAIService");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.ScheduleEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.ScheduleEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,7 +105,7 @@ namespace ToDoAI.Migrations
                     b.ToTable("Schedules", "ToDoAIService");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.TaskEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.TaskEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,6 +121,9 @@ namespace ToDoAI.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("DeadlineAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
@@ -156,7 +159,7 @@ namespace ToDoAI.Migrations
                     b.ToTable("Tasks", "ToDoAIService");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.TaskExecutionEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.TaskExecutionEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -184,7 +187,7 @@ namespace ToDoAI.Migrations
                     b.ToTable("TaskExecutions", "ToDoAIService");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.UserEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.UserEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -213,16 +216,22 @@ namespace ToDoAI.Migrations
                     b.ToTable("Users", "ToDoAIService");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.UserStateEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.UserStateEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("ConcentrationLevel")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("EnergyLevel")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MotivationLevel")
                         .HasColumnType("integer");
 
                     b.Property<int>("SleepMinutes")
@@ -241,9 +250,9 @@ namespace ToDoAI.Migrations
                     b.ToTable("States", "ToDoAIService");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.DayScheduleEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.DayScheduleEntity", b =>
                 {
-                    b.HasOne("ToDoAI.ToDoAI.Domain.Entities.UserEntity", "User")
+                    b.HasOne("ToDoAI.Domain.Entities.UserEntity", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -252,15 +261,15 @@ namespace ToDoAI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.ScheduleEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.ScheduleEntity", b =>
                 {
-                    b.HasOne("ToDoAI.ToDoAI.Domain.Entities.DayScheduleEntity", "DaySchedule")
+                    b.HasOne("ToDoAI.Domain.Entities.DayScheduleEntity", "DaySchedule")
                         .WithMany("Blocks")
                         .HasForeignKey("DayScheduleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ToDoAI.ToDoAI.Domain.Entities.TaskEntity", "Task")
+                    b.HasOne("ToDoAI.Domain.Entities.TaskEntity", "Task")
                         .WithMany()
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -271,9 +280,9 @@ namespace ToDoAI.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.TaskEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.TaskEntity", b =>
                 {
-                    b.HasOne("ToDoAI.ToDoAI.Domain.Entities.UserEntity", "User")
+                    b.HasOne("ToDoAI.Domain.Entities.UserEntity", "User")
                         .WithMany("Tasks")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -282,9 +291,9 @@ namespace ToDoAI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.TaskExecutionEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.TaskExecutionEntity", b =>
                 {
-                    b.HasOne("ToDoAI.ToDoAI.Domain.Entities.TaskEntity", "Task")
+                    b.HasOne("ToDoAI.Domain.Entities.TaskEntity", "Task")
                         .WithMany()
                         .HasForeignKey("TaskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -293,9 +302,9 @@ namespace ToDoAI.Migrations
                     b.Navigation("Task");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.UserStateEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.UserStateEntity", b =>
                 {
-                    b.HasOne("ToDoAI.ToDoAI.Domain.Entities.UserEntity", "User")
+                    b.HasOne("ToDoAI.Domain.Entities.UserEntity", "User")
                         .WithMany("States")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -304,12 +313,12 @@ namespace ToDoAI.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.DayScheduleEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.DayScheduleEntity", b =>
                 {
                     b.Navigation("Blocks");
                 });
 
-            modelBuilder.Entity("ToDoAI.ToDoAI.Domain.Entities.UserEntity", b =>
+            modelBuilder.Entity("ToDoAI.Domain.Entities.UserEntity", b =>
                 {
                     b.Navigation("States");
 

@@ -63,6 +63,7 @@ public sealed class TaskController : ToDoAiControllerBase
             EstimatedMinutes = request.EstimatedMinutes,
             Priority = request.Priority,
             ComplexityLevel = request.ComplexityLevel,
+            DeadlineAt = request.DeadlineAt,
         };
         
         var result = await _createTaskUseCase.CreateTask(taskRequest, cancellationToken);
@@ -195,7 +196,8 @@ public sealed class TaskController : ToDoAiControllerBase
             Description = request.Description,
             EstimatedMinutes = request.EstimatedMinutes,
             Priority = request.Priority,
-            ComplexityLevel = request.ComplexityLevel
+            ComplexityLevel = request.ComplexityLevel,
+            DeadlineAt = request.DeadlineAt
         };
         
         var result = await _updateTaskUseCase.UpdateTask(blRequest, cancellationToken);

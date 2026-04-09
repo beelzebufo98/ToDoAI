@@ -15,6 +15,8 @@ public sealed record CreateTaskReqDal
     public int ComplexityLevel { get; init; }
     
     public int PriorityLevel { get; init; }
+
+    public DateTimeOffset DeadlineAt { get; init; }
     
     public DateTimeOffset CreatedAt { get; init; }
     

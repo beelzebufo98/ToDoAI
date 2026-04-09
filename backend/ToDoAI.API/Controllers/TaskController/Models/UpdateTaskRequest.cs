@@ -11,4 +11,6 @@ public sealed class UpdateTaskRequest
     public int? ComplexityLevel { get; init; }
     
     public int? Priority { get; init; }
+
+    public DateTimeOffset? DeadlineAt { get; init; }
 }

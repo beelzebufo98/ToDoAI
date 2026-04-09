@@ -23,5 +23,8 @@ public sealed class CreateTaskValidator : AbstractValidator<CreateTaskRequest>
         RuleFor(r => r.Priority)
             .GreaterThan(0)
             .LessThanOrEqualTo(10);
+
+        RuleFor(r => r.DeadlineAt)
+            .NotEmpty();
     }
 }

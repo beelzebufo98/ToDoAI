@@ -16,6 +16,7 @@ public static class TasksMappers
             EstimatedMinutes = result.EstimatedMinutes,
             ComplexityLevel = result.ComplexityLevel,
             Priority = result.Priority,
+            DeadlineAt = result.DeadlineAt,
             CreatedAt = result.CreatedAt,
             UpdatedAt = result.UpdatedAt,
             ActualStartDate = result.ActualStartDate,

@@ -12,7 +12,6 @@ using ToDoAI.Application.UseCases.LoginUser;
 using ToDoAI.Application.UseCases.LoginUser.Models;
 using ToDoAI.Application.UseCases.RefreshToken;
 using ToDoAI.Application.UseCases.RefreshToken.Models;
-using ToDoAI.ToDoAI.API.Controllers;
 using ErrorCodes = ToDoAI.Domain.Enums.ErrorCodes;
 
 namespace ToDoAI.API.Controllers.Auth;

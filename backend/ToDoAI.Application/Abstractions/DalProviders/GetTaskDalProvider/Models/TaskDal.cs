@@ -15,6 +15,8 @@ public sealed record TaskDal
     public int ComplexityLevel { get; init; }
     
     public int Priority { get; init; }
+
+    public DateTimeOffset DeadlineAt { get; init; }
     
     public DateTimeOffset CreatedAt { get; init; }
     
@@ -24,6 +26,5 @@ public sealed record TaskDal
     
     public DateTimeOffset? ActualEndDate { get; init; }
     
-    //TODO: сделать в dal слое 
     public WorkStatus WorkStatus { get; init; }
 }

@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\Migrations\**\*.cs" Link="Migrations\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Remove="Migrations\20260409212157_AddTaskDeadlineAndExpandUserState.Designer.cs" />
   </ItemGroup>
 
 </Project>

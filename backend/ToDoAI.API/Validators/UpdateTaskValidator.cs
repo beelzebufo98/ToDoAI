@@ -28,5 +28,9 @@ public sealed class UpdateTaskValidator : AbstractValidator<UpdateTaskRequest>
             .GreaterThan(0)
             .LessThanOrEqualTo(10)
             .When(x => x.Priority.HasValue);
+
+        RuleFor(x => x.DeadlineAt)
+            .NotEmpty()
+            .When(x => x.DeadlineAt.HasValue);
     }
 }
