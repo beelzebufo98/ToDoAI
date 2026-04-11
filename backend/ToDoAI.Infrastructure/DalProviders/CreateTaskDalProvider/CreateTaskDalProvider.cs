@@ -36,6 +36,7 @@ public sealed class CreateTaskDalProvider : ICreateTaskDalProvider
             EstimatedMinutes = task.EstimatedMinutes,
             ComplexityLevel = task.ComplexityLevel,
             Priority = task.PriorityLevel,
+            DeadlineAt = task.DeadlineAt,
             CreatedAt = task.CreatedAt,
             UpdatedAt = task.UpdatedAt,
             WorkStatus = task.Status,

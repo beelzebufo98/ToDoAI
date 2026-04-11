@@ -11,4 +11,6 @@ public sealed class CreateTaskRequest
     public required int ComplexityLevel { get; init; }
     
     public required int Priority { get; init; }
+
+    public required DateTimeOffset DeadlineAt { get; init; }
 }

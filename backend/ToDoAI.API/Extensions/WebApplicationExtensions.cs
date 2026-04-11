@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Antiforgery;
 using ToDoAI.Infrastructure.Data;
 
 namespace ToDoAI.API.Extensions;
@@ -24,5 +25,73 @@ public static class WebApplicationExtensions
         await db.Database.MigrateAsync();
 
         return app;
+    }
+
+    public static WebApplication UseCsrfProtection(this WebApplication app)
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            return app;
+        }
+
+        app.Use(async (context, next) =>
+        {
+            if (!RequiresCsrfValidation(context))
+            {
+                await next();
+                return;
+            }
+
+            var antiforgery = context.RequestServices.GetRequiredService<IAntiforgery>();
+
+            try
+            {
+                await antiforgery.ValidateRequestAsync(context);
+                await next();
+            }
+            catch (AntiforgeryValidationException)
+            {
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    error = new
+                    {
+                        code = "invalid_csrf_token"
+                    }
+                });
+            }
+        });
+
+        return app;
+    }
+
+    private static bool RequiresCsrfValidation(HttpContext context)
+    {
+        if (HttpMethods.IsGet(context.Request.Method) ||
+            HttpMethods.IsHead(context.Request.Method) ||
+            HttpMethods.IsOptions(context.Request.Method) ||
+            HttpMethods.IsTrace(context.Request.Method))
+        {
+            return false;
+        }
+
+        var path = context.Request.Path;
+        if (path.StartsWithSegments("/swagger"))
+        {
+            return false;
+        }
+
+        if (path.StartsWithSegments("/api", out var remaining))
+        {
+            var tail = remaining.Value ?? string.Empty;
+            if (tail.Contains("/auth/login", StringComparison.OrdinalIgnoreCase) ||
+                tail.Contains("/auth/register", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        return context.Request.Cookies.ContainsKey("accessToken") ||
+               context.Request.Cookies.ContainsKey("refreshToken");
     }
 }

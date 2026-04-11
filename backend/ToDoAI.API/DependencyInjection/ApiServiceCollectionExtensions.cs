@@ -2,9 +2,11 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Asp.Versioning;
 using FluentValidation;
+using Microsoft.AspNetCore.Antiforgery;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using ToDoAI.API.Controllers.Auth.Models;
 using ToDoAI.API.Controllers.TaskController.Models;
+using ToDoAI.API.Controllers.UserStateController.Models;
 using ToDoAI.API.Validators;
 using ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
 using static System.Text.Json.JsonNamingPolicy;
@@ -16,12 +18,21 @@ public static class ApiServiceCollectionExtensions
     public static IServiceCollection AddApi(this IServiceCollection services)
     {
         services.AddDatabaseDeveloperPageExceptionFilter();
+        services.AddAntiforgery(options =>
+        {
+            options.HeaderName = "X-CSRF-TOKEN";
+            options.Cookie.Name = "XSRF-COOKIE";
+            options.Cookie.HttpOnly = true;
+            options.Cookie.SameSite = SameSiteMode.Lax;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        });
         services.AddScoped<IValidator<RegisterUserRequest>, AuthValidator>();
         services.AddScoped<IValidator<LoginUserRequest>, LoginValidator>();
         services.AddScoped<IValidator<CreateTaskRequest>, CreateTaskValidator>();
         services.AddScoped<IValidator<TaskFiltersRequest>, TaskFiltersValidator>();
         services.AddScoped<IValidator<UpdateTaskRequest>, UpdateTaskValidator>();
         services.AddScoped<IValidator<TaskStatusRequest>, TaskStatusValidator>();
+        services.AddScoped<IValidator<CreateUserStateRequest>, CreateUserStateValidator>();
         services.AddFluentValidationAutoValidation();
         services.AddAuthorization();
 

@@ -1,5 +1,6 @@
 using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
 using ToDoAI.Application.UseCases.GetTask.Mappers;
 using ToDoAI.Application.UseCases.GetTask.Models;
 using ToDoAI.Application.UseCases.UpdateTask.Models;
@@ -10,14 +11,26 @@ namespace ToDoAI.Application.UseCases.UpdateTask;
 public sealed class UpdateTaskUseCase : IUpdateTaskUseCase
 {
     private readonly IUpdateTaskDalProvider _updateTaskDalProvider;
+    private readonly IUserDalProvider _userDalProvider;
 
-    public UpdateTaskUseCase(IUpdateTaskDalProvider updateTaskDalProvider)
+    public UpdateTaskUseCase(IUpdateTaskDalProvider updateTaskDalProvider, IUserDalProvider userDalProvider)
     {
         _updateTaskDalProvider = updateTaskDalProvider;
+        _userDalProvider = userDalProvider;
     }
 
     public async Task<GetTaskResult> UpdateTask(UpdateTaskBlRequest request, CancellationToken cancellationToken)
     {
+        var user = await _userDalProvider.GetUser(request.UserId, cancellationToken);
+
+        if (user == null)
+        {
+            return new GetTaskResult
+            {
+                ErrorCode = ErrorCodes.NotAuthorized
+            };
+        }
+        
         var taskReq = new UpdateTaskDalRequest
         {
             TaskId = request.TaskId,
@@ -26,7 +39,8 @@ public sealed class UpdateTaskUseCase : IUpdateTaskUseCase
             Description = request.Description,
             EstimatedMinutes = request.EstimatedMinutes,
             Priority = request.Priority,
-            ComplexityLevel = request.ComplexityLevel
+            ComplexityLevel = request.ComplexityLevel,
+            DeadlineAt = request.DeadlineAt
         };
         
         var result = await _updateTaskDalProvider.UpdateTask(taskReq, cancellationToken);

@@ -51,6 +51,13 @@ public sealed class UpdateTaskDalProvider : IUpdateTaskDalProvider
         {
             taskEntity.Priority = updateTask.Priority.Value;
         }
+
+        if (updateTask.DeadlineAt.HasValue)
+        {
+            taskEntity.DeadlineAt = updateTask.DeadlineAt.Value;
+        }
+
+        taskEntity.UpdatedAt = DateTimeOffset.UtcNow;
         
         await dbContext.SaveChangesAsync(cancellation);
 

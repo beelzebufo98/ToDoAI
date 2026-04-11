@@ -36,6 +36,7 @@ public sealed class CreateTaskUseCase :  ICreateTaskUseCase
             EstimatedMinutes = task.EstimatedMinutes,
             ComplexityLevel = task.ComplexityLevel,
             PriorityLevel = task.Priority,
+            DeadlineAt = task.DeadlineAt,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow,
             UserId = user.UserId

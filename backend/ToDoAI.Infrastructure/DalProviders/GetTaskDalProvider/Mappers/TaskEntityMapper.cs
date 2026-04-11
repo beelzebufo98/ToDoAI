@@ -15,6 +15,7 @@ public static class TaskEntityMapper
             EstimatedMinutes = taskEntity.EstimatedMinutes,
             ComplexityLevel = taskEntity.ComplexityLevel,
             Priority = taskEntity.Priority,
+            DeadlineAt = taskEntity.DeadlineAt,
             CreatedAt = taskEntity.CreatedAt,
             UpdatedAt = taskEntity.UpdatedAt,
             ActualStartDate = taskEntity.ActualStartDate,
