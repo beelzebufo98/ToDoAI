@@ -70,7 +70,7 @@ public sealed class TaskController : ToDoAiControllerBase
 
         if (result.ErrorCode is not null)
         {
-            return  ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode));
+            return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode));
         }
         return Ok(new CreateTaskResponse
         {

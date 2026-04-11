@@ -1,5 +1,6 @@
 using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskStatusDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskStatusDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
 using ToDoAI.Application.UseCases.GetTask.Models;
 using ToDoAI.Application.UseCases.UpdateTaskStatus.Models;
 using ToDoAI.Domain.Enums;
@@ -9,15 +10,27 @@ namespace ToDoAI.Application.UseCases.UpdateTaskStatus;
 public sealed class UpdateTaskStatusUseCase : IUpdateTaskStatusUseCase
 {
     private readonly IUpdateTaskStatusDalProvider  _updateTaskStatusDalProvider;
+    private readonly IUserDalProvider _userDalProvider;
 
-    public UpdateTaskStatusUseCase(IUpdateTaskStatusDalProvider updateTaskStatusDalProvider)
+    public UpdateTaskStatusUseCase(IUpdateTaskStatusDalProvider updateTaskStatusDalProvider, IUserDalProvider userDalProvider)
     {
         _updateTaskStatusDalProvider = updateTaskStatusDalProvider;
+        _userDalProvider = userDalProvider;
     }
     
     public async Task<UpdateTaskStatusResult> UpdateTaskStatus(UpdateTaskStatusBlRequest updateTaskStatusBlRequest,
         CancellationToken cancellationToken)
     {
+        var user = await _userDalProvider.GetUser(updateTaskStatusBlRequest.UserId, cancellationToken);
+
+        if (user == null)
+        {
+            return new UpdateTaskStatusResult
+            {
+                ErrorCode = ErrorCodes.NotAuthorized
+            };
+        }
+        
         var request = new UpdateTaskStatusDalRequest
         {
             UserId = updateTaskStatusBlRequest.UserId,

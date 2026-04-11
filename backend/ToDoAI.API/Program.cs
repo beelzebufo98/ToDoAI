@@ -24,6 +24,7 @@ await app.UseDatabaseMigrations();
 app.UseHttpsRedirection();
 app.UseCors("Frontend");
 app.UseAuthentication();
+app.UseCsrfProtection();
 app.UseAuthorization();
 
 app.MapControllers();

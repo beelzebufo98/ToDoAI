@@ -8,6 +8,7 @@ using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskStatusDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.UserStateDalProvider;
 using ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider;
 using ToDoAI.Infrastructure.DalProviders.DeleteDalProvider;
 using ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
@@ -15,6 +16,7 @@ using ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.Infrastructure.DalProviders.UpdateTaskDalProvider;
 using ToDoAI.Infrastructure.DalProviders.UpdateTaskStatusDalProvider;
 using ToDoAI.Infrastructure.DalProviders.UserDalProvider;
+using ToDoAI.Infrastructure.DalProviders.UserStateDalProvider;
 using ToDoAI.Infrastructure.Data;
 
 namespace ToDoAI.Infrastructure.DependencyInjection;
@@ -34,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IDeleteTaskDalProvider, DeleteTaskDalProvider>();
         services.AddScoped<IUpdateTaskDalProvider, UpdateTaskDalProvider>();
         services.AddScoped<IUpdateTaskStatusDalProvider, UpdateTaskStatusDalProvider>();
+        services.AddScoped<IUserStateDalProvider, UserStateDalProvider>();
 
         return services;
     }

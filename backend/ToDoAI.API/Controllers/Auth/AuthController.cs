@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +28,7 @@ public sealed class AuthController : ToDoAiControllerBase
     private readonly IUserDalProvider _userDalProvider;
     private readonly IJwtService _jwtService;
     private readonly IOptions<AuthSettings> _authSettings;
+    private readonly IAntiforgery _antiforgery;
     
     public AuthController(
         ICreateUserUseCase createUserUseCase,
@@ -34,7 +36,8 @@ public sealed class AuthController : ToDoAiControllerBase
         IRefreshTokenUseCase refreshTokenUseCase,
         IUserDalProvider userDalProvider,
         IJwtService jwtService,
-        IOptions<AuthSettings> authSettings)
+        IOptions<AuthSettings> authSettings,
+        IAntiforgery antiforgery)
     {
         _createUserUseCase = createUserUseCase;
         _loginUserUseCase = loginUserUseCase;
@@ -42,6 +45,7 @@ public sealed class AuthController : ToDoAiControllerBase
         _userDalProvider = userDalProvider;
         _jwtService = jwtService;
         _authSettings = authSettings;
+        _antiforgery = antiforgery;
     }
     
     [HttpPost("register")]
@@ -109,6 +113,8 @@ public sealed class AuthController : ToDoAiControllerBase
            SameSite = SameSiteMode.Lax,
            Expires = refreshCookieExpiration
         });
+
+       SetCsrfCookie();
        
        return Ok();
     }
@@ -165,6 +171,7 @@ public sealed class AuthController : ToDoAiControllerBase
         }, cancellationToken);
 
         SetAuthCookies(accessToken, newRefreshToken, refreshTokenExpiresAt);
+        SetCsrfCookie();
         return Ok();
     }
 
@@ -232,5 +239,34 @@ public sealed class AuthController : ToDoAiControllerBase
 
         HttpContext.Response.Cookies.Delete("accessToken", cookieOptions);
         HttpContext.Response.Cookies.Delete("refreshToken", cookieOptions);
+        HttpContext.Response.Cookies.Delete("XSRF-TOKEN", new CookieOptions
+        {
+            HttpOnly = false,
+            Secure = HttpContext.Request.IsHttps,
+            SameSite = SameSiteMode.Lax
+        });
+        HttpContext.Response.Cookies.Delete("XSRF-COOKIE", new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = HttpContext.Request.IsHttps,
+            SameSite = SameSiteMode.Lax
+        });
+    }
+
+    [NonAction]
+    private void SetCsrfCookie()
+    {
+        var tokens = _antiforgery.GetAndStoreTokens(HttpContext);
+        if (string.IsNullOrWhiteSpace(tokens.RequestToken))
+        {
+            return;
+        }
+
+        HttpContext.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions
+        {
+            HttpOnly = false,
+            Secure = HttpContext.Request.IsHttps,
+            SameSite = SameSiteMode.Lax
+        });
     }
 }

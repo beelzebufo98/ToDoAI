@@ -11,6 +11,7 @@ using ToDoAI.Application.UseCases.LoginUser;
 using ToDoAI.Application.UseCases.RefreshToken;
 using ToDoAI.Application.UseCases.UpdateTask;
 using ToDoAI.Application.UseCases.UpdateTaskStatus;
+using ToDoAI.Application.UseCases.UserStateUseCase;
 
 namespace ToDoAI.Application.DependencyInjection;
 
@@ -26,6 +27,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUpdateTaskStatusUseCase, UpdateTaskStatusUseCase>();
         services.AddScoped<IUpdateTaskUseCase,  UpdateTaskUseCase>();
         services.AddScoped<IDeleteTaskUseCase, DeleteTaskUseCase>();
+        services.AddScoped<IUserStateUseCase, UserStateUseCase>();
         services.AddScoped<IJwtService, JwtService>();
 
         services.AddSingleton<IValidateOptions<AuthSettings>, AuthSettingsValidator>();

@@ -1,0 +1,51 @@
+services:
+
+  db:
+    image: postgres:16
+    container_name: todoai-db
+    environment:
+      POSTGRES_DB: ai_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - todoai_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ai_database"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: todoai-api
+    container_name: todoai-api
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file: ./backend/.env          # SecretKey, ConnectionString и т.д.
+    environment:
+      ASPNETCORE_URLS: "http://+:5114"
+      ASPNETCORE_ENVIRONMENT: "Development"
+    ports:
+      - "5114:5114"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # URL бакается в бандл — должен быть доступен из браузера
+        VITE_API_URL: http://localhost:5114/api/v1.0
+    image: todoai-frontend
+    container_name: todoai-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+
+volumes:
+  todoai_pg:

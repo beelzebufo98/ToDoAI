@@ -4,7 +4,7 @@ using ToDoAI.Domain.Entities;
 
 namespace ToDoAI.Infrastructure.Data.EntitiesConfiguration;
 
-public sealed class UserStateEntityСonfiguration : IEntityTypeConfiguration<UserStateEntity>
+public sealed class UserStateEntityConfiguration : IEntityTypeConfiguration<UserStateEntity>
 {
     public void Configure(EntityTypeBuilder<UserStateEntity> builder)
     {
