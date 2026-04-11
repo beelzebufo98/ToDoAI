@@ -27,4 +27,22 @@ public sealed class UserStateDalProvider : IUserStateDalProvider
         var result = userStateEntity.ToUserStateDal();
         return result;
     }
+    
+    public async Task<UserStateDal?> GetLatestUserState(Guid userId, CancellationToken cancellationToken)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        
+        var stateEntity = await dbContext.States.AsNoTracking().Where(s => s.UserId == userId).OrderByDescending(x => x.CreatedAt).FirstOrDefaultAsync(cancellationToken);
+        var result = stateEntity?.ToUserStateDal();
+        return result;
+    }
+
+    public async Task<IReadOnlyList<UserStateDal>> GetUserStates(Guid userId, int limit,
+        CancellationToken cancellationToken)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var stateEntity = await dbContext.States.AsNoTracking().Where(s => s.UserId == userId).OrderByDescending(x => x.CreatedAt).Take(limit).ToListAsync(cancellationToken);
+        var result = stateEntity.Select(s => s.ToUserStateDal()).ToList();
+        return result;
+    }
 }

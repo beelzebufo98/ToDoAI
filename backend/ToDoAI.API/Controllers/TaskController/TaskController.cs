@@ -139,7 +139,7 @@ public sealed class TaskController : ToDoAiControllerBase
         return Ok(taskResponse);
     }
 
-    [HttpDelete("{taskId}")]
+    [HttpDelete("{taskId}/decline")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
@@ -169,7 +169,7 @@ public sealed class TaskController : ToDoAiControllerBase
         return NoContent();
     }
 
-    [HttpPatch("{taskId}")]
+    [HttpPatch("{taskId}/update")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetTaskResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]

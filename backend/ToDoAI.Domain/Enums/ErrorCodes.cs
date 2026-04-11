@@ -18,4 +18,10 @@ public enum ErrorCodes
     
     [Description("Нет задач по текущему пользователю")]
     TasksNotFound = 4,
+    
+    [Description("Нет состояний по текущему пользователю")]
+    UserStateNotFound = 5,
+    
+    [Description("Некорретное значение параметров")]
+    IncorrectValue = 6,
 }

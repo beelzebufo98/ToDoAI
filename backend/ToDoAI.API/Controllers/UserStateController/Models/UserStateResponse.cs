@@ -1,6 +1,6 @@
 namespace ToDoAI.API.Controllers.UserStateController.Models;
 
-public sealed class CreateUserStateResponse
+public sealed class UserStateResponse
 {
     public Guid Id { get; init; }
     
