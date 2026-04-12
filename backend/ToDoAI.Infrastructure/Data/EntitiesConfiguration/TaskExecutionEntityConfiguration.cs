@@ -14,5 +14,10 @@ public sealed class TaskExecutionEntityConfiguration : IEntityTypeConfiguration<
             .WithMany()
             .HasForeignKey(te => te.TaskId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasOne(te => te.Schedule)
+            .WithMany()
+            .HasForeignKey(te => te.ScheduleId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
