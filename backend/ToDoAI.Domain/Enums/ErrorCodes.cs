@@ -31,6 +31,9 @@ public enum ErrorCodes
     [Description("Задача должна быть выполнена")]
     TaskShouldBeCompleted = 8,
     
-    [Description("У задачи нет графика")]
-    TaskDoesNotHaveSchedule = 9
+    [Description("Расписание не найдено")]
+    ScheduleNotFound = 10,
+
+    [Description("Расписание не связано с задачей")]
+    ScheduleDoesNotMatchTask = 11
 }

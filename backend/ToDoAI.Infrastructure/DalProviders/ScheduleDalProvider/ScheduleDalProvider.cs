@@ -13,12 +13,15 @@ public sealed class ScheduleDalProvider : IScheduleDalProvider
     {
         _dbContextFactory = dbContextFactory;
     }
-
-    public async Task<ScheduleDal?> GetSchedule(Guid taskId, CancellationToken cancellationToken)
+    
+    public async Task<ScheduleDal?> GetSchedule(Guid scheduleId, Guid userId, CancellationToken cancellationToken)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-        
-        var scheduleEntity = await dbContext.Schedules.AsNoTracking().FirstOrDefaultAsync(s => s.TaskId == taskId, cancellationToken);
+
+        var scheduleEntity = await dbContext.Schedules
+            .AsNoTracking()
+            .Include(s => s.DaySchedule)
+            .FirstOrDefaultAsync(s => s.Id == scheduleId && s.DaySchedule.UserId == userId, cancellationToken);
 
         if (scheduleEntity is null)
         {

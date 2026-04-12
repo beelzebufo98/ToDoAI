@@ -2,7 +2,7 @@ namespace ToDoAI.API.Controllers.TaskExecutionController.Models;
 
 public sealed class CreateTaskExecutionRequest
 {
-    public string? ScheduledId { get; set; }
+    public string? ScheduleId { get; set; }
     
     public int ActualMinutes { get; set; }
     

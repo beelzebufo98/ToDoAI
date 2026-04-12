@@ -56,13 +56,25 @@ public sealed class TaskExecutionUseCase : ITaskExecutionUseCase
             };
         }
         
-        var scheduleDal = await _scheduleDalProvider.GetSchedule(taskExecutionBlRequest.TaskId, cancellationToken);
-        if (scheduleDal is null)
+        if (taskExecutionBlRequest.ScheduleId is not null)
         {
-            return new TaskExecutionBlResult
+            var scheduleDal = await _scheduleDalProvider.GetSchedule(taskExecutionBlRequest.ScheduleId.Value,
+                taskExecutionBlRequest.UserId, cancellationToken);
+            if (scheduleDal is null)
             {
-                ErrorCode = ErrorCodes.TaskDoesNotHaveSchedule
-            };
+                return new TaskExecutionBlResult
+                {
+                    ErrorCode = ErrorCodes.ScheduleNotFound
+                };
+            }
+
+            if (scheduleDal.TaskId != taskExecutionBlRequest.TaskId)
+            {
+                return new TaskExecutionBlResult
+                {
+                    ErrorCode = ErrorCodes.ScheduleDoesNotMatchTask
+                };
+            }
         }
 
         var dalRequest = new TaskExecutionDalRequest

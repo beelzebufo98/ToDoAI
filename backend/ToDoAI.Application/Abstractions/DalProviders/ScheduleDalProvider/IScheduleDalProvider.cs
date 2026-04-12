@@ -4,5 +4,5 @@ namespace ToDoAI.Application.Abstractions.DalProviders.ScheduleDalProvider;
 
 public interface IScheduleDalProvider
 {
-    Task<ScheduleDal?> GetSchedule(Guid taskId, CancellationToken cancellationToken);
+    Task<ScheduleDal?> GetSchedule(Guid scheduleId, Guid userId, CancellationToken cancellationToken);
 }

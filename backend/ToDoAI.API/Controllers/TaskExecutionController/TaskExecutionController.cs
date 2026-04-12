@@ -24,6 +24,8 @@ public sealed class TaskExecutionController : ToDoAiControllerBase
     [HttpPost("{taskId}/create")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TaskExecutionResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> CreateTaskExecution([FromRoute] string taskId,[FromBody] CreateTaskExecutionRequest request, CancellationToken cancellationToken)
     {
@@ -40,11 +42,11 @@ public sealed class TaskExecutionController : ToDoAiControllerBase
 
         Guid? scheduleIdReq = null;
 
-        if (request.ScheduledId is not null)
+        if (request.ScheduleId is not null)
         {
-            if (!Guid.TryParse(request.ScheduledId, out var parsed))
+            if (!Guid.TryParse(request.ScheduleId, out var parsed))
             {
-                return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.TaskNotFound));
+                return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.IncorrectValue));
             }
 
             scheduleIdReq = parsed;
@@ -64,7 +66,18 @@ public sealed class TaskExecutionController : ToDoAiControllerBase
 
         if (result.ErrorCode is not null)
         {
-            return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode));
+            var statusCode = result.ErrorCode switch
+            {
+                ErrorCodes.NotAuthorized => StatusCodes.Status401Unauthorized,
+                ErrorCodes.TaskNotFound => StatusCodes.Status404NotFound,
+                ErrorCodes.ScheduleNotFound => StatusCodes.Status404NotFound,
+                ErrorCodes.TaskExecutionAlreadyExists => StatusCodes.Status409Conflict,
+                ErrorCodes.TaskShouldBeCompleted => StatusCodes.Status409Conflict,
+                ErrorCodes.ScheduleDoesNotMatchTask => StatusCodes.Status409Conflict,
+                _ => StatusCodes.Status400BadRequest
+            };
+
+            return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode), statusCode);
         }
 
         var response = new TaskExecutionResponse
