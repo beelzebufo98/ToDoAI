@@ -16,6 +16,12 @@ public enum ErrorCodes
     [Description("Задача отсутствует")]
     TaskNotFound = 3,
     
-    [Description("Нет задач по текущему пользователю")]
-    TasksNotFound = 4,
+    [Description("Нет состояний по текущему пользователю")]
+    UserStateNotFound = 4,
+    
+    [Description("Некорретное значение параметров")]
+    IncorrectValue = 5,
+
+    [Description("Некорретное изменение статуса задачи")]
+    InvalidTaskStatusTransition = 6,
 }

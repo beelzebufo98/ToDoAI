@@ -8,17 +8,17 @@ public abstract class ToDoAiControllerBase : ControllerBase
     [NonAction]
     protected ActionResult Ok<TResult>(TResult result) where TResult : class
     {
-        return (ActionResult) this.Ok((object) new PayloadApiResponse<TResult>(result));
+        return base.Ok(new PayloadApiResponse<TResult>(result));
     }
 
     [NonAction]
     protected ActionResult ClientError<TErrorCode>(ErrorApi<TErrorCode> error, int statusCode = 400)
     {
-        return (ActionResult) this.StatusCode(statusCode, (object) new ClientErrorApiResponse<TErrorCode>(error)); 
+        return base.StatusCode(statusCode, new ClientErrorApiResponse<TErrorCode>(error));
     }
     
     [NonAction]
-    protected ActionResult ServerError() => (ActionResult) this.StatusCode(500, (object) null);
+    protected ActionResult ServerError() => base.StatusCode(500);
 
     public class PayloadApiResponse<T> where T : class
     {

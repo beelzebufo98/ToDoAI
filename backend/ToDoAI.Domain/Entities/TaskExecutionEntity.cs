@@ -8,6 +8,10 @@ public sealed class TaskExecutionEntity
 
     public TaskEntity Task { get; init; } = default!;
     
+    public Guid? ScheduleId { get; init; }
+    
+    public ScheduleEntity? Schedule { get; init; }
+    
     public int ActualMinutes { get; init; }
     
     public int EnergyAfter { get; init; }

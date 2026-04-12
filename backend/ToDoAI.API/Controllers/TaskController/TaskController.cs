@@ -44,7 +44,7 @@ public sealed class TaskController : ToDoAiControllerBase
     }
     
     [HttpPost("create")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetTaskResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> CreateTask([FromBody] CreateTaskRequest  request, CancellationToken cancellationToken)
@@ -139,7 +139,7 @@ public sealed class TaskController : ToDoAiControllerBase
         return Ok(taskResponse);
     }
 
-    [HttpDelete("{taskId}")]
+    [HttpDelete("{taskId}/decline")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
@@ -169,7 +169,7 @@ public sealed class TaskController : ToDoAiControllerBase
         return NoContent();
     }
 
-    [HttpPatch("{taskId}")]
+    [HttpPatch("{taskId}/update")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetTaskResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
@@ -215,8 +215,9 @@ public sealed class TaskController : ToDoAiControllerBase
     }
 
     [HttpPatch("{taskId}/status")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK,  Type = typeof(GetTaskResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> UpdateStatus([FromRoute] string taskId,[FromBody] TaskStatusRequest taskStatus, CancellationToken cancellationToken)
@@ -245,13 +246,26 @@ public sealed class TaskController : ToDoAiControllerBase
 
         if (result.ErrorCode is not null)
         {
-            var statusCode = result.ErrorCode == ErrorCodes.TaskNotFound
-                ? StatusCodes.Status404NotFound
-                : StatusCodes.Status400BadRequest;
+            var statusCode = result.ErrorCode switch
+            {
+                ErrorCodes.TaskNotFound => StatusCodes.Status404NotFound,
+                ErrorCodes.InvalidTaskStatusTransition => StatusCodes.Status409Conflict,
+                _ => StatusCodes.Status400BadRequest
+            };
             return ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode), statusCode);
         }
-        
-        return Ok(result.WorkStatus.ToString());
+
+        var getTaskResult = await _getTaskUseCase.GetTask(taskIdReq, userId, cancellationToken);
+        if (getTaskResult.ErrorCode is not null)
+        {
+            var statusCode = getTaskResult.ErrorCode == ErrorCodes.TaskNotFound
+                ? StatusCodes.Status404NotFound
+                : StatusCodes.Status400BadRequest;
+            return ClientError(new ErrorApi<ErrorCodes?>(getTaskResult.ErrorCode), statusCode);
+        }
+
+        var taskResponse = getTaskResult.TaskResult.GetTask();
+        return Ok(taskResponse);
     }
     
 }
