@@ -31,6 +31,22 @@ public sealed class UpdateTaskStatusDalProvider :  IUpdateTaskStatusDalProvider
         
         var workStatus = GetWorkStatus(updateTask.WorkStatus);
 
+        if (taskEntity.WorkStatus == WorkStatus.Deleted)
+        {
+            return new UpdateTaskStatusDal
+            {
+                ErrorCode = ErrorCodes.InvalidTaskStatusTransition
+            };
+        }
+
+        if (taskEntity.WorkStatus == WorkStatus.Completed && workStatus != WorkStatus.Completed)
+        {
+            return new UpdateTaskStatusDal
+            {
+                ErrorCode = ErrorCodes.InvalidTaskStatusTransition
+            };
+        }
+
         switch (workStatus)
         {
             case WorkStatus.New:

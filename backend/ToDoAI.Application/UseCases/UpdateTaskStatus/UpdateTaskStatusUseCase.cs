@@ -47,6 +47,14 @@ public sealed class UpdateTaskStatusUseCase : IUpdateTaskStatusUseCase
             }; 
         }
 
+        if (result.ErrorCode is not null)
+        {
+            return new UpdateTaskStatusResult
+            {
+                ErrorCode = result.ErrorCode
+            };
+        }
+
         return new UpdateTaskStatusResult
         {
             WorkStatus = GetTaskWorkStatusBl(result.WorkStatus),
