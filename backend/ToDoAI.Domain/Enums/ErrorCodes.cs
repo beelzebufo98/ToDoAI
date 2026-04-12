@@ -24,4 +24,16 @@ public enum ErrorCodes
 
     [Description("Некорретное изменение статуса задачи")]
     InvalidTaskStatusTransition = 6,
+    
+    [Description("Обратная связь по задаче уже существует")]
+    TaskExecutionAlreadyExists = 7,
+    
+    [Description("Задача должна быть выполнена")]
+    TaskShouldBeCompleted = 8,
+    
+    [Description("Расписание не найдено")]
+    ScheduleNotFound = 10,
+
+    [Description("Расписание не связано с задачей")]
+    ScheduleDoesNotMatchTask = 11
 }
