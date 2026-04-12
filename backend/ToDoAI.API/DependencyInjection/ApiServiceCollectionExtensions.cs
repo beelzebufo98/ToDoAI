@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using ToDoAI.API.Controllers.Auth.Models;
 using ToDoAI.API.Controllers.TaskController.Models;
+using ToDoAI.API.Controllers.TaskExecutionController.Models;
 using ToDoAI.API.Controllers.UserStateController.Models;
 using ToDoAI.API.Validators;
 using ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
@@ -33,6 +34,7 @@ public static class ApiServiceCollectionExtensions
         services.AddScoped<IValidator<UpdateTaskRequest>, UpdateTaskValidator>();
         services.AddScoped<IValidator<TaskStatusRequest>, TaskStatusValidator>();
         services.AddScoped<IValidator<CreateUserStateRequest>, CreateUserStateValidator>();
+        services.AddScoped<IValidator<CreateTaskExecutionRequest>, TaskExecutionValidator>();
         services.AddFluentValidationAutoValidation();
         services.AddAuthorization();
 
