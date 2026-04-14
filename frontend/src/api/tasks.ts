@@ -1,70 +1,75 @@
 import { apiClient } from './client'
 
-export type Priority = 'Low' | 'Medium' | 'High' | 'Critical'
-export type ComplexityLevel = 'Easy' | 'Medium' | 'Hard' | 'VeryHard'
-export type WorkStatus = 'Pending' | 'InProgress' | 'Completed' | 'Cancelled'
+// Числа 1-10 как на бэкенде
+export type Priority = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+export type ComplexityLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+
+// Строковые значения enum как на бэкенде (lowercase)
+export type WorkStatus = 'new' | 'todo' | 'running' | 'completed' | 'deleted'
+export type SortBy = 'createdAt' | 'priority' | 'complexityLevel'
+export type SortType = 'asc' | 'desc'
+
+export interface Task {
+  id: string
+  title: string
+  description: string
+  estimatedMinutes: number
+  complexityLevel: ComplexityLevel
+  priority: Priority
+  workStatus: WorkStatus
+  deadlineAt: string
+  createdAt: string
+  updatedAt: string
+  actualStartDate?: string
+  actualEndDate?: string
+}
 
 export interface CreateTaskRequest {
   title: string
-  description?: string
+  description: string        // обязательный на бэкенде
   estimatedMinutes: number
-  priority: Priority
   complexityLevel: ComplexityLevel
-  deadlineAt?: string
+  priority: Priority
+  deadlineAt: string
 }
 
 export interface UpdateTaskRequest {
   title?: string
   description?: string
   estimatedMinutes?: number
-  priority?: Priority
   complexityLevel?: ComplexityLevel
+  priority?: Priority
   deadlineAt?: string
 }
 
 export interface TaskFilters {
-  workStatus?: WorkStatus
-  sortType?: 'Asc' | 'Desc'
-  sortBy?: string
+  workStatus?: Exclude<WorkStatus, 'deleted'>
+  sortBy?: SortBy
+  sortType?: SortType
   page?: number
   pageSize?: number
 }
 
-export interface Task {
-  id: string
-  title: string
-  description?: string
-  estimatedMinutes: number
-  priority: Priority
-  complexityLevel: ComplexityLevel
-  workStatus: WorkStatus
-  deadlineAt?: string
-  createdAt: string
-}
-
 export interface GetTasksResponse {
-  items: Task[]
-  totalCount: number
-  page: number
-  pageSize: number
+  tasks: Task[]   // поле "tasks", не "items"
 }
 
 export const tasksApi = {
   create: (data: CreateTaskRequest) =>
-    apiClient.post<Task>('/task/create', data),
+    apiClient.post<{ payload: { taskId: string } }>('/task/create', data),
 
   getAll: (filters?: TaskFilters) =>
-    apiClient.get<GetTasksResponse>('/task/get', { params: filters }),
+    apiClient.get<{ payload: GetTasksResponse }>('/task/get', { params: filters }),
 
   getById: (taskId: string) =>
-    apiClient.get<Task>(`/task/${taskId}/get`),
+    apiClient.get<{ payload: Task }>(`/task/${taskId}/get`),
 
   update: (taskId: string, data: UpdateTaskRequest) =>
-    apiClient.patch<Task>(`/task/${taskId}`, data),
+    apiClient.patch<{ payload: Task }>(`/task/${taskId}/update`, data),
 
-  updateStatus: (taskId: string, workStatus: WorkStatus) =>
-    apiClient.patch(`/task/${taskId}/status`, { workStatus }),
+  updateStatus: (taskId: string, workStatus: Exclude<WorkStatus, 'deleted'>) =>
+    apiClient.patch<{ payload: Task }>(`/task/${taskId}/status`, { workStatus }),
 
   delete: (taskId: string) =>
-    apiClient.delete(`/task/${taskId}`),
+    apiClient.delete(`/task/${taskId}/decline`),   // soft-delete маршрут
 }
