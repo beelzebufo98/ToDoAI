@@ -6,6 +6,8 @@ public sealed class DayScheduleEntity
 
     public DateOnly Date { get; set; }
 
+    public int TimeZoneOffsetMinutes { get; set; }
+
     public int Version { get; set; }
     
     public bool IsActiveVersion { get; set; }

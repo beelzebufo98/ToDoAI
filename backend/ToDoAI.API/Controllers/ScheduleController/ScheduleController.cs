@@ -76,6 +76,13 @@ public sealed class ScheduleController : ToDoAiControllerBase
                 EndAt = x.EndAt,
                 TaskTitle = x.TaskTitle,
                 TaskDescription = x.TaskDescription,
+            }).ToList(),
+            Unscheduled = result.Unscheduled.Select(x => new UnscheduledTaskResponse
+            {
+                TaskId = x.TaskId,
+                TaskTitle = x.TaskTitle,
+                Description = x.Description,
+                EstimatedMinutes = x.EstimatedMinutes
             }).ToList()
         };
 

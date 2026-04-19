@@ -20,6 +20,9 @@ public sealed class DayScheduleDalProvider : IDayScheduleDalProvider
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
+        var responseOffset = request.StartAt.Offset;
+        var responseOffsetMinutes = (int)responseOffset.TotalMinutes;
+
         var existingSchedules = await dbContext.DaySchedules
             .Where(x => x.UserId == request.UserId && x.Date == request.ScheduleDate)
             .ToListAsync(cancellationToken);
@@ -38,6 +41,7 @@ public sealed class DayScheduleDalProvider : IDayScheduleDalProvider
             Id = Guid.NewGuid(),
             UserId = request.UserId,
             Date = request.ScheduleDate,
+            TimeZoneOffsetMinutes = responseOffsetMinutes,
             Version = nextVersion,
             IsActiveVersion = true,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -55,8 +59,8 @@ public sealed class DayScheduleDalProvider : IDayScheduleDalProvider
                 Id = Guid.NewGuid(),
                 DayScheduleId = dayScheduleEntity.Id,
                 TaskId = task.Id,
-                Start = slotStart,
-                End = slotEnd,
+                Start = slotStart.ToOffset(TimeSpan.Zero),
+                End = slotEnd.ToOffset(TimeSpan.Zero),
             });
 
             cursor = slotEnd;
@@ -79,8 +83,8 @@ public sealed class DayScheduleDalProvider : IDayScheduleDalProvider
                 {
                     ScheduleId = x.Id,
                     TaskId = x.TaskId,
-                    StartAt = x.Start,
-                    EndAt = x.End,
+                    StartAt = x.Start.ToOffset(responseOffset),
+                    EndAt = x.End.ToOffset(responseOffset),
                 })
                 .ToList()
         };
@@ -97,6 +101,8 @@ public sealed class DayScheduleDalProvider : IDayScheduleDalProvider
         {
             return null;
         }
+
+        var responseOffset = TimeSpan.FromMinutes(dayScheduleEntity.TimeZoneOffsetMinutes);
         
         return new DayScheduleDalResult
         {
@@ -111,8 +117,8 @@ public sealed class DayScheduleDalProvider : IDayScheduleDalProvider
                 {
                     ScheduleId = x.Id,
                     TaskId = x.TaskId,
-                    StartAt = x.Start,
-                    EndAt = x.End,
+                    StartAt = x.Start.ToOffset(responseOffset),
+                    EndAt = x.End.ToOffset(responseOffset),
                     TaskTitle = x.Task.Title,
                     TaskDescription = x.Task.Description
                 }).OrderBy(x => x.StartAt)

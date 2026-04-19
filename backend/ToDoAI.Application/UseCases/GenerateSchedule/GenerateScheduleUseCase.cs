@@ -88,19 +88,47 @@ public sealed class GenerateScheduleUseCase : IGenerateScheduleUseCase
             .ThenBy(x => x.CreatedAt)
             .ToArray();
 
+        var endOfScheduleDay = new DateTimeOffset(
+            request.ScheduleDate.ToDateTime(TimeOnly.MinValue),
+            request.StartAt.Offset).AddDays(1);
+
+        var scheduledTasks = new List<TaskDal>(orderedTasks.Length);
+        var unscheduledTasks = new List<UnscheduledTaskBlResult>();
+        var cursor = request.StartAt;
+
+        foreach (var task in orderedTasks)
+        {
+            var slotEnd = cursor.AddMinutes(task.EstimatedMinutes);
+            if (slotEnd <= endOfScheduleDay)
+            {
+                scheduledTasks.Add(task);
+                cursor = slotEnd;
+                continue;
+            }
+
+            unscheduledTasks.Add(new UnscheduledTaskBlResult
+            {
+                TaskId = task.Id,
+                TaskTitle = task.Title,
+                Description = task.Description,
+                EstimatedMinutes = task.EstimatedMinutes
+            });
+        }
+
         var daySchedule = await _dayScheduleDalProvider.CreateDaySchedule(new ScheduleDalRequest
         {
             UserId = request.UserId,
             ScheduleDate = request.ScheduleDate,
             StartAt = request.StartAt,
-            TaskList = orderedTasks
+            TaskList = scheduledTasks
         }, cancellationToken);
 
 
         DayScheduleBlResult dayScheduleBlResult = daySchedule.ToDayScheduleBl();
         return new GenerateScheduleBlResult
         {
-            DaySchedule = dayScheduleBlResult
+            DaySchedule = dayScheduleBlResult,
+            Unscheduled = unscheduledTasks
         };
     }
 }

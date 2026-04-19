@@ -13,4 +13,6 @@ public sealed class DayScheduleResponse
     public DateTimeOffset CreateDate { get; init; }
 
     public IReadOnlyCollection<ScheduleBlockResponse> Blocks { get; init; } = [];
+
+    public IReadOnlyCollection<UnscheduledTaskResponse> Unscheduled { get; init; } = [];
 }
