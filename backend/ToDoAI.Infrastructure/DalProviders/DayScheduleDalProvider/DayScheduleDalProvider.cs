@@ -85,4 +85,38 @@ public sealed class DayScheduleDalProvider : IDayScheduleDalProvider
                 .ToList()
         };
     }
+
+    public async Task<DayScheduleDalResult?> GetDaySchedule(Guid userId, DateOnly scheduleDate,
+        CancellationToken cancellationToken)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        
+        var dayScheduleEntity = await dbContext.DaySchedules.AsNoTracking().Include(dayScheduleEntity => dayScheduleEntity.Blocks).ThenInclude(x => x.Task).FirstOrDefaultAsync(x => x.UserId == userId && x.Date == scheduleDate && x.IsActiveVersion == true, cancellationToken);
+
+        if (dayScheduleEntity == null)
+        {
+            return null;
+        }
+        
+        return new DayScheduleDalResult
+        {
+            DayScheduleId = dayScheduleEntity.Id,
+            UserId = dayScheduleEntity.UserId,
+            ScheduleDate = dayScheduleEntity.Date,
+            Version = dayScheduleEntity.Version,
+            IsActiveVersion = dayScheduleEntity.IsActiveVersion,
+            CreateDate = dayScheduleEntity.CreatedAt,
+            Blocks = dayScheduleEntity.Blocks
+                .Select(x => new ScheduleDalResult
+                {
+                    ScheduleId = x.Id,
+                    TaskId = x.TaskId,
+                    StartAt = x.Start,
+                    EndAt = x.End,
+                    TaskTitle = x.Task.Title,
+                    TaskDescription = x.Task.Description
+                }).OrderBy(x => x.StartAt)
+                .ToList()
+        };
+    }
 }

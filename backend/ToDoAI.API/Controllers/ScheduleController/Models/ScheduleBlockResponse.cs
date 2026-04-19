@@ -9,4 +9,8 @@ public sealed class ScheduleBlockResponse
     public DateTimeOffset StartAt { get; init; }
 
     public DateTimeOffset EndAt { get; init; }
+    
+    public string? TaskTitle { get; init; }
+    
+    public string? TaskDescription { get; init; }
 }

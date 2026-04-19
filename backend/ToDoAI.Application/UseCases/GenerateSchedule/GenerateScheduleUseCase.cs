@@ -4,6 +4,7 @@ using ToDoAI.Application.Abstractions.DalProviders.DayScheduleDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.DayScheduleDalProvider.Models;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserStateDalProvider;
+using ToDoAI.Application.UseCases.GenerateSchedule.Mappers;
 using ToDoAI.Application.UseCases.GenerateSchedule.Models;
 using ToDoAI.Domain.Enums;
 
@@ -95,9 +96,11 @@ public sealed class GenerateScheduleUseCase : IGenerateScheduleUseCase
             TaskList = orderedTasks
         }, cancellationToken);
 
+
+        DayScheduleBlResult dayScheduleBlResult = daySchedule.ToDayScheduleBl();
         return new GenerateScheduleBlResult
         {
-            DaySchedule = daySchedule
+            DaySchedule = dayScheduleBlResult
         };
     }
 }

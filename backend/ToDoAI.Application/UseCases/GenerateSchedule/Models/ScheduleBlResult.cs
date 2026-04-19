@@ -1,6 +1,6 @@
-namespace ToDoAI.Application.Abstractions.DalProviders.DayScheduleDalProvider.Models;
+namespace ToDoAI.Application.UseCases.GenerateSchedule.Models;
 
-public sealed record ScheduleDalResult
+public sealed record ScheduleBlResult
 {
     public Guid ScheduleId { get; set; }
     

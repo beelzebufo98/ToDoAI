@@ -16,7 +16,7 @@ public sealed class GenerateScheduleValidator : AbstractValidator<GenerateSchedu
             .WithMessage("Start time is required.");
 
         RuleFor(x => x)
-            .Must(x => DateOnly.FromDateTime(x.StartAt.UtcDateTime) == x.ScheduleDate)
+            .Must(x => DateOnly.FromDateTime(x.StartAt.DateTime) == x.ScheduleDate)
             .WithMessage("Start time must belong to schedule date.");
 
         RuleFor(x => x.TaskIds)
