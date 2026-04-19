@@ -38,6 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (data: RegisterRequest) => {
     await authApi.register(data)
+    // register не выдаёт токены — логинимся сразу после
+    await authApi.login({ userName: data.userName, password: data.password })
     setIsAuthenticated(true)
     localStorage.setItem('isAuthenticated', 'true')
   }, [])

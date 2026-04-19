@@ -38,6 +38,9 @@ namespace ToDoAI.Migrations
                     b.Property<bool>("IsActiveVersion")
                         .HasColumnType("boolean");
 
+                    b.Property<int>("TimeZoneOffsetMinutes")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
