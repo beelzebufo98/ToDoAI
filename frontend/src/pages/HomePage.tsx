@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { userStateApi } from '@/api/userState'
-import { scheduleApi, type DaySchedule } from '@/api/schedule'
+import { scheduleApi } from '@/api/schedule'
 import { NoStateTodayCard } from '@/components/schedule/NoStateTodayCard'
 import { GenerateDayCard } from '@/components/schedule/GenerateDayCard'
 import { DayScheduleTimeline } from '@/components/schedule/DayScheduleTimeline'
@@ -27,10 +27,8 @@ function isToday(iso: string) {
 
 export function HomePage() {
   const today = todayString()
-
-  // optimistic schedule: when user generates, show immediately without waiting for refetch
-  const [localSchedule, setLocalSchedule] = useState<DaySchedule | null>(null)
-  const [showGenerate, setShowGenerate]   = useState(false)
+  const queryClient = useQueryClient()
+  const [showGenerate, setShowGenerate] = useState(false)
 
   const { data: stateData, isLoading: stateLoading } = useQuery({
     queryKey: ['userState', 'latest'],
@@ -54,14 +52,12 @@ export function HomePage() {
   const scheduleLoadError =
     !scheduleData && !!scheduleError && !scheduleNotFound
 
-  const schedule: DaySchedule | null =
-    localSchedule ?? scheduleData?.data.payload ?? null
+  const schedule = scheduleData?.data.payload ?? null
 
   const isLoading = stateLoading || scheduleLoading
 
   return (
     <div className="p-6 max-w-2xl mx-auto w-full">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-foreground">Главная</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
@@ -77,34 +73,29 @@ export function HomePage() {
 
       {!isLoading && (
         <>
-          {/* State 1: no user state today */}
           {!hasStateToday && <NoStateTodayCard />}
 
-          {/* Schedule load error (non-404) */}
           {hasStateToday && scheduleLoadError && (
             <p className="text-center text-sm text-muted-foreground py-16">
               Не удалось загрузить расписание — попробуйте обновить страницу
             </p>
           )}
 
-          {/* State 2: has state, show schedule or generate form */}
           {hasStateToday && !scheduleLoadError && (
             <div className="bg-card border border-border/50 rounded-xl p-5">
               {schedule && !showGenerate ? (
                 <DayScheduleTimeline
                   schedule={schedule}
-                  onRegenerate={() => {
-                    setLocalSchedule(null)
-                    setShowGenerate(true)
-                  }}
+                  onRegenerate={() => setShowGenerate(true)}
                 />
               ) : (
                 <GenerateDayCard
                   scheduleDate={today}
-                  onGenerated={s => {
-                    setLocalSchedule(s)
+                  onGenerated={() => {
+                    queryClient.invalidateQueries({ queryKey: ['schedule', today] })
                     setShowGenerate(false)
                   }}
+                  onCancel={schedule ? () => setShowGenerate(false) : undefined}
                 />
               )}
             </div>

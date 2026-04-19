@@ -81,6 +81,7 @@ export function TasksPage() {
       tasksApi.updateStatus(taskId, status),
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['tasks'] })
+      queryClient.invalidateQueries({ queryKey: ['task', vars.taskId] })
       if (vars.status === 'completed') {
         const task = tasks.find(t => t.id === vars.taskId)
         if (task) setFeedbackTask({ ...task, workStatus: 'completed' })

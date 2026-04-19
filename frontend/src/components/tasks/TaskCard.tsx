@@ -115,12 +115,14 @@ export function TaskCard({ task, onStatusChange, onDelete, onFeedback, onEdit, f
             + Фидбек
           </button>
         )}
-        <button
-          onClick={() => onEdit(task)}
-          className="ml-auto text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
-        >
-          <Pencil className="h-3.5 w-3.5" />
-        </button>
+        {task.workStatus !== 'completed' && (
+          <button
+            onClick={() => onEdit(task)}
+            className="ml-auto text-muted-foreground hover:text-foreground transition-colors p-1 rounded"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
+        )}
         <button
           onClick={() => onDelete(task.id)}
           className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded"

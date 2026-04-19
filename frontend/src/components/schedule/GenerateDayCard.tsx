@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { Loader2, Clock } from 'lucide-react'
+import { Loader2, Clock, ArrowLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { tasksApi } from '@/api/tasks'
-import { scheduleApi, type DaySchedule } from '@/api/schedule'
+import { scheduleApi } from '@/api/schedule'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
@@ -29,19 +29,23 @@ function buildLocalDateTime(scheduleDate: string, startTime: string): Date {
   return new Date(year, month - 1, day, hours, minutes, 0, 0)
 }
 
+// Round UP to the next 30-minute mark (e.g. 21:47 → 22:00, 21:15 → 21:30)
 function defaultStartTime(): string {
   const d = new Date()
-  const h = String(d.getHours()).padStart(2, '0')
-  const min = d.getMinutes() < 30 ? '00' : '30'
-  return `${h}:${min}`
+  const totalMinutes = d.getHours() * 60 + d.getMinutes()
+  const rounded = Math.ceil(totalMinutes / 30) * 30
+  const h = Math.floor(rounded / 60) % 24
+  const m = rounded % 60
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
 interface Props {
   scheduleDate: string
-  onGenerated: (schedule: DaySchedule) => void
+  onGenerated: () => void
+  onCancel?: () => void
 }
 
-export function GenerateDayCard({ scheduleDate, onGenerated }: Props) {
+export function GenerateDayCard({ scheduleDate, onGenerated, onCancel }: Props) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [startTime, setStartTime] = useState(defaultStartTime)
 
@@ -67,15 +71,26 @@ export function GenerateDayCard({ scheduleDate, onGenerated }: Props) {
       const startAt = toLocalISOString(buildLocalDateTime(scheduleDate, startTime))
       return scheduleApi.generate({ scheduleDate, startAt, taskIds: [...selectedIds] })
     },
-    onSuccess: res => onGenerated(res.data.payload),
+    onSuccess: () => onGenerated(),
     onError: () => toast.error('Не удалось сгенерировать расписание'),
   })
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-sm font-semibold text-foreground mb-0.5">Расписание на сегодня</h2>
-        <p className="text-xs text-muted-foreground">Выберите задачи и время начала — план составится автоматически</p>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h2 className="text-sm font-semibold text-foreground mb-0.5">Расписание на сегодня</h2>
+          <p className="text-xs text-muted-foreground">Выберите задачи и время начала — план составится автоматически</p>
+        </div>
+        {onCancel && (
+          <button
+            onClick={onCancel}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors shrink-0 mt-0.5"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Назад
+          </button>
+        )}
       </div>
 
       {/* Start time */}

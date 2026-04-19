@@ -1,4 +1,4 @@
-import { apiClient } from './client'
+import { apiClient, refreshSession } from './client'
 
 export interface LoginRequest {
   userName: string
@@ -23,5 +23,5 @@ export const authApi = {
     apiClient.post('/auth/logout'),
 
   refresh: () =>
-    apiClient.post('/auth/refresh'),
+    refreshSession(),
 }
