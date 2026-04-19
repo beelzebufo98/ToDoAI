@@ -30,7 +30,7 @@ const COMPLEXITY_OPTIONS: { label: string; value: ComplexityLevel }[] = [
 const schema = z.object({
   title:            z.string().min(1, 'Введите название'),
   description:      z.string().min(1, 'Введите описание'),
-  estimatedMinutes: z.number({ invalid_type_error: 'Введите число' }).int().min(1, 'Минимум 1 минута').max(1440),
+  estimatedMinutes: z.number().int().min(1, 'Минимум 1 минута').max(1440),
   priority:         z.number().min(1).max(10),
   complexityLevel:  z.number().min(1).max(10),
   deadlineAt:       z.string().min(1, 'Выберите дедлайн'),
