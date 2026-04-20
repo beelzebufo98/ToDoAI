@@ -78,19 +78,40 @@ public sealed class UserStateUseCase : IUserStateUseCase
             };
         }
         
-        var dalRequest = new UserStateDalRequest
+        var stateResult = await _userStateDalProvider.GetLatestUserState(userStateRequest.UserId, cancellationToken);
+        UserStateDal result = null!;
+        if (stateResult == null || stateResult.CreatedAt.AddHours(3) < DateTimeOffset.UtcNow)
         {
-            UserId = userStateRequest.UserId,
-            UserStateId = Guid.NewGuid(),
-            CreatedAt = DateTimeOffset.UtcNow,
-            SleepMinutes = userStateRequest.SleepMinutes,
-            EnergyLevel = userStateRequest.EnergyLevel,
-            StressLevel = userStateRequest.StressLevel,
-            MotivationLevel = userStateRequest.MotivationLevel,
-            ConcentrationLevel = userStateRequest.ConcentrationLevel,
-        };
+
+            var dalRequest = new UserStateDalRequest
+            {
+                UserId = userStateRequest.UserId,
+                UserStateId = Guid.NewGuid(),
+                CreatedAt = DateTimeOffset.UtcNow,
+                SleepMinutes = userStateRequest.SleepMinutes,
+                EnergyLevel = userStateRequest.EnergyLevel,
+                StressLevel = userStateRequest.StressLevel,
+                MotivationLevel = userStateRequest.MotivationLevel,
+                ConcentrationLevel = userStateRequest.ConcentrationLevel,
+            };
+
+            result = await _userStateDalProvider.CreateUserState(dalRequest, cancellationToken);
+        }
+        else
+        {
+            var updateRequest = new UpdateUserStateDalRequest
+            {
+                StateId = stateResult.UserStateId,
+                UserId = userStateRequest.UserId,
+                SleepMinutes = userStateRequest.SleepMinutes,
+                EnergyLevel = userStateRequest.EnergyLevel,
+                StressLevel = userStateRequest.StressLevel,
+                MotivationLevel = userStateRequest.MotivationLevel,
+                ConcentrationLevel = userStateRequest.ConcentrationLevel,
+            };
+            result = await _userStateDalProvider.UpdateUserState(updateRequest,  cancellationToken);
+        }
         
-        var result = await _userStateDalProvider.CreateUserState(dalRequest, cancellationToken);
         return new UserStateBlResult
         {
             UserState = result.ToUserStateResult()

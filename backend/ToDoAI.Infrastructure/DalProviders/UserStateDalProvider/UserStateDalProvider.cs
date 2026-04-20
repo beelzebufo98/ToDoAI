@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ToDoAI.Application.Abstractions.DalProviders.UserStateDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserStateDalProvider.Models;
+using ToDoAI.Domain.Entities;
 using ToDoAI.Infrastructure.DalProviders.UserStateDalProvider.Mappers;
 using ToDoAI.Infrastructure.Data;
 
@@ -27,7 +28,21 @@ public sealed class UserStateDalProvider : IUserStateDalProvider
         var result = userStateEntity.ToUserStateDal();
         return result;
     }
-    
+
+    public async Task<UserStateDal> UpdateUserState(UpdateUserStateDalRequest request, CancellationToken cancellationToken)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var stateEntity = await dbContext.States.Where(s => s.Id == request.StateId && s.UserId == request.UserId).OrderByDescending(x => x.CreatedAt).FirstAsync(cancellationToken);
+
+        stateEntity.SleepMinutes = request.SleepMinutes;
+        stateEntity.EnergyLevel = request.EnergyLevel;
+        stateEntity.StressLevel = request.StressLevel;
+        stateEntity.MotivationLevel = request.MotivationLevel;
+        stateEntity.ConcentrationLevel = request.ConcentrationLevel;
+        await dbContext.SaveChangesAsync(cancellationToken);
+        var result = stateEntity.ToUserStateDal();
+        return result;
+    }
     public async Task<UserStateDal?> GetLatestUserState(Guid userId, CancellationToken cancellationToken)
     {
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);

@@ -4,15 +4,15 @@ public sealed class UserStateEntity
 {
     public Guid Id { get; init; }
     
-    public int SleepMinutes { get; init; }
+    public int SleepMinutes { get; set; }
     
-    public int EnergyLevel { get; init; }
+    public int EnergyLevel { get; set; }
     
-    public int StressLevel { get; init; }
+    public int StressLevel { get; set; }
     
-    public int MotivationLevel  { get; init; }
+    public int MotivationLevel  { get; set; }
     
-    public int ConcentrationLevel  { get; init; }
+    public int ConcentrationLevel  { get; set; }
     
     public DateTimeOffset CreatedAt { get; init; }
     
