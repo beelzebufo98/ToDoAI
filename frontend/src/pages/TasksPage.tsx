@@ -101,9 +101,9 @@ export function TasksPage() {
 
   const taskCount = tasks.length
   const countLabel =
-    taskCount === 1 ? '1 задача' :
-    taskCount < 5   ? `${taskCount} задачи` :
-                      `${taskCount} задач`
+    taskCount === 1                    ? '1 задача' :
+    taskCount >= 2 && taskCount <= 4   ? `${taskCount} задачи` :
+                                         `${taskCount} задач`
 
   return (
     <div className="p-6 max-w-2xl mx-auto w-full">

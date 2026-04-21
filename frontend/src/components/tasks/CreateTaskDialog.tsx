@@ -81,7 +81,6 @@ export function CreateTaskDialog({ open, onClose }: Props) {
           <motion.div
             className="fixed inset-0 bg-black/40 z-40"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={handleClose}
           />
           <motion.div
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-lg bg-card border border-border/50 rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto"

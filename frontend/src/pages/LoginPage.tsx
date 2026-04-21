@@ -12,16 +12,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 const schema = z.object({
-  userName: z.string()
-    .min(6, 'Минимум 6 символов')
-    .max(100, 'Максимум 100 символов')
-    .regex(/^[a-zA-Z0-9_]*$/, 'Только буквы, цифры и символ _'),
-  password: z.string()
-    .min(8, 'Минимум 8 символов')
-    .max(64, 'Максимум 64 символа')
-    .regex(/[a-z]/, 'Нужна хотя бы одна строчная буква')
-    .regex(/[0-9]/, 'Нужна хотя бы одна цифра')
-    .regex(/[^a-zA-Z0-9]/, 'Нужен хотя бы один спецсимвол'),
+  userName: z.string().min(1, 'Введите логин'),
+  password: z.string().min(1, 'Введите пароль'),
 })
 
 type FormData = z.infer<typeof schema>
