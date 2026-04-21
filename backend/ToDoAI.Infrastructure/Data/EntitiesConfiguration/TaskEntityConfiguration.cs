@@ -9,5 +9,8 @@ public sealed class TaskEntityConfiguration : IEntityTypeConfiguration<TaskEntit
     public void Configure(EntityTypeBuilder<TaskEntity> builder)
     {
         builder.ToTable("Tasks", "ToDoAIService");
+
+        builder.Property(t => t.ActualSpentMinutes)
+            .HasDefaultValue(0);
     }
 }

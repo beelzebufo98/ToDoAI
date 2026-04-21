@@ -19,6 +19,8 @@ public class ToDoAIDbContext : DbContext
     public virtual DbSet<TaskExecutionEntity>  TaskExecutions { get; set; }
     
     public virtual DbSet<RefreshSessionEntity>  RefreshSessions { get; set; }
+    
+    public virtual DbSet<TaskWorkSessionEntity>   TaskWorkSessions { get; set; }
     public ToDoAIDbContext(DbContextOptions<ToDoAIDbContext> options)
         : base(options) { }
 
