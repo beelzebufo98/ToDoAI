@@ -10,4 +10,6 @@ public interface IUserStateDalProvider
 
     Task<IReadOnlyList<UserStateDal>> GetUserStates(Guid userId, int limit,
         CancellationToken cancellationToken);
+
+    Task<UserStateDal> UpdateUserState(UpdateUserStateDalRequest request, CancellationToken cancellationToken);
 }

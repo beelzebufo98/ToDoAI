@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -63,6 +64,10 @@ function LevelSelector({
       </div>
     </div>
   )
+}
+
+function isWithin3Hours(iso: string) {
+  return Date.now() - new Date(iso).getTime() < 3 * 60 * 60 * 1000
 }
 
 function formatDate(iso: string) {
@@ -139,12 +144,48 @@ export function ProfilePage() {
 
   const { data: historyData, isLoading: historyLoading } = useQuery({
     queryKey: ['userState', 'history'],
-    queryFn: () => userStateApi.getHistory(7),
+    queryFn: () => userStateApi.getHistory(30),
     retry: false,
   })
 
   const latest  = latestData?.data.payload
-  const history = historyData?.data.payload.history ?? []
+  const allHistory = historyData?.data.payload.history ?? []
+  const today = new Date().toDateString()
+  const history = Object.entries(
+    allHistory.reduce<Record<string, typeof allHistory>>((acc, s) => {
+      const day = new Date(s.createdAt).toDateString()
+      if (day !== today) { (acc[day] ??= []).push(s) }
+      return acc
+    }, {})
+  )
+    .map(([day, entries]) => {
+      const avg = (fn: (s: typeof entries[0]) => number) =>
+        Math.round(entries.reduce((sum, s) => sum + fn(s), 0) / entries.length)
+      return {
+        day,
+        date: entries[0].createdAt,
+        sleepMinutes:       avg(s => s.sleepMinutes),
+        energyLevel:        avg(s => s.energyLevel),
+        stressLevel:        avg(s => s.stressLevel),
+        motivationLevel:    avg(s => s.motivationLevel),
+        concentrationLevel: avg(s => s.concentrationLevel),
+        count: entries.length,
+      }
+    })
+    .sort((a, b) => b.date.localeCompare(a.date))
+  const isUpdate = !!latest && isWithin3Hours(latest.createdAt)
+
+  useEffect(() => {
+    if (isUpdate && latest) {
+      reset({
+        sleepHours:         latest.sleepMinutes / 60,
+        energyLevel:        latest.energyLevel,
+        stressLevel:        latest.stressLevel,
+        motivationLevel:    latest.motivationLevel,
+        concentrationLevel: latest.concentrationLevel,
+      })
+    }
+  }, [isUpdate, latest?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const mutation = useMutation({
     mutationFn: (data: FormData) =>
@@ -156,7 +197,7 @@ export function ProfilePage() {
         concentrationLevel: data.concentrationLevel,
       }),
     onSuccess: () => {
-      toast.success('Состояние сохранено')
+      toast.success(isUpdate ? 'Состояние обновлено' : 'Состояние сохранено')
       queryClient.invalidateQueries({ queryKey: ['userState'] })
       reset()
     },
@@ -184,7 +225,7 @@ export function ProfilePage() {
 
         {/* Create form */}
         <div className="bg-card border border-border/50 rounded-xl p-5">
-          <h2 className="text-sm font-semibold mb-4">Добавить состояние</h2>
+          <h2 className="text-sm font-semibold mb-4">{isUpdate ? 'Обновить состояние' : 'Добавить состояние'}</h2>
 
           <form onSubmit={handleSubmit(d => mutation.mutate(d))} className="space-y-4">
             {/* Sleep */}
@@ -214,7 +255,7 @@ export function ProfilePage() {
               className="w-full bg-indigo-600 text-white hover:bg-indigo-500 mt-2"
             >
               {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              Сохранить
+              {isUpdate ? 'Обновить' : 'Сохранить'}
             </Button>
           </form>
         </div>
@@ -226,8 +267,24 @@ export function ProfilePage() {
               История ({history.length})
             </p>
             <div className="space-y-3">
-              {history.map(s => (
-                <StateCard key={s.id} state={s} />
+              {history.map(entry => (
+                <div key={entry.day} className="bg-card border border-border/50 rounded-xl p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(entry.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {entry.count > 1 && <span className="ml-1.5 text-muted-foreground/60">· ср. за {entry.count} записи</span>}
+                    </span>
+                    <span className="text-xs font-medium text-foreground">
+                      Сон: {Math.floor(entry.sleepMinutes / 60)} ч{entry.sleepMinutes % 60 > 0 ? ` ${entry.sleepMinutes % 60} мин` : ''}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
+                    <Metric label="Энергия"      value={entry.energyLevel} />
+                    <Metric label="Стресс"        value={entry.stressLevel} colorInvert />
+                    <Metric label="Мотивация"     value={entry.motivationLevel} />
+                    <Metric label="Концентрация"  value={entry.concentrationLevel} />
+                  </div>
+                </div>
               ))}
             </div>
           </div>

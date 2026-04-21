@@ -33,4 +33,8 @@ public sealed class TaskEntity
     public Guid UserId { get; init; }
 
     public UserEntity User { get; init; } = default!;
+    
+    public int ActualSpentMinutes { get; set; }
+    
+    public ICollection<TaskWorkSessionEntity> TaskWorkSessions { get; set; } = [];
 }
