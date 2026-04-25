@@ -29,6 +29,9 @@ public static class ApiServiceCollectionExtensions
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
         services.AddScoped<IValidator<RegisterUserRequest>, AuthValidator>();
+        services.AddScoped<IValidator<ConfirmEmailRequest>, ConfirmEmailValidator>();
+        services.AddScoped<IValidator<ForgotPasswordRequest>, ForgotPasswordValidator>();
+        services.AddScoped<IValidator<ResetPasswordRequest>, ResetPasswordValidator>();
         services.AddScoped<IValidator<LoginUserRequest>, LoginValidator>();
         services.AddScoped<IValidator<CreateTaskRequest>, CreateTaskValidator>();
         services.AddScoped<IValidator<TaskFiltersRequest>, TaskFiltersValidator>();

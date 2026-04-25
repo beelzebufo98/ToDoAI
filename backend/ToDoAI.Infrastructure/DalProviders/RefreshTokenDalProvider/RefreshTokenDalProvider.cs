@@ -68,4 +68,21 @@ public sealed class RefreshTokenDalProvider : IRefreshTokenDalProvider
         toDoAiDb.RefreshSessions.Remove(refreshSession);
         await toDoAiDb.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task DeleteRefreshTokens(Guid userId, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var refreshSessions = await toDoAiDb.RefreshSessions
+            .Where(x => x.UserId == userId)
+            .ToListAsync(cancellationToken);
+
+        if (refreshSessions.Count == 0)
+        {
+            return;
+        }
+
+        toDoAiDb.RefreshSessions.RemoveRange(refreshSessions);
+        await toDoAiDb.SaveChangesAsync(cancellationToken);
+    }
 }
