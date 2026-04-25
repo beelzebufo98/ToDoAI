@@ -7,8 +7,9 @@ import { useNavigate } from 'react-router-dom'
 import { tasksApi } from '@/api/tasks'
 import type { Task, WorkStatus } from '@/api/tasks'
 import { userStateApi } from '@/api/userState'
+import { useTaskSession } from '@/contexts/TaskSessionContext'
 import { Button } from '@/components/ui/button'
-import { TaskCard } from '@/components/tasks/TaskCard'
+import { TaskCard, type SessionState } from '@/components/tasks/TaskCard'
 import { CreateTaskDialog } from '@/components/tasks/CreateTaskDialog'
 import { EditTaskDialog } from '@/components/tasks/EditTaskDialog'
 import { TaskExecutionDialog } from '@/components/tasks/TaskExecutionDialog'
@@ -37,6 +38,7 @@ const TABS: { value: FilterTab; label: string }[] = [
 export function TasksPage() {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const { current: activeSession, syncing: sessionSyncing, startSession, stopSession, cancelSession } = useTaskSession()
   const [filter, setFilter]             = useState<FilterTab>('all')
   const [createOpen, setCreateOpen]     = useState(false)
   const [editTask, setEditTask]         = useState<Task | null>(null)
@@ -189,17 +191,28 @@ export function TasksPage() {
       {/* Task list */}
       <div className="space-y-3">
         <AnimatePresence mode="popLayout">
-          {tasks.map(task => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              onStatusChange={(id, status) => statusMutation.mutate({ taskId: id, status })}
-              onDelete={id => deleteMutation.mutate(id)}
-              onEdit={t => setEditTask(t)}
-              onFeedback={t => setFeedbackTask(t)}
-              feedbackDone={doneFeedbacks.has(task.id)}
-            />
-          ))}
+          {tasks.map(task => {
+            const sessionState: SessionState =
+              activeSession?.taskId === task.id ? 'active' :
+              activeSession ? 'other' : 'none'
+            return (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onStatusChange={(id, status) => statusMutation.mutate({ taskId: id, status })}
+                onDelete={id => deleteMutation.mutate(id)}
+                onEdit={t => setEditTask(t)}
+                onFeedback={t => setFeedbackTask(t)}
+                feedbackDone={doneFeedbacks.has(task.id)}
+                sessionState={sessionState}
+                sessionSyncing={sessionSyncing}
+                activeSessionStartedAt={activeSession?.taskId === task.id ? activeSession.startedAt : undefined}
+                onStartSession={() => startSession(task.id)}
+                onStopSession={stopSession}
+                onCancelSession={cancelSession}
+              />
+            )
+          })}
         </AnimatePresence>
       </div>
 

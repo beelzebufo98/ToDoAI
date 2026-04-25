@@ -30,6 +30,7 @@ public sealed class ScheduleController : ToDoAiControllerBase
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DayScheduleResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> GenerateSchedule([FromBody] GenerateScheduleRequest  request, CancellationToken cancellationToken)
     {
@@ -53,6 +54,7 @@ public sealed class ScheduleController : ToDoAiControllerBase
             var statusCode = result.ErrorCode switch
             {
                 ErrorCodes.NotAuthorized => StatusCodes.Status401Unauthorized,
+                ErrorCodes.TaskWorkSessionAlreadyExists => StatusCodes.Status409Conflict,
                 ErrorCodes.TaskNotFound => StatusCodes.Status404NotFound,
                 ErrorCodes.UserStateNotFound => StatusCodes.Status404NotFound,
                 _ => StatusCodes.Status400BadRequest

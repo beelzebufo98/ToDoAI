@@ -65,7 +65,10 @@ public sealed class GetTaskDalProvider : IGetTaskDalProvider
         }
         else
         {
-            query = query.Where(x => x.WorkStatus == WorkStatus.New || x.WorkStatus == WorkStatus.Todo);
+            query = query.Where(
+                x => x.WorkStatus == WorkStatus.New ||
+                     x.WorkStatus == WorkStatus.Todo ||
+                     x.WorkStatus == WorkStatus.Running);
         }
 
         bool isDescending = false;

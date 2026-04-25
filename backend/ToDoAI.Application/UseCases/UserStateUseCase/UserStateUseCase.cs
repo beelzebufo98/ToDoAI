@@ -9,6 +9,7 @@ namespace ToDoAI.Application.UseCases.UserStateUseCase;
 
 public sealed class UserStateUseCase : IUserStateUseCase
 {
+    private static readonly TimeSpan UserLocalOffset = TimeSpan.FromHours(3);
     private readonly IUserDalProvider _userDalProvider;
     private readonly IUserStateDalProvider _userStateDalProvider;
     
@@ -79,15 +80,20 @@ public sealed class UserStateUseCase : IUserStateUseCase
         }
         
         var stateResult = await _userStateDalProvider.GetLatestUserState(userStateRequest.UserId, cancellationToken);
+        var now = DateTimeOffset.UtcNow;
         UserStateDal result = null!;
-        if (stateResult == null || stateResult.CreatedAt.AddHours(3) < DateTimeOffset.UtcNow)
-        {
+        var shouldCreateNewState =
+            stateResult == null ||
+            stateResult.CreatedAt.ToOffset(UserLocalOffset).Date != now.ToOffset(UserLocalOffset).Date ||
+            stateResult.CreatedAt.AddHours(3) < now;
 
+        if (shouldCreateNewState)
+        {
             var dalRequest = new UserStateDalRequest
             {
                 UserId = userStateRequest.UserId,
                 UserStateId = Guid.NewGuid(),
-                CreatedAt = DateTimeOffset.UtcNow,
+                CreatedAt = now,
                 SleepMinutes = userStateRequest.SleepMinutes,
                 EnergyLevel = userStateRequest.EnergyLevel,
                 StressLevel = userStateRequest.StressLevel,

@@ -2,8 +2,10 @@ using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider.Models;
 using ToDoAI.Application.Abstractions.DalProviders.DayScheduleDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.DayScheduleDalProvider.Models;
+using ToDoAI.Application.Abstractions.DalProviders.TaskWorkSessionDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserStateDalProvider;
+using ToDoAI.Application.Common;
 using ToDoAI.Application.UseCases.GenerateSchedule.Mappers;
 using ToDoAI.Application.UseCases.GenerateSchedule.Models;
 using ToDoAI.Domain.Enums;
@@ -12,21 +14,25 @@ namespace ToDoAI.Application.UseCases.GenerateSchedule;
 
 public sealed class GenerateScheduleUseCase : IGenerateScheduleUseCase
 {
+    private static readonly TimeSpan UserLocalOffset = TimeSpan.FromHours(3);
     private readonly IUserStateDalProvider  _userStateDalProvider;
     private readonly IUserDalProvider  _userDalProvider;
     private readonly IGetTaskDalProvider _getTaskDalProvider;
     private readonly IDayScheduleDalProvider _dayScheduleDalProvider;
+    private readonly ITaskWorkSessionDalProvider _taskWorkSessionDalProvider;
     
     public GenerateScheduleUseCase(
         IUserStateDalProvider userStateDalProvider,
         IUserDalProvider userDalProvider,
         IGetTaskDalProvider getTaskDalProvider,
-        IDayScheduleDalProvider dayScheduleDalProvider)
+        IDayScheduleDalProvider dayScheduleDalProvider,
+        ITaskWorkSessionDalProvider taskWorkSessionDalProvider)
     {
         _userStateDalProvider = userStateDalProvider;
         _userDalProvider = userDalProvider;
         _getTaskDalProvider = getTaskDalProvider;
         _dayScheduleDalProvider = dayScheduleDalProvider;
+        _taskWorkSessionDalProvider = taskWorkSessionDalProvider;
     }
 
     public async Task<GenerateScheduleBlResult> GenerateSchedule(GenerateScheduleBlRequest request, CancellationToken cancellationToken)
@@ -38,6 +44,15 @@ public sealed class GenerateScheduleUseCase : IGenerateScheduleUseCase
             return new GenerateScheduleBlResult
             {
                 ErrorCode = ErrorCodes.NotAuthorized
+            };
+        }
+
+        var activeSession = await _taskWorkSessionDalProvider.GetTaskWorkSession(request.UserId, cancellationToken);
+        if (activeSession is not null)
+        {
+            return new GenerateScheduleBlResult
+            {
+                ErrorCode = ErrorCodes.TaskWorkSessionAlreadyExists
             };
         }
 
@@ -62,7 +77,7 @@ public sealed class GenerateScheduleUseCase : IGenerateScheduleUseCase
                 };
             }
 
-            if (task.WorkStatus is WorkStatus.Completed or WorkStatus.Running)
+            if (task.WorkStatus is WorkStatus.Completed)
             {
                 return new GenerateScheduleBlResult
                 {
@@ -74,7 +89,11 @@ public sealed class GenerateScheduleUseCase : IGenerateScheduleUseCase
         }
 
         var userState = await _userStateDalProvider.GetLatestUserState(request.UserId, cancellationToken);
-        if (userState == null || DateOnly.FromDateTime(userState.CreatedAt.DateTime) != request.ScheduleDate)
+        var userStateScheduleDate = userState?.CreatedAt.ToOffset(UserLocalOffset).Date;
+        var hasStateForScheduleDate = userStateScheduleDate != null &&
+                                      DateOnly.FromDateTime(userStateScheduleDate.Value) == request.ScheduleDate;
+
+        if (userState == null || !hasStateForScheduleDate)
         {
             return new GenerateScheduleBlResult
             {
@@ -98,10 +117,26 @@ public sealed class GenerateScheduleUseCase : IGenerateScheduleUseCase
 
         foreach (var task in orderedTasks)
         {
-            var slotEnd = cursor.AddMinutes(task.EstimatedMinutes);
+            var remainingMinutes = TaskTimeCalculator.CalculateRemainingMinutes(
+                task.EstimatedMinutes,
+                task.ActualSpentMinutes,
+                task.WorkStatus);
+            if (remainingMinutes == 0)
+            {
+                unscheduledTasks.Add(new UnscheduledTaskBlResult
+                {
+                    TaskId = task.Id,
+                    TaskTitle = task.Title,
+                    Description = task.Description,
+                    EstimatedMinutes = 0
+                });
+                continue;
+            }
+
+            var slotEnd = cursor.AddMinutes(remainingMinutes);
             if (slotEnd <= endOfScheduleDay)
             {
-                scheduledTasks.Add(task);
+                scheduledTasks.Add(task with { EstimatedMinutes = remainingMinutes });
                 cursor = slotEnd;
                 continue;
             }
@@ -111,7 +146,7 @@ public sealed class GenerateScheduleUseCase : IGenerateScheduleUseCase
                 TaskId = task.Id,
                 TaskTitle = task.Title,
                 Description = task.Description,
-                EstimatedMinutes = task.EstimatedMinutes
+                EstimatedMinutes = remainingMinutes
             });
         }
 

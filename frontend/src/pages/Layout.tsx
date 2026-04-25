@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { ActiveSessionBanner } from '@/components/session/ActiveSessionBanner'
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Главная' },
@@ -63,6 +64,11 @@ export function Layout() {
         </nav>
 
         <Separator className="bg-sidebar-border" />
+
+        {/* Active session */}
+        <div className="pt-2">
+          <ActiveSessionBanner />
+        </div>
 
         {/* Logout */}
         <div className="p-3">

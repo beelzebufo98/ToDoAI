@@ -11,6 +11,10 @@ public sealed record TaskResult
     public string Description { get; init; } = default!;
     
     public int EstimatedMinutes { get; init; }
+
+    public int ActualSpentMinutes { get; init; }
+
+    public int RemainingMinutes { get; init; }
     
     public int ComplexityLevel { get; init; }
     

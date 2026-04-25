@@ -8,6 +8,7 @@ using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.ScheduleDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.TaskExecutionDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.TaskWorkSessionDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UpdateTaskStatusDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
@@ -19,6 +20,7 @@ using ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
 using ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.Infrastructure.DalProviders.ScheduleDalProvider;
 using ToDoAI.Infrastructure.DalProviders.TaskExecutionDalProvider;
+using ToDoAI.Infrastructure.DalProviders.TaskWorkSessionDalProvider;
 using ToDoAI.Infrastructure.DalProviders.UpdateTaskDalProvider;
 using ToDoAI.Infrastructure.DalProviders.UpdateTaskStatusDalProvider;
 using ToDoAI.Infrastructure.DalProviders.UserDalProvider;
@@ -45,6 +47,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserStateDalProvider, UserStateDalProvider>();
         services.AddScoped<ITaskExecutionDalProvider, TaskExecutionDalProvider>();
         services.AddScoped<IScheduleDalProvider, ScheduleDalProvider>();
+        services.AddScoped<ITaskWorkSessionDalProvider, TaskWorkSessionDalProvider>();
         services.AddScoped<IDayScheduleDalProvider, DayScheduleDalProvider>();
 
         return services;

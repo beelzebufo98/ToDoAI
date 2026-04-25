@@ -13,6 +13,7 @@ public static class TaskEntityMapper
             Title = taskEntity.Title,
             Description = taskEntity.Description,
             EstimatedMinutes = taskEntity.EstimatedMinutes,
+            ActualSpentMinutes = taskEntity.ActualSpentMinutes,
             ComplexityLevel = taskEntity.ComplexityLevel,
             Priority = taskEntity.Priority,
             DeadlineAt = taskEntity.DeadlineAt,
