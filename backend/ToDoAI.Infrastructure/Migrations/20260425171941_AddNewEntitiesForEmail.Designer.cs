@@ -2,18 +2,21 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ToDoAI.Infrastructure.Data;
 
 #nullable disable
 
-namespace ToDoAI.Migrations
+namespace ToDoAI.Infrastructure.Migrations
 {
     [DbContext(typeof(ToDoAIDbContext))]
-    partial class ToDoAIDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260425171941_AddNewEntitiesForEmail")]
+    partial class AddNewEntitiesForEmail
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
