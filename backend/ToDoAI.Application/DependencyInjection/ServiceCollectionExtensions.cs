@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using ToDoAI.Application.Services.AiService.Settings;
 using ToDoAI.Application.Services.JwtService;
 using ToDoAI.Application.Services.JwtService.Settings;
 using ToDoAI.Application.UseCases.CreateTask;
@@ -40,6 +41,11 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICancelTaskWorkSessionUseCase, CancelTaskWorkSessionUseCase>();
         services.AddScoped<IGetTaskWorkSessionUseCase, GetTaskWorkSessionUseCase>();
         services.AddScoped<IJwtService, JwtService>();
+
+        services.AddSingleton<IValidateOptions<AiServiceSettings>, AiServiceSettingsValidator>();
+        services.AddOptions<AiServiceSettings>()
+            .BindConfiguration("AiService")
+            .ValidateOnStart();
 
         services.AddSingleton<IValidateOptions<AuthSettings>, AuthSettingsValidator>();
         services.AddOptions<AuthSettings>()

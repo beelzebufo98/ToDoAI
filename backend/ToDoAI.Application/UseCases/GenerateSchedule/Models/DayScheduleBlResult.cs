@@ -14,5 +14,7 @@ public sealed record DayScheduleBlResult
     
     public DateTimeOffset CreateDate { get; init; }
 
+    public IReadOnlyCollection<string> Explanations { get; init; } = [];
+
     public IList<ScheduleBlResult> Blocks { get; init; } = [];
 }

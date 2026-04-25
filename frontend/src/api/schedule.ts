@@ -15,6 +15,7 @@ export interface DaySchedule {
   version: number
   isActiveVersion: boolean
   createDate: string
+  explanations?: string[]
   blocks: ScheduleBlock[]
 }
 
