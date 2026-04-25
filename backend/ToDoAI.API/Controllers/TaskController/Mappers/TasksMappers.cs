@@ -14,6 +14,8 @@ public static class TasksMappers
             Title = result.Title,
             Description = result.Description,
             EstimatedMinutes = result.EstimatedMinutes,
+            ActualSpentMinutes = result.ActualSpentMinutes,
+            RemainingMinutes = result.RemainingMinutes,
             ComplexityLevel = result.ComplexityLevel,
             Priority = result.Priority,
             DeadlineAt = result.DeadlineAt,

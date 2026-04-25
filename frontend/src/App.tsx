@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 
 import { AuthProvider } from '@/contexts/AuthContext'
+import { TaskSessionProvider } from '@/contexts/TaskSessionContext'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Layout } from '@/pages/Layout'
 import { LoginPage } from '@/pages/LoginPage'
@@ -24,25 +25,27 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+        <TaskSessionProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Public */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
 
-            {/* Protected */}
-            <Route element={<ProtectedRoute />}>
-              <Route element={<Layout />}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/tasks" element={<TasksPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
+              {/* Protected */}
+              <Route element={<ProtectedRoute />}>
+                <Route element={<Layout />}>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/tasks" element={<TasksPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                </Route>
               </Route>
-            </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
-        <Toaster richColors position="top-right" />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+          <Toaster richColors position="top-right" />
+        </TaskSessionProvider>
       </AuthProvider>
     </QueryClientProvider>
   )

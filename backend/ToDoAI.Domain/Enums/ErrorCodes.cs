@@ -39,4 +39,13 @@ public enum ErrorCodes
     
     [Description("Расписание на указанную дату не найдено")]
     DayScheduleNotFound = 12,
+    
+    [Description("У пользователя не может быть несколько открытых сессий")]
+    TaskWorkSessionAlreadyExists = 13,
+    
+    [Description("Открытая сессия отсутствует")]
+    SessionNotFound = 14,
+    
+    [Description("Invalid task work session status")]
+    InvalidTaskWorkSessionStatus = 15,
 }

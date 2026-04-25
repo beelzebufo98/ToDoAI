@@ -12,6 +12,7 @@ using ToDoAI.Application.UseCases.RefreshToken;
 using ToDoAI.Application.UseCases.GenerateSchedule;
 using ToDoAI.Application.UseCases.GetSchedule;
 using ToDoAI.Application.UseCases.TaskExecutionUseCase;
+using ToDoAI.Application.UseCases.TaskWorkSession;
 using ToDoAI.Application.UseCases.UpdateTask;
 using ToDoAI.Application.UseCases.UpdateTaskStatus;
 using ToDoAI.Application.UseCases.UserStateUseCase;
@@ -34,6 +35,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITaskExecutionUseCase, TaskExecutionUseCase>();
         services.AddScoped<IGenerateScheduleUseCase, GenerateScheduleUseCase>();
         services.AddScoped<IGetScheduleUseCase, GetScheduleUseCase>();
+        services.AddScoped<ICreateTaskWorkSessionUseCase, CreateTaskWorkSessionUseCase>();
+        services.AddScoped<IStopTaskWorkSessionUseCase, StopTaskWorkSessionUseCase>();
+        services.AddScoped<ICancelTaskWorkSessionUseCase, CancelTaskWorkSessionUseCase>();
+        services.AddScoped<IGetTaskWorkSessionUseCase, GetTaskWorkSessionUseCase>();
         services.AddScoped<IJwtService, JwtService>();
 
         services.AddSingleton<IValidateOptions<AuthSettings>, AuthSettingsValidator>();

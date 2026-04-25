@@ -14,6 +14,8 @@ export interface Task {
   title: string
   description: string
   estimatedMinutes: number
+  actualSpentMinutes: number
+  remainingMinutes: number
   complexityLevel: ComplexityLevel
   priority: Priority
   workStatus: WorkStatus

@@ -175,8 +175,11 @@ export function ProfilePage() {
     .sort((a, b) => b.date.localeCompare(a.date))
   const isUpdate = !!latest && isWithin3Hours(latest.createdAt)
 
+  // Pre-fill once when the record first loads (or a new record appears).
+  // Intentionally excludes `isUpdate` — it can briefly toggle during refetch
+  // and would re-run the effect with stale cache data, overwriting user edits.
   useEffect(() => {
-    if (isUpdate && latest) {
+    if (latest && isWithin3Hours(latest.createdAt)) {
       reset({
         sleepHours:         latest.sleepMinutes / 60,
         energyLevel:        latest.energyLevel,
@@ -185,7 +188,7 @@ export function ProfilePage() {
         concentrationLevel: latest.concentrationLevel,
       })
     }
-  }, [isUpdate, latest?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [latest?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const mutation = useMutation({
     mutationFn: (data: FormData) =>
@@ -199,7 +202,7 @@ export function ProfilePage() {
     onSuccess: () => {
       toast.success(isUpdate ? 'Состояние обновлено' : 'Состояние сохранено')
       queryClient.invalidateQueries({ queryKey: ['userState'] })
-      reset()
+      if (!isUpdate) reset()
     },
     onError: () => toast.error('Не удалось сохранить состояние'),
   })
