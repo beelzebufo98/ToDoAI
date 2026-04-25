@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { ArrowLeft, Clock, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { scheduleApi } from '@/api/schedule'
+import { scheduleApi, type DaySchedule } from '@/api/schedule'
 import { tasksApi } from '@/api/tasks'
 import { useTaskSession } from '@/contexts/TaskSessionContext'
 import { Button } from '@/components/ui/button'
@@ -44,7 +44,7 @@ function defaultStartTime(): string {
 
 interface Props {
   scheduleDate: string
-  onGenerated: () => void
+  onGenerated: (schedule: DaySchedule) => void
   onCancel?: () => void
   preselectedTaskIds?: string[]
 }
@@ -128,7 +128,7 @@ export function GenerateDayCard({
       const taskIds = [...selectedIds].filter(taskId => allowedIds.has(taskId))
       return scheduleApi.generate({ scheduleDate, startAt, taskIds })
     },
-    onSuccess: () => onGenerated(),
+    onSuccess: response => onGenerated(response.data.payload),
     onError: error => {
       if (axios.isAxiosError(error) && error.response?.status === 409) {
         toast.info('Завершите или отмените активную сессию перед генерацией расписания')

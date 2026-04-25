@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from config import settings
+from app.config import settings
 
 
 def _init_router(_app: FastAPI) -> None:
-    from api import router
+    from app.api import router
 
     _app.include_router(router)
 

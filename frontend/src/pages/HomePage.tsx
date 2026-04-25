@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { userStateApi } from '@/api/userState'
-import { scheduleApi } from '@/api/schedule'
+import { scheduleApi, type DaySchedule } from '@/api/schedule'
 import { taskWorkSessionsApi, type TaskWorkSession } from '@/api/taskWorkSessions'
 import { NoStateTodayCard } from '@/components/schedule/NoStateTodayCard'
 import { GenerateDayCard } from '@/components/schedule/GenerateDayCard'
@@ -71,6 +71,7 @@ export function HomePage() {
   const todayUtc = todayUtcString()
   const queryClient = useQueryClient()
   const [showGenerate, setShowGenerate] = useState(false)
+  const [generatedSchedule, setGeneratedSchedule] = useState<DaySchedule | null>(null)
 
   const { data: stateData, isLoading: stateLoading } = useQuery({
     queryKey: ['userState', 'latest'],
@@ -101,7 +102,7 @@ export function HomePage() {
   const scheduleLoadError =
     !scheduleData && !!scheduleError && !scheduleNotFound
 
-  const schedule = scheduleData?.data.payload ?? null
+  const schedule = generatedSchedule ?? scheduleData?.data.payload ?? null
 
   const isLoading = stateLoading || scheduleLoading
 
@@ -146,7 +147,8 @@ export function HomePage() {
                 <GenerateDayCard
                   scheduleDate={today}
                   preselectedTaskIds={schedule?.blocks.map(block => block.taskId) ?? []}
-                  onGenerated={() => {
+                  onGenerated={nextSchedule => {
+                    setGeneratedSchedule(nextSchedule)
                     queryClient.invalidateQueries({ queryKey: ['schedule', today] })
                     setShowGenerate(false)
                   }}

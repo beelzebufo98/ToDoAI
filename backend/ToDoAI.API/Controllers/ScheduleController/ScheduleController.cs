@@ -70,6 +70,7 @@ public sealed class ScheduleController : ToDoAiControllerBase
             Version = result.DaySchedule.Version,
             IsActiveVersion = result.DaySchedule.IsActiveVersion,
             CreateDate = result.DaySchedule.CreateDate,
+            Explanations = result.DaySchedule.Explanations,
             Blocks = result.DaySchedule.Blocks.Select(x => new ScheduleBlockResponse
             {
                 ScheduleId = x.ScheduleId,
@@ -130,6 +131,7 @@ public sealed class ScheduleController : ToDoAiControllerBase
             Version = result.DaySchedule.Version,
             IsActiveVersion = result.DaySchedule.IsActiveVersion,
             CreateDate = result.DaySchedule.CreateDate,
+            Explanations = result.DaySchedule.Explanations,
             Blocks = result.DaySchedule.Blocks.Select(x => new ScheduleBlockResponse
             {
                 ScheduleId = x.ScheduleId,

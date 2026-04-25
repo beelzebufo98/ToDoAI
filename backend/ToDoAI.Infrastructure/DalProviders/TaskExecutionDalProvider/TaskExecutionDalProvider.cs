@@ -49,4 +49,32 @@ public sealed class TaskExecutionDalProvider : ITaskExecutionDalProvider
             CreatedAt = entity.CreatedAt
         };
     }
+
+    public async Task<IReadOnlyCollection<RecentTaskExecutionDal>> GetRecentTaskExecutions(
+        Guid userId,
+        int count,
+        CancellationToken cancellationToken)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        return await dbContext.TaskExecutions
+            .AsNoTracking()
+            .Where(e => e.Task.UserId == userId)
+            .OrderByDescending(e => e.CreatedAt)
+            .Take(count)
+            .Select(e => new RecentTaskExecutionDal
+            {
+                TaskExecutionId = e.Id,
+                TaskId = e.TaskId,
+                TaskTitle = e.Task.Title,
+                TaskEstimatedMinutes = e.Task.EstimatedMinutes,
+                TaskComplexityLevel = e.Task.ComplexityLevel,
+                TaskPriority = e.Task.Priority,
+                ActualMinutes = e.ActualMinutes,
+                EnergyAfter = e.EnergyAfter,
+                StressAfter = e.StressAfter,
+                CreatedAt = e.CreatedAt
+            })
+            .ToArrayAsync(cancellationToken);
+    }
 }

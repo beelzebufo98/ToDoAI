@@ -32,6 +32,7 @@ interface Props {
 
 export function DayScheduleTimeline({ schedule, onRegenerate }: Props) {
   const blocks = schedule.blocks
+  const explanations = schedule.explanations ?? []
   const { current } = useTaskSession()
   const isRegenerationBlocked = current != null
 
@@ -89,6 +90,19 @@ export function DayScheduleTimeline({ schedule, onRegenerate }: Props) {
         <p className="text-xs text-muted-foreground">
           Пока идет активная сессия, перегенерация расписания заблокирована.
         </p>
+      )}
+
+      {explanations.length > 0 && (
+        <div className="rounded-lg border border-border/40 bg-muted/30 px-3 py-2">
+          <p className="mb-1 text-xs font-medium text-foreground">Почему такой план</p>
+          <ul className="space-y-1">
+            {explanations.slice(0, 3).map((explanation, index) => (
+              <li key={`${index}-${explanation}`} className="text-xs leading-relaxed text-muted-foreground">
+                {explanation}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <div className="relative space-y-0">
