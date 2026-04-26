@@ -15,4 +15,6 @@ public sealed class TaskExecutionResponse
     public int StressAfter { get; init; }
 
     public DateTimeOffset CreatedAt { get; init; }
+
+    public string MotivationMessage { get; init; } = string.Empty;
 }

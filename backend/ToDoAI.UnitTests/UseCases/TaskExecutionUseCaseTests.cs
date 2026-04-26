@@ -6,6 +6,8 @@ using ToDoAI.Application.Abstractions.DalProviders.TaskExecutionDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.TaskExecutionDalProvider.Models;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider.Models;
+using ToDoAI.Application.Abstractions.Services.AiService;
+using ToDoAI.Application.Abstractions.Services.AiService.Models;
 using ToDoAI.Application.UseCases.TaskExecutionUseCase;
 using ToDoAI.Application.UseCases.TaskExecutionUseCase.Models;
 using ToDoAI.Domain.Enums;
@@ -18,9 +20,10 @@ public sealed class TaskExecutionUseCaseTests
     private readonly Mock<IUserDalProvider> _userDal = new();
     private readonly Mock<IGetTaskDalProvider> _getTaskDal = new();
     private readonly Mock<IScheduleDalProvider> _scheduleDal = new();
+    private readonly Mock<IAiMotivationClient> _aiMotivationClient = new();
 
     private TaskExecutionUseCase CreateUseCase() =>
-        new(_executionDal.Object, _userDal.Object, _getTaskDal.Object, _scheduleDal.Object);
+        new(_executionDal.Object, _userDal.Object, _getTaskDal.Object, _scheduleDal.Object, _aiMotivationClient.Object);
 
     private static readonly Guid UserId = Guid.NewGuid();
     private static readonly Guid TaskId = Guid.NewGuid();
@@ -227,6 +230,17 @@ public sealed class TaskExecutionUseCaseTests
         _executionDal
             .Setup(x => x.CreateTaskExecution(It.IsAny<TaskExecutionDalRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(MakeExecutionDal());
+        _aiMotivationClient
+            .Setup(x => x.GenerateMotivation(It.IsAny<AiGenerateMotivationRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AiGenerateMotivationResult
+            {
+                UsedAi = true,
+                Response = new AiGenerateMotivationResponse
+                {
+                    Message = "Хорошая работа.",
+                    Model = "test-model"
+                }
+            });
 
         var useCase = CreateUseCase();
 
@@ -237,6 +251,7 @@ public sealed class TaskExecutionUseCaseTests
         result.ErrorCode.Should().BeNull();
         result.TaskExecutionResult.Should().NotBeNull();
         result.TaskExecutionResult!.TaskId.Should().Be(TaskId);
+        result.TaskExecutionResult.MotivationMessage.Should().Be("Хорошая работа.");
         _scheduleDal.VerifyNoOtherCalls();
     }
 
@@ -258,6 +273,13 @@ public sealed class TaskExecutionUseCaseTests
         _executionDal
             .Setup(x => x.CreateTaskExecution(It.IsAny<TaskExecutionDalRequest>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(MakeExecutionDal(scheduleId));
+        _aiMotivationClient
+            .Setup(x => x.GenerateMotivation(It.IsAny<AiGenerateMotivationRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AiGenerateMotivationResult
+            {
+                UsedAi = false,
+                FallbackReason = "disabled"
+            });
 
         var useCase = CreateUseCase();
 

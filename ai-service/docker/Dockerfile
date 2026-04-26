@@ -26,7 +26,7 @@ RUN poetry install --no-root
 
 WORKDIR /app
 
-CMD ["python", "app/main.py"]
+CMD ["python", "-m", "app.main"]
 
 FROM base AS production
 
@@ -37,4 +37,4 @@ WORKDIR /app
 COPY ./app /app/app
 COPY pyproject.toml /app/pyproject.toml
 
-CMD ["python", "app/main.py"]
+CMD ["python", "-m", "app.main"]

@@ -47,8 +47,9 @@ export function TaskExecutionDialog({ open, onClose, onDone, taskId, taskTitle }
 
   const mutation = useMutation({
     mutationFn: (data: FormData) => taskExecutionApi.create(taskId, data),
-    onSuccess: () => {
-      toast.success('Фидбек сохранён')
+    onSuccess: (response) => {
+      const motivationMessage = response.data?.payload?.motivationMessage?.trim()
+      toast.success(motivationMessage || 'Фидбек сохранён')
       reset()
       onDone?.()
       onClose()

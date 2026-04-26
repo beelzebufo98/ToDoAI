@@ -16,6 +16,31 @@ services:
       timeout: 3s
       retries: 20
 
+  ai-service:
+    build:
+      context: ../ai-service
+      dockerfile: docker/Dockerfile
+      target: production
+    image: todoai-ai-service
+    container_name: todoai-ai-service
+    env_file:
+      - ../ai-service/.env
+    environment:
+      ENV: production
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      RELOAD: false
+      WORKERS: 1
+    ports:
+      - "8000:8000"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: todoai-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   api:
     build:
       context: .
@@ -25,6 +50,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      ai-service:
+        condition: service_started
+      mailpit:
+        condition: service_started
     environment:
       ConnectionStrings__Default: ${CONNECTIONSTRINGS__DEFAULT}
       AuthSettings__SecretKey: ${AUTHSETTINGS__SECRETKEY}
@@ -32,6 +61,18 @@ services:
       AuthSettings__RefreshTokenLifetime: ${AUTHSETTINGS__REFRESHTOKENLIFETIME}
       ASPNETCORE_URLS: "http://+:5114"
       ASPNETCORE_ENVIRONMENT: "Development"
+      AiService__Enabled: "true"
+      AiService__BaseUrl: "http://ai-service:8000"
+      AiService__GenerateSchedulePath: "/api/v1/ai/schedule/generate"
+      AiService__GenerateMotivationPath: "/api/v1/ai/motivation/generate"
+      EmailSettings__Enabled: "true"
+      EmailSettings__Host: "mailpit"
+      EmailSettings__Port: "1025"
+      EmailSettings__SocketSecurityMode: "None"
+      EmailSettings__UserName: ""
+      EmailSettings__Password: ""
+      EmailSettings__FromAddress: "noreply@todoai.local"
+      EmailSettings__FromName: "ToDoAI"
     ports:
       - "5114:5114"
 

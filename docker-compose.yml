@@ -1,5 +1,4 @@
 services:
-
   db:
     image: postgres:16
     container_name: todoai-db
@@ -17,6 +16,31 @@ services:
       timeout: 3s
       retries: 20
 
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: docker/Dockerfile
+      target: production
+    image: todoai-ai-service
+    container_name: todoai-ai-service
+    env_file:
+      - ./ai-service/.env
+    environment:
+      ENV: production
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      RELOAD: false
+      WORKERS: 1
+    ports:
+      - "8000:8000"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: todoai-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
   api:
     build:
       context: ./backend
@@ -26,10 +50,27 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    env_file: ./backend/.env          # SecretKey, ConnectionString и т.д.
+      ai-service:
+        condition: service_started
+      mailpit:
+        condition: service_started
+    env_file:
+      - ./backend/.env
     environment:
       ASPNETCORE_URLS: "http://+:5114"
       ASPNETCORE_ENVIRONMENT: "Development"
+      AiService__Enabled: "true"
+      AiService__BaseUrl: "http://ai-service:8000"
+      AiService__GenerateSchedulePath: "/api/v1/ai/schedule/generate"
+      AiService__GenerateMotivationPath: "/api/v1/ai/motivation/generate"
+      EmailSettings__Enabled: "true"
+      EmailSettings__Host: "mailpit"
+      EmailSettings__Port: "1025"
+      EmailSettings__SocketSecurityMode: "None"
+      EmailSettings__UserName: ""
+      EmailSettings__Password: ""
+      EmailSettings__FromAddress: "noreply@todoai.local"
+      EmailSettings__FromName: "ToDoAI"
     ports:
       - "5114:5114"
 
@@ -38,7 +79,6 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        # URL бакается в бандл — должен быть доступен из браузера
         VITE_API_URL: http://localhost:5114/api/v1.0
     image: todoai-frontend
     container_name: todoai-frontend
