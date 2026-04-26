@@ -25,6 +25,18 @@ function blockDuration(startAt: string, endAt: string) {
   return `${blockDurationMinutes(startAt, endAt)} мин`
 }
 
+function getTasksCountLabel(count: number) {
+  if (count === 1) {
+    return 'задача'
+  }
+
+  if (count >= 2 && count <= 4) {
+    return 'задачи'
+  }
+
+  return 'задач'
+}
+
 interface Props {
   schedule: DaySchedule
   onRegenerate: () => void
@@ -63,7 +75,7 @@ export function DayScheduleTimeline({ schedule, onRegenerate }: Props) {
         <div>
           <h2 className="text-sm font-semibold text-foreground">Расписание на сегодня</h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {blocks.length} {blocks.length === 1 ? 'задача' : blocks.length >= 2 && blocks.length <= 4 ? 'задачи' : 'задач'}
+            {blocks.length} {getTasksCountLabel(blocks.length)}
           </p>
         </div>
         <button
@@ -116,7 +128,7 @@ export function DayScheduleTimeline({ schedule, onRegenerate }: Props) {
 
           const durationLabel = isRunning
             ? isOverrun
-              ? `${plannedMinutes} мин план / время вышло`
+              ? `${plannedMinutes} мин план / потрачено больше, чем планировали`
               : `${plannedMinutes} мин план / ${task.remainingMinutes} мин осталось`
             : blockDuration(block.startAt, block.endAt)
 

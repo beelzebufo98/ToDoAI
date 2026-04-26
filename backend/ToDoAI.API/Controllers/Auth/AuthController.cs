@@ -9,10 +9,16 @@ using ToDoAI.Application.Services.JwtService;
 using ToDoAI.Application.Services.JwtService.Settings;
 using ToDoAI.Application.UseCases.CreateUser;
 using ToDoAI.Application.UseCases.CreateUser.Models;
+using ToDoAI.Application.UseCases.ConfirmEmail;
+using ToDoAI.Application.UseCases.ConfirmEmail.Models;
+using ToDoAI.Application.UseCases.ForgotPassword;
 using ToDoAI.Application.UseCases.LoginUser;
 using ToDoAI.Application.UseCases.LoginUser.Models;
 using ToDoAI.Application.UseCases.RefreshToken;
 using ToDoAI.Application.UseCases.RefreshToken.Models;
+using ToDoAI.Application.UseCases.ResendConfirmationCode;
+using ToDoAI.Application.UseCases.ResetPassword;
+using ToDoAI.Application.UseCases.ResetPassword.Models;
 using ErrorCodes = ToDoAI.Domain.Enums.ErrorCodes;
 
 namespace ToDoAI.API.Controllers.Auth;
@@ -23,6 +29,10 @@ namespace ToDoAI.API.Controllers.Auth;
 public sealed class AuthController : ToDoAiControllerBase
 {
     private readonly ICreateUserUseCase _createUserUseCase;
+    private readonly IConfirmEmailUseCase _confirmEmailUseCase;
+    private readonly IForgotPasswordUseCase _forgotPasswordUseCase;
+    private readonly IResendConfirmationCodeUseCase _resendConfirmationCodeUseCase;
+    private readonly IResetPasswordUseCase _resetPasswordUseCase;
     private readonly ILoginUserUseCase  _loginUserUseCase;
     private readonly IRefreshTokenUseCase _refreshTokenUseCase;
     private readonly IUserDalProvider _userDalProvider;
@@ -32,6 +42,10 @@ public sealed class AuthController : ToDoAiControllerBase
     
     public AuthController(
         ICreateUserUseCase createUserUseCase,
+        IConfirmEmailUseCase confirmEmailUseCase,
+        IForgotPasswordUseCase forgotPasswordUseCase,
+        IResendConfirmationCodeUseCase resendConfirmationCodeUseCase,
+        IResetPasswordUseCase resetPasswordUseCase,
         ILoginUserUseCase loginUserUseCase,
         IRefreshTokenUseCase refreshTokenUseCase,
         IUserDalProvider userDalProvider,
@@ -40,6 +54,10 @@ public sealed class AuthController : ToDoAiControllerBase
         IAntiforgery antiforgery)
     {
         _createUserUseCase = createUserUseCase;
+        _confirmEmailUseCase = confirmEmailUseCase;
+        _forgotPasswordUseCase = forgotPasswordUseCase;
+        _resendConfirmationCodeUseCase = resendConfirmationCodeUseCase;
+        _resetPasswordUseCase = resetPasswordUseCase;
         _loginUserUseCase = loginUserUseCase;
         _refreshTokenUseCase = refreshTokenUseCase;
         _userDalProvider = userDalProvider;
@@ -58,6 +76,7 @@ public sealed class AuthController : ToDoAiControllerBase
             UserName = request.UserName,
             FirstName = request.FirstName,
             LastName = request.LastName,
+            Email = request.Email,
             Password = request.Password
         };
         var result = await _createUserUseCase.CreateUser(blRequest, cancellationToken);
@@ -67,6 +86,65 @@ public sealed class AuthController : ToDoAiControllerBase
         }
 
         return Created();
+    }
+
+    [HttpPost("confirm-email")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    public async Task<ActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _confirmEmailUseCase.ConfirmEmail(new ConfirmEmailBlRequest
+        {
+            Email = request.Email,
+            Code = request.Code
+        }, cancellationToken);
+
+        if (result.Error is not null)
+        {
+            return ClientError(new ErrorApi<ErrorCodes?>(result.Error));
+        }
+
+        return Ok();
+    }
+
+    [HttpPost("forgot-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request, CancellationToken cancellationToken)
+    {
+        await _forgotPasswordUseCase.ForgotPassword(request.Email, cancellationToken);
+        return Ok();
+    }
+
+    [HttpPost("resend-confirmation-code")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    public async Task<ActionResult> ResendConfirmationCode(
+        [FromBody] ResendConfirmationCodeRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _resendConfirmationCodeUseCase.ResendConfirmationCode(request.Email, cancellationToken);
+        return Ok();
+    }
+
+    [HttpPost("reset-password")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _resetPasswordUseCase.ResetPassword(new ResetPasswordBlRequest
+        {
+            Email = request.Email,
+            Code = request.Code,
+            NewPassword = request.NewPassword
+        }, cancellationToken);
+
+        if (result.Error is not null)
+        {
+            return ClientError(new ErrorApi<ErrorCodes?>(result.Error));
+        }
+
+        return Ok();
     }
 
     [HttpPost("login")]

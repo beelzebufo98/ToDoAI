@@ -48,4 +48,7 @@ public enum ErrorCodes
     
     [Description("Invalid task work session status")]
     InvalidTaskWorkSessionStatus = 15,
+
+    [Description("Email пользователя не подтвержден")]
+    EmailNotConfirmed = 16,
 }

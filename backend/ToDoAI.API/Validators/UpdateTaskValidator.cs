@@ -30,7 +30,7 @@ public sealed class UpdateTaskValidator : AbstractValidator<UpdateTaskRequest>
             .When(x => x.Priority.HasValue);
 
         RuleFor(x => x.DeadlineAt)
-            .NotEmpty()
-            .When(x => x.DeadlineAt.HasValue);
+            .Must(x => !x.HasValue || x.Value != default)
+            .WithMessage("Deadline must not be default.");
     }
 }

@@ -10,7 +10,14 @@ public sealed class RefreshSessionEntityConfiguration : IEntityTypeConfiguration
     {
         builder.ToTable("RefreshSessions", "ToDoAIService");
 
+        builder.HasOne<UserEntity>()
+            .WithMany()
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasIndex(x => x.TokenHash)
             .IsUnique();
+
+        builder.HasIndex(x => x.UserId);
     }
 }

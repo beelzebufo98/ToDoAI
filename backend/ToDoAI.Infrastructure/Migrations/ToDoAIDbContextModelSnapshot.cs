@@ -54,6 +54,78 @@ namespace ToDoAI.Migrations
                     b.ToTable("DaySchedules", "ToDoAIService");
                 });
 
+            modelBuilder.Entity("ToDoAI.Domain.Entities.EmailConfirmationEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId", "CodeHash");
+
+                    b.HasIndex("UserId", "SentAt");
+
+                    b.ToTable("EmailConfirmations", "ToDoAIService");
+                });
+
+            modelBuilder.Entity("ToDoAI.Domain.Entities.PasswordResetEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId", "CodeHash");
+
+                    b.HasIndex("UserId", "SentAt");
+
+                    b.ToTable("PasswordResets", "ToDoAIService");
+                });
+
             modelBuilder.Entity("ToDoAI.Domain.Entities.RefreshSessionEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -77,6 +149,8 @@ namespace ToDoAI.Migrations
 
                     b.HasIndex("TokenHash")
                         .IsUnique();
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("RefreshSessions", "ToDoAIService");
                 });
@@ -263,6 +337,9 @@ namespace ToDoAI.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsEmailConfirmed")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
@@ -322,6 +399,33 @@ namespace ToDoAI.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ToDoAI.Domain.Entities.EmailConfirmationEntity", b =>
+                {
+                    b.HasOne("ToDoAI.Domain.Entities.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ToDoAI.Domain.Entities.PasswordResetEntity", b =>
+                {
+                    b.HasOne("ToDoAI.Domain.Entities.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ToDoAI.Domain.Entities.RefreshSessionEntity", b =>
+                {
+                    b.HasOne("ToDoAI.Domain.Entities.UserEntity", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ToDoAI.Domain.Entities.ScheduleEntity", b =>

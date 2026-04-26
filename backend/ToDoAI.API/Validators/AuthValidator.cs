@@ -16,7 +16,7 @@ public sealed class AuthValidator : AbstractValidator<RegisterUserRequest>
             .WithMessage("Username must be less than 100 characters")
             .Matches(@"^[a-zA-Z0-9_]*$")
             .WithMessage("Username can contain only letters, numbers and underscore");
-        
+
         RuleFor(user => user.FirstName)
             .NotEmpty()
             .WithMessage("First name is required")
@@ -24,14 +24,22 @@ public sealed class AuthValidator : AbstractValidator<RegisterUserRequest>
             .WithMessage("First name must be between 1 and 100 characters")
             .Matches("^[a-zA-Zа-яА-Я]+$")
             .WithMessage("First name must contain only letters");
-        
+
         RuleFor(user => user.LastName)
             .MaximumLength(100)
             .WithMessage("Last name must not exceed 100 characters")
             .Matches("^[a-zA-Zа-яА-Я]*$")
             .WithMessage("Last name must contain only letters")
             .When(user => !string.IsNullOrEmpty(user.LastName));
-        
+
+        RuleFor(user => user.Email)
+            .NotEmpty()
+            .WithMessage("Email is required")
+            .MaximumLength(256)
+            .WithMessage("Email must be less than 256 characters")
+            .EmailAddress()
+            .WithMessage("Email must be valid");
+
         RuleFor(user => user.Password)
             .NotEmpty()
             .WithMessage("Password is required")

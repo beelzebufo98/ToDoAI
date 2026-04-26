@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAI.Application", "ToDoA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAI.Infrastructure", "ToDoAI.Infrastructure\ToDoAI.Infrastructure.csproj", "{99526D2E-6C61-43A8-99D1-C58DF5AC0959}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAI.UnitTests", "ToDoAI.UnitTests\ToDoAI.UnitTests.csproj", "{BD8530B8-B866-4904-9FDD-C5B6764ABF40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToDoAI.IntegrationTests", "ToDoAI.IntegrationTests\ToDoAI.IntegrationTests.csproj", "{D9D4CA8E-1C8C-4F31-B348-C6A708801209}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +34,14 @@ Global
 		{99526D2E-6C61-43A8-99D1-C58DF5AC0959}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99526D2E-6C61-43A8-99D1-C58DF5AC0959}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99526D2E-6C61-43A8-99D1-C58DF5AC0959}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD8530B8-B866-4904-9FDD-C5B6764ABF40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD8530B8-B866-4904-9FDD-C5B6764ABF40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD8530B8-B866-4904-9FDD-C5B6764ABF40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD8530B8-B866-4904-9FDD-C5B6764ABF40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9D4CA8E-1C8C-4F31-B348-C6A708801209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9D4CA8E-1C8C-4F31-B348-C6A708801209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9D4CA8E-1C8C-4F31-B348-C6A708801209}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9D4CA8E-1C8C-4F31-B348-C6A708801209}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

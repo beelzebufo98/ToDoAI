@@ -29,6 +29,17 @@ public sealed class UserDalProvider : IUserDalProvider
         return true;
     }
 
+    public async Task<bool> CheckUserEmailExists(string email, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var normalizedEmail = email.ToLowerInvariant();
+        var user = await toDoAiDb.Users
+            .Where(u => u.Email != null && u.Email.ToLower() == normalizedEmail)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return user is not null;
+    }
+
     public async Task CreateUser(RegisterUserRequestDal userRequest, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
@@ -38,6 +49,7 @@ public sealed class UserDalProvider : IUserDalProvider
             UserName = userRequest.UserName,
             FirstName = userRequest.FirstName,
             LastName = userRequest.LastName,
+            Email = userRequest.Email,
             PasswordHash = userRequest.PasswordHash,
         };
         
@@ -70,6 +82,48 @@ public sealed class UserDalProvider : IUserDalProvider
 
         return GetLoginUserDal(user);
     }
+
+    public async Task<LoginUserDal?> GetUserByEmail(string email, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+        var normalizedEmail = email.ToLowerInvariant();
+        var user = await toDoAiDb.Users
+            .FirstOrDefaultAsync(x => x.Email != null && x.Email.ToLower() == normalizedEmail, cancellationToken);
+        if (user is null)
+        {
+            return null;
+        }
+
+        return GetLoginUserDal(user);
+    }
+
+    public async Task UpdatePassword(Guid userId, string passwordHash, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var user = await toDoAiDb.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+        if (user is null)
+        {
+            return;
+        }
+
+        user.PasswordHash = passwordHash;
+        await toDoAiDb.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task UpdateEmailConfirmed(Guid userId, bool isEmailConfirmed, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var user = await toDoAiDb.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+        if (user is null)
+        {
+            return;
+        }
+
+        user.IsEmailConfirmed = isEmailConfirmed;
+        await toDoAiDb.SaveChangesAsync(cancellationToken);
+    }
     
     private static LoginUserDal GetLoginUserDal(UserEntity user)
     {
@@ -78,6 +132,8 @@ public sealed class UserDalProvider : IUserDalProvider
             UserId = user.Id,
             UserName = user.UserName,
             FirstName = user.FirstName,
+            Email = user.Email,
+            IsEmailConfirmed = user.IsEmailConfirmed,
             PasswordHash = user.PasswordHash,
         };
     }

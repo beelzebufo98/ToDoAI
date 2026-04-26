@@ -5,11 +5,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
 import { Loader2, Sparkles } from 'lucide-react'
+import axios from 'axios'
 
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+
+const EMAIL_NOT_CONFIRMED = 'email_not_confirmed'
 
 const schema = z.object({
   userName: z.string().min(1, 'Введите логин'),
@@ -22,17 +25,29 @@ export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
+  const [emailNotConfirmed, setEmailNotConfirmed] = useState(false)
+  const [confirmationEmail, setConfirmationEmail] = useState('')
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
 
+  const isConfirmationEmailValid = z.string().email().safeParse(confirmationEmail).success
+
   const onSubmit = async (data: FormData) => {
     try {
       setError(null)
+      setEmailNotConfirmed(false)
+      setConfirmationEmail('')
       await login(data)
       navigate('/')
-    } catch {
-      setError('Неверный логин или пароль')
+    } catch (err) {
+      const code = axios.isAxiosError(err) ? err.response?.data?.error?.code : null
+      if (code === EMAIL_NOT_CONFIRMED) {
+        setEmailNotConfirmed(true)
+        setConfirmationEmail(data.userName.includes('@') ? data.userName : '')
+      } else {
+        setError('Неверный логин или пароль')
+      }
     }
   }
 
@@ -76,6 +91,36 @@ export function LoginPage() {
               </motion.div>
             )}
 
+            {emailNotConfirmed && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 dark:border-amber-800 dark:bg-amber-950"
+              >
+                <p className="text-sm text-amber-800 dark:text-amber-300">
+                  Сначала подтвердите email
+                </p>
+                <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+                  Укажите email, который использовали при регистрации.
+                </p>
+                <Input
+                  type="email"
+                  value={confirmationEmail}
+                  onChange={(e) => setConfirmationEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="mt-3 h-10 border-amber-200 bg-white/80 dark:border-amber-800 dark:bg-amber-950/60"
+                />
+                <Button
+                  type="button"
+                  onClick={() => navigate('/confirm-email', { state: { email: confirmationEmail } })}
+                  disabled={!isConfirmationEmailValid}
+                  className="mt-3 w-full bg-amber-600 text-white hover:bg-amber-500"
+                >
+                  Перейти к подтверждению
+                </Button>
+              </motion.div>
+            )}
+
             <div className="space-y-1.5">
               <Label htmlFor="userName" className="text-sm font-medium">Логин</Label>
               <Input
@@ -90,7 +135,15 @@ export function LoginPage() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="password" className="text-sm font-medium">Пароль</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-sm font-medium">Пароль</Label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+                >
+                  Забыли пароль?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"

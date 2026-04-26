@@ -25,6 +25,7 @@ public sealed class CreateTaskValidator : AbstractValidator<CreateTaskRequest>
             .LessThanOrEqualTo(10);
 
         RuleFor(r => r.DeadlineAt)
-            .NotEmpty();
+            .Must(x => x != default)
+            .WithMessage("Deadline is required.");
     }
 }

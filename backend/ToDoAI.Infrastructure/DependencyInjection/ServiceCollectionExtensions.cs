@@ -6,7 +6,9 @@ using ToDoAI.Application.Abstractions.Services.AiService;
 using ToDoAI.Application.Abstractions.DalProviders.CreateTaskDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.DeleteTaskDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.DayScheduleDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.EmailConfirmationDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.GetTaskDalProvider;
+using ToDoAI.Application.Abstractions.DalProviders.PasswordResetDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.ScheduleDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.TaskExecutionDalProvider;
@@ -18,7 +20,9 @@ using ToDoAI.Application.Abstractions.DalProviders.UserStateDalProvider;
 using ToDoAI.Infrastructure.DalProviders.CreateTaskDalProvider;
 using ToDoAI.Infrastructure.DalProviders.DeleteDalProvider;
 using ToDoAI.Infrastructure.DalProviders.DayScheduleDalProvider;
+using ToDoAI.Infrastructure.DalProviders.EmailConfirmationDalProvider;
 using ToDoAI.Infrastructure.DalProviders.GetTaskDalProvider;
+using ToDoAI.Infrastructure.DalProviders.PasswordResetDalProvider;
 using ToDoAI.Infrastructure.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.Infrastructure.DalProviders.ScheduleDalProvider;
 using ToDoAI.Infrastructure.DalProviders.TaskExecutionDalProvider;
@@ -45,6 +49,8 @@ public static class ServiceCollectionExtensions
         services.AddDbContextFactory<ToDoAIDbContext>(options => ConfigureDatabase(options, connectionString));
 
         services.AddScoped<IRefreshTokenDalProvider, RefreshTokenDalProvider>();
+        services.AddScoped<IEmailConfirmationDalProvider, EmailConfirmationDalProvider>();
+        services.AddScoped<IPasswordResetDalProvider, PasswordResetDalProvider>();
         services.AddScoped<IUserDalProvider, UserDalProvider>();
         services.AddScoped<ICreateTaskDalProvider, CreateTaskDalProvider>();
         services.AddScoped<IGetTaskDalProvider, GetTaskDalProvider>();
