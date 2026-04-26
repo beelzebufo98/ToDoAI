@@ -41,12 +41,13 @@ public sealed class EmailConfirmationDalProvider : IEmailConfirmationDalProvider
         await toDoAiDb.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<EmailConfirmationDal?> GetEmailConfirmation(Guid userId, string codeHash, CancellationToken cancellationToken)
+    public async Task<EmailConfirmationDal?> GetEmailConfirmation(Guid userId, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         var emailConfirmation = await toDoAiDb.EmailConfirmations
-            .FirstOrDefaultAsync(x => x.UserId == userId && x.CodeHash == codeHash, cancellationToken);
+            .OrderByDescending(x => x.SentAt)
+            .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
 
         if (emailConfirmation is null)
         {
@@ -62,6 +63,29 @@ public sealed class EmailConfirmationDalProvider : IEmailConfirmationDalProvider
             SentAt = emailConfirmation.SentAt,
             Attempts = emailConfirmation.Attempts
         };
+    }
+
+    public async Task RegisterFailedAttempt(Guid userId, int maxAttempts, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var emailConfirmation = await toDoAiDb.EmailConfirmations
+            .OrderByDescending(x => x.SentAt)
+            .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+
+        if (emailConfirmation is null)
+        {
+            return;
+        }
+
+        emailConfirmation.Attempts++;
+
+        if (emailConfirmation.Attempts >= maxAttempts)
+        {
+            toDoAiDb.EmailConfirmations.Remove(emailConfirmation);
+        }
+
+        await toDoAiDb.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeleteEmailConfirmations(Guid userId, CancellationToken cancellationToken)

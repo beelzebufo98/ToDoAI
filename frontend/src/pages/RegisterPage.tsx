@@ -24,6 +24,9 @@ const schema = z.object({
     .max(100, 'Максимум 100 символов')
     .regex(/^[a-zA-Zа-яА-ЯёЁ]*$/, 'Только буквы')
     .optional(),
+  email: z.string()
+    .min(1, 'Введите email')
+    .email('Некорректный email'),
   password: z.string()
     .min(8, 'Минимум 8 символов')
     .max(64, 'Максимум 64 символа')
@@ -53,11 +56,12 @@ export function RegisterPage() {
         userName: data.userName,
         firstName: data.firstName,
         lastName: data.lastName,
+        email: data.email,
         password: data.password,
       })
-      navigate('/')
+      navigate('/confirm-email', { state: { email: data.email, justSent: true } })
     } catch {
-      setError('Ошибка регистрации. Возможно, логин уже занят.')
+      setError('Ошибка регистрации. Возможно, логин или email уже заняты.')
     }
   }
 
@@ -72,7 +76,6 @@ export function RegisterPage() {
         transition={{ duration: 0.35, ease: 'easeOut' }}
         className="w-full max-w-[400px]"
       >
-        {/* Logo */}
         <div className="flex flex-col items-center mb-8 gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground shadow-sm">
             <Sparkles className="h-5 w-5 text-background" />
@@ -83,7 +86,6 @@ export function RegisterPage() {
           </div>
         </div>
 
-        {/* Card */}
         <div className="bg-card rounded-2xl shadow-sm border border-border/50 p-6">
           <div className="mb-5">
             <h2 className="text-base font-semibold text-foreground">Создать аккаунт</h2>
@@ -120,6 +122,9 @@ export function RegisterPage() {
                   className="bg-background/80 h-10 rounded-lg border-border/60"
                   {...register('lastName')}
                 />
+                {errors.lastName && (
+                  <p className="text-xs text-destructive">{errors.lastName.message}</p>
+                )}
               </div>
             </div>
 
@@ -133,6 +138,20 @@ export function RegisterPage() {
               />
               {errors.userName && (
                 <p className="text-xs text-destructive">{errors.userName.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                className="bg-background/80 h-10 rounded-lg border-border/60"
+                {...register('email')}
+              />
+              {errors.email && (
+                <p className="text-xs text-destructive">{errors.email.message}</p>
               )}
             </div>
 

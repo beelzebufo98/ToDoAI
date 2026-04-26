@@ -42,6 +42,18 @@ function defaultStartTime(): string {
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
+function getTaskTimeLabel(remainingMinutes: number, estimatedMinutes: number) {
+  if (remainingMinutes > estimatedMinutes) {
+    return `Рекомендуем ещё ${remainingMinutes} мин`
+  }
+
+  if (remainingMinutes === estimatedMinutes) {
+    return `${remainingMinutes} мин`
+  }
+
+  return `${remainingMinutes} мин осталось из ${estimatedMinutes}`
+}
+
 interface Props {
   scheduleDate: string
   onGenerated: (schedule: DaySchedule) => void
@@ -231,9 +243,7 @@ export function GenerateDayCard({
                 <div className="min-w-0">
                   <p className="text-sm font-medium leading-snug text-foreground">{task.title}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    {task.remainingMinutes === task.estimatedMinutes
-                      ? `${task.remainingMinutes} мин`
-                      : `${task.remainingMinutes} мин осталось из ${task.estimatedMinutes}`}
+                    {getTaskTimeLabel(task.remainingMinutes, task.estimatedMinutes)}
                   </p>
                 </div>
               </div>

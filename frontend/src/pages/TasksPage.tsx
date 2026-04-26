@@ -180,12 +180,14 @@ export function TasksPage() {
       {!isLoading && !isError && tasks.length === 0 && (
         <div className="text-center py-16">
           <p className="text-muted-foreground text-sm">Задач пока нет</p>
-          <button
-            onClick={() => setCreateOpen(true)}
-            className="mt-2 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
-          >
-            Создать первую →
-          </button>
+          {hasStateToday && (
+            <button
+              onClick={() => setCreateOpen(true)}
+              className="mt-2 text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+            >
+              Создать первую →
+            </button>
+          )}
         </div>
       )}
 

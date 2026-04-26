@@ -1,5 +1,4 @@
-using System.Security.Cryptography;
-using System.Text;
+using ToDoAI.Application.Common;
 using ToDoAI.Application.Abstractions.DalProviders.EmailConfirmationDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
 using ToDoAI.Application.UseCases.ConfirmEmail.Models;
@@ -9,6 +8,8 @@ namespace ToDoAI.Application.UseCases.ConfirmEmail;
 
 public sealed class ConfirmEmailUseCase : IConfirmEmailUseCase
 {
+    private const int MaxConfirmationAttempts = 5;
+
     private readonly IUserDalProvider _userDalProvider;
     private readonly IEmailConfirmationDalProvider _emailConfirmationDalProvider;
 
@@ -37,13 +38,27 @@ public sealed class ConfirmEmailUseCase : IConfirmEmailUseCase
             };
         }
 
-        var emailConfirmation = await _emailConfirmationDalProvider.GetEmailConfirmation(
-            user.UserId,
-            HashCode(request.Code.Trim()),
-            cancellationToken);
+        var emailConfirmation = await _emailConfirmationDalProvider.GetEmailConfirmation(user.UserId, cancellationToken);
 
-        if (emailConfirmation is null || emailConfirmation.ExpiresAt <= DateTimeOffset.UtcNow)
+        if (emailConfirmation is null)
         {
+            return InvalidRequest();
+        }
+
+        if (emailConfirmation.ExpiresAt <= DateTimeOffset.UtcNow)
+        {
+            await _emailConfirmationDalProvider.DeleteEmailConfirmations(user.UserId, cancellationToken);
+            return InvalidRequest();
+        }
+
+        var codeHash = ConfirmationCodeHelper.Hash(request.Code.Trim());
+        if (emailConfirmation.CodeHash != codeHash)
+        {
+            await _emailConfirmationDalProvider.RegisterFailedAttempt(
+                user.UserId,
+                MaxConfirmationAttempts,
+                cancellationToken);
+
             return InvalidRequest();
         }
 
@@ -65,9 +80,4 @@ public sealed class ConfirmEmailUseCase : IConfirmEmailUseCase
         };
     }
 
-    private static string HashCode(string code)
-    {
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(code));
-        return Convert.ToHexString(hash).ToLowerInvariant();
-    }
 }

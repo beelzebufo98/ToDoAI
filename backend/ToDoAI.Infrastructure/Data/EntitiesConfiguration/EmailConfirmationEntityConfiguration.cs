@@ -18,6 +18,8 @@ public sealed class EmailConfirmationEntityConfiguration :  IEntityTypeConfigura
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasIndex(x => x.UserId)
+            .IsUnique();
         builder.HasIndex(x => new { x.UserId, x.CodeHash });
         builder.HasIndex(x => x.ExpiresAt);
         builder.HasIndex(x => new { x.UserId, x.SentAt });

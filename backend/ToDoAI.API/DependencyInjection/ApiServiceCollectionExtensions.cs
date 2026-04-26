@@ -9,6 +9,7 @@ using ToDoAI.API.Controllers.ScheduleController.Models;
 using ToDoAI.API.Controllers.TaskController.Models;
 using ToDoAI.API.Controllers.TaskExecutionController.Models;
 using ToDoAI.API.Controllers.UserStateController.Models;
+using ToDoAI.API.Settings;
 using ToDoAI.API.Validators;
 using ToDoAI.ToDoAI.API.Controllers.TaskController.Models;
 using static System.Text.Json.JsonNamingPolicy;
@@ -19,6 +20,9 @@ public static class ApiServiceCollectionExtensions
 {
     public static IServiceCollection AddApi(this IServiceCollection services)
     {
+        services.AddOptions<DevEmailSettings>()
+            .BindConfiguration("DevEmail");
+
         services.AddDatabaseDeveloperPageExceptionFilter();
         services.AddAntiforgery(options =>
         {
@@ -31,6 +35,7 @@ public static class ApiServiceCollectionExtensions
         services.AddScoped<IValidator<RegisterUserRequest>, AuthValidator>();
         services.AddScoped<IValidator<ConfirmEmailRequest>, ConfirmEmailValidator>();
         services.AddScoped<IValidator<ForgotPasswordRequest>, ForgotPasswordValidator>();
+        services.AddScoped<IValidator<ResendConfirmationCodeRequest>, ResendConfirmationCodeValidator>();
         services.AddScoped<IValidator<ResetPasswordRequest>, ResetPasswordValidator>();
         services.AddScoped<IValidator<LoginUserRequest>, LoginValidator>();
         services.AddScoped<IValidator<CreateTaskRequest>, CreateTaskValidator>();

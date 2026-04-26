@@ -80,6 +80,9 @@ namespace ToDoAI.Migrations
 
                     b.HasIndex("ExpiresAt");
 
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
                     b.HasIndex("UserId", "CodeHash");
 
                     b.HasIndex("UserId", "SentAt");
@@ -112,6 +115,9 @@ namespace ToDoAI.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.HasIndex("UserId", "CodeHash");
 

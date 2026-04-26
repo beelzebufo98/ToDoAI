@@ -41,12 +41,13 @@ public sealed class PasswordResetDalProvider : IPasswordResetDalProvider
         await toDoAiDb.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<PasswordResetDal?> GetPasswordReset(Guid userId, string codeHash, CancellationToken cancellationToken)
+    public async Task<PasswordResetDal?> GetPasswordReset(Guid userId, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
 
         var passwordReset = await toDoAiDb.PasswordResets
-            .FirstOrDefaultAsync(x => x.UserId == userId && x.CodeHash == codeHash, cancellationToken);
+            .OrderByDescending(x => x.SentAt)
+            .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
 
         if (passwordReset is null)
         {
@@ -62,6 +63,29 @@ public sealed class PasswordResetDalProvider : IPasswordResetDalProvider
             SentAt = passwordReset.SentAt,
             Attempts = passwordReset.Attempts
         };
+    }
+
+    public async Task RegisterFailedAttempt(Guid userId, int maxAttempts, CancellationToken cancellationToken)
+    {
+        await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var passwordReset = await toDoAiDb.PasswordResets
+            .OrderByDescending(x => x.SentAt)
+            .FirstOrDefaultAsync(x => x.UserId == userId, cancellationToken);
+
+        if (passwordReset is null)
+        {
+            return;
+        }
+
+        passwordReset.Attempts++;
+
+        if (passwordReset.Attempts >= maxAttempts)
+        {
+            toDoAiDb.PasswordResets.Remove(passwordReset);
+        }
+
+        await toDoAiDb.SaveChangesAsync(cancellationToken);
     }
 
     public async Task DeletePasswordResets(Guid userId, CancellationToken cancellationToken)

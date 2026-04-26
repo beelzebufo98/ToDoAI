@@ -14,6 +14,7 @@ using ToDoAI.Application.UseCases.ForgotPassword;
 using ToDoAI.Application.UseCases.GetTask;
 using ToDoAI.Application.UseCases.LoginUser;
 using ToDoAI.Application.UseCases.RefreshToken;
+using ToDoAI.Application.UseCases.ResendConfirmationCode;
 using ToDoAI.Application.UseCases.ResetPassword;
 using ToDoAI.Application.UseCases.GenerateSchedule;
 using ToDoAI.Application.UseCases.GetSchedule;
@@ -32,6 +33,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICreateUserUseCase, CreateUserUseCase>();
         services.AddScoped<IConfirmEmailUseCase, ConfirmEmailUseCase>();
         services.AddScoped<IForgotPasswordUseCase, ForgotPasswordUseCase>();
+        services.AddScoped<IResendConfirmationCodeUseCase, ResendConfirmationCodeUseCase>();
         services.AddScoped<IResetPasswordUseCase, ResetPasswordUseCase>();
         services.AddScoped<ILoginUserUseCase, LoginUserUseCase>();
         services.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();

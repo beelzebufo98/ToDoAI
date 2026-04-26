@@ -5,6 +5,7 @@ namespace ToDoAI.Application.Abstractions.DalProviders.EmailConfirmationDalProvi
 public interface IEmailConfirmationDalProvider
 {
     Task ReplaceEmailConfirmation(EmailConfirmationRequestDal request, CancellationToken cancellationToken);
-    Task<EmailConfirmationDal?> GetEmailConfirmation(Guid userId, string codeHash, CancellationToken cancellationToken);
+    Task<EmailConfirmationDal?> GetEmailConfirmation(Guid userId, CancellationToken cancellationToken);
+    Task RegisterFailedAttempt(Guid userId, int maxAttempts, CancellationToken cancellationToken);
     Task DeleteEmailConfirmations(Guid userId, CancellationToken cancellationToken);
 }

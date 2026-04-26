@@ -16,6 +16,7 @@ using ToDoAI.Application.UseCases.LoginUser;
 using ToDoAI.Application.UseCases.LoginUser.Models;
 using ToDoAI.Application.UseCases.RefreshToken;
 using ToDoAI.Application.UseCases.RefreshToken.Models;
+using ToDoAI.Application.UseCases.ResendConfirmationCode;
 using ToDoAI.Application.UseCases.ResetPassword;
 using ToDoAI.Application.UseCases.ResetPassword.Models;
 using ErrorCodes = ToDoAI.Domain.Enums.ErrorCodes;
@@ -30,6 +31,7 @@ public sealed class AuthController : ToDoAiControllerBase
     private readonly ICreateUserUseCase _createUserUseCase;
     private readonly IConfirmEmailUseCase _confirmEmailUseCase;
     private readonly IForgotPasswordUseCase _forgotPasswordUseCase;
+    private readonly IResendConfirmationCodeUseCase _resendConfirmationCodeUseCase;
     private readonly IResetPasswordUseCase _resetPasswordUseCase;
     private readonly ILoginUserUseCase  _loginUserUseCase;
     private readonly IRefreshTokenUseCase _refreshTokenUseCase;
@@ -42,6 +44,7 @@ public sealed class AuthController : ToDoAiControllerBase
         ICreateUserUseCase createUserUseCase,
         IConfirmEmailUseCase confirmEmailUseCase,
         IForgotPasswordUseCase forgotPasswordUseCase,
+        IResendConfirmationCodeUseCase resendConfirmationCodeUseCase,
         IResetPasswordUseCase resetPasswordUseCase,
         ILoginUserUseCase loginUserUseCase,
         IRefreshTokenUseCase refreshTokenUseCase,
@@ -53,6 +56,7 @@ public sealed class AuthController : ToDoAiControllerBase
         _createUserUseCase = createUserUseCase;
         _confirmEmailUseCase = confirmEmailUseCase;
         _forgotPasswordUseCase = forgotPasswordUseCase;
+        _resendConfirmationCodeUseCase = resendConfirmationCodeUseCase;
         _resetPasswordUseCase = resetPasswordUseCase;
         _loginUserUseCase = loginUserUseCase;
         _refreshTokenUseCase = refreshTokenUseCase;
@@ -109,6 +113,17 @@ public sealed class AuthController : ToDoAiControllerBase
     public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request, CancellationToken cancellationToken)
     {
         await _forgotPasswordUseCase.ForgotPassword(request.Email, cancellationToken);
+        return Ok();
+    }
+
+    [HttpPost("resend-confirmation-code")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    public async Task<ActionResult> ResendConfirmationCode(
+        [FromBody] ResendConfirmationCodeRequest request,
+        CancellationToken cancellationToken)
+    {
+        await _resendConfirmationCodeUseCase.ResendConfirmationCode(request.Email, cancellationToken);
         return Ok();
     }
 

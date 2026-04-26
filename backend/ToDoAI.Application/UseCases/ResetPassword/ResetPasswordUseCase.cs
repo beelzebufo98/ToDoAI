@@ -1,6 +1,5 @@
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Identity;
+using ToDoAI.Application.Common;
 using ToDoAI.Application.Abstractions.DalProviders.PasswordResetDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
@@ -12,6 +11,8 @@ namespace ToDoAI.Application.UseCases.ResetPassword;
 
 public sealed class ResetPasswordUseCase : IResetPasswordUseCase
 {
+    private const int MaxResetAttempts = 5;
+
     private readonly IUserDalProvider _userDalProvider;
     private readonly IPasswordResetDalProvider _passwordResetDalProvider;
     private readonly IRefreshTokenDalProvider _refreshTokenDalProvider;
@@ -35,13 +36,27 @@ public sealed class ResetPasswordUseCase : IResetPasswordUseCase
             return InvalidRequest();
         }
 
-        var passwordReset = await _passwordResetDalProvider.GetPasswordReset(
-            user.UserId,
-            HashCode(request.Code.Trim()),
-            cancellationToken);
+        var passwordReset = await _passwordResetDalProvider.GetPasswordReset(user.UserId, cancellationToken);
 
-        if (passwordReset is null || passwordReset.ExpiresAt <= DateTimeOffset.UtcNow)
+        if (passwordReset is null)
         {
+            return InvalidRequest();
+        }
+
+        if (passwordReset.ExpiresAt <= DateTimeOffset.UtcNow)
+        {
+            await _passwordResetDalProvider.DeletePasswordResets(user.UserId, cancellationToken);
+            return InvalidRequest();
+        }
+
+        var codeHash = ConfirmationCodeHelper.Hash(request.Code.Trim());
+        if (passwordReset.CodeHash != codeHash)
+        {
+            await _passwordResetDalProvider.RegisterFailedAttempt(
+                user.UserId,
+                MaxResetAttempts,
+                cancellationToken);
+
             return InvalidRequest();
         }
 
@@ -73,9 +88,4 @@ public sealed class ResetPasswordUseCase : IResetPasswordUseCase
         };
     }
 
-    private static string HashCode(string code)
-    {
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(code));
-        return Convert.ToHexString(hash).ToLowerInvariant();
-    }
 }

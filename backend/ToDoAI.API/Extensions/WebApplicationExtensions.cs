@@ -12,6 +12,13 @@ public static class WebApplicationExtensions
         app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToDoAI API v1.0");
+            c.SwaggerEndpoint("/swagger/internal/swagger.json", "ToDoAI Internal API v1.0");
+        });
+        app.UseSwaggerUI(c =>
+        {
+            c.RoutePrefix = "internal/swagger";
+            c.DocumentTitle = "ToDoAI Internal API";
+            c.SwaggerEndpoint("/swagger/internal/swagger.json", "ToDoAI Internal API v1.0");
         });
 
         return app;

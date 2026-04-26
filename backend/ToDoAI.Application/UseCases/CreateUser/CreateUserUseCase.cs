@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using System.Security.Cryptography;
-using System.Text;
+using ToDoAI.Application.Common;
 using ToDoAI.Application.Abstractions.DalProviders.EmailConfirmationDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.EmailConfirmationDalProvider.Models;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
@@ -69,18 +68,19 @@ public sealed class CreateUserUseCase : ICreateUserUseCase
         };
 
         await _userDalProvider.CreateUser(requestDal, cancellationToken);
-        var emailConfirmationCode = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+        var emailConfirmationCode = ConfirmationCodeHelper.Generate();
         var now = DateTimeOffset.UtcNow;
         await _emailConfirmationDalProvider.ReplaceEmailConfirmation(new EmailConfirmationRequestDal
         {
             Id = Guid.NewGuid(),
             UserId = userId,
-            CodeHash = HashCode(emailConfirmationCode),
+            CodeHash = ConfirmationCodeHelper.Hash(emailConfirmationCode),
             ExpiresAt = now.AddMinutes(15),
             SentAt = now,
             Attempts = 0
         }, cancellationToken);
 
+         //TODO: убрать, так как не даем зарегатьсч без подвержденного email
         if (_emailSettings.Enabled)
         {
             await _emailService.SendEmailConfirmationAsync(normalizedEmail, emailConfirmationCode, cancellationToken);
@@ -96,11 +96,5 @@ public sealed class CreateUserUseCase : ICreateUserUseCase
         {
             Success = true
         };
-    }
-
-    private static string HashCode(string code)
-    {
-        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(code));
-        return Convert.ToHexString(hash).ToLowerInvariant();
     }
 }

@@ -45,6 +45,15 @@ public sealed class LoginUserUseCase : ILoginUserUseCase
             };
         }
 
+        if (!account.IsEmailConfirmed)
+        {
+            return new LoginUserResult
+            {
+                Success = false,
+                Error = ErrorCodes.EmailNotConfirmed
+            };
+        }
+
         var userHash = new UserHash
         {
             Id = account.UserId,
