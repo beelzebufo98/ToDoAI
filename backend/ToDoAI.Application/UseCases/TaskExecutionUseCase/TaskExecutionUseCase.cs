@@ -3,6 +3,8 @@ using ToDoAI.Application.Abstractions.DalProviders.ScheduleDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.TaskExecutionDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.TaskExecutionDalProvider.Models;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
+using ToDoAI.Application.Abstractions.Services.AiService;
+using ToDoAI.Application.Abstractions.Services.AiService.Models;
 using ToDoAI.Application.UseCases.TaskExecutionUseCase.Models;
 using ToDoAI.Domain.Enums;
 
@@ -14,16 +16,19 @@ public sealed class TaskExecutionUseCase : ITaskExecutionUseCase
     private readonly IUserDalProvider _userDalProvider;
     private readonly IGetTaskDalProvider _getTaskDalProvider;
     private readonly IScheduleDalProvider  _scheduleDalProvider;
+    private readonly IAiMotivationClient _aiMotivationClient;
 
     public TaskExecutionUseCase(ITaskExecutionDalProvider taskExecutionDalProvider,
         IUserDalProvider userDalProvider,
         IGetTaskDalProvider getTaskDalProvider,
-        IScheduleDalProvider scheduleDalProvider)
+        IScheduleDalProvider scheduleDalProvider,
+        IAiMotivationClient aiMotivationClient)
     {
         _taskExecutionDalProvider = taskExecutionDalProvider;
         _userDalProvider = userDalProvider;
         _getTaskDalProvider = getTaskDalProvider;
         _scheduleDalProvider = scheduleDalProvider;
+        _aiMotivationClient = aiMotivationClient;
     }
 
     public async Task<TaskExecutionBlResult> CreateTaskExecution(TaskExecutionBlRequest taskExecutionBlRequest,
@@ -96,6 +101,8 @@ public sealed class TaskExecutionUseCase : ITaskExecutionUseCase
             };
         }
 
+        var motivationMessage = await GetTaskCompletionMotivationMessage(cancellationToken);
+
         return new TaskExecutionBlResult
         {
             TaskExecutionResult = new TaskExecutionResult
@@ -106,9 +113,28 @@ public sealed class TaskExecutionUseCase : ITaskExecutionUseCase
                 ActualMinutes = result.ActualMinutes,
                 EnergyAfter = result.EnergyAfter,
                 StressAfter = result.StressAfter,
-                CreatedAt = result.CreatedAt
+                CreatedAt = result.CreatedAt,
+                MotivationMessage = motivationMessage
             }
         };
 
+    }
+
+    private async Task<string> GetTaskCompletionMotivationMessage(CancellationToken cancellationToken)
+    {
+        var aiResult = await _aiMotivationClient.GenerateMotivation(
+            new AiGenerateMotivationRequest
+            {
+                Trigger = "task_completion"
+            },
+            cancellationToken);
+
+        var message = aiResult.Response?.Message?.Trim();
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            return message;
+        }
+
+        return "Задача закрыта. Это уже реальный прогресс, а не только план.";
     }
 }

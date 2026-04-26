@@ -5,6 +5,8 @@ using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.RefreshTokenDalProvider.Models;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider;
 using ToDoAI.Application.Abstractions.DalProviders.UserDalProvider.Models;
+using ToDoAI.Application.Abstractions.Services.AiService;
+using ToDoAI.Application.Abstractions.Services.AiService.Models;
 using ToDoAI.Application.Services.JwtService;
 using ToDoAI.Application.Services.JwtService.Settings;
 using ToDoAI.Application.UseCases.CreateUser.Models;
@@ -18,6 +20,7 @@ public sealed class LoginUserUseCaseTests
 {
     private readonly Mock<IUserDalProvider> _userDal = new();
     private readonly Mock<IRefreshTokenDalProvider> _refreshTokenDal = new();
+    private readonly Mock<IAiMotivationClient> _aiMotivationClient = new();
     private readonly Mock<IJwtService> _jwtService = new();
     private readonly Mock<ILogger<LoginUserUseCase>> _logger = new();
 
@@ -25,6 +28,7 @@ public sealed class LoginUserUseCaseTests
         new(
             _userDal.Object,
             _refreshTokenDal.Object,
+            _aiMotivationClient.Object,
             _jwtService.Object,
             Options.Create(new AuthSettings()),
             _logger.Object);
@@ -135,6 +139,17 @@ public sealed class LoginUserUseCaseTests
         _jwtService.Setup(x => x.GenerateAccessToken(user)).Returns("access_token");
         _jwtService.Setup(x => x.GenerateRefreshToken(user)).Returns("refresh_token");
         _jwtService.Setup(x => x.HashRefreshToken("refresh_token")).Returns("hashed_refresh_token");
+        _aiMotivationClient
+            .Setup(x => x.GenerateMotivation(It.IsAny<AiGenerateMotivationRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AiGenerateMotivationResult
+            {
+                UsedAi = true,
+                Response = new AiGenerateMotivationResponse
+                {
+                    Message = "Хороший старт.",
+                    Model = "test-model"
+                }
+            });
 
         var useCase = CreateUseCase();
         var request = new LoginUserBlRequest { UserName = user.UserName, Password = "Password1!" };
@@ -147,6 +162,7 @@ public sealed class LoginUserUseCaseTests
         result.Error.Should().BeNull();
         result.AccessToken.Should().Be("access_token");
         result.RefreshToken.Should().Be("refresh_token");
+        result.MotivationMessage.Should().Be("Хороший старт.");
 
         _refreshTokenDal.Verify(
             x => x.CreateRefreshToken(
@@ -170,10 +186,17 @@ public sealed class LoginUserUseCaseTests
         _jwtService.Setup(x => x.GenerateAccessToken(It.IsAny<LoginUserDal>())).Returns("access_token");
         _jwtService.Setup(x => x.GenerateRefreshToken(It.IsAny<LoginUserDal>())).Returns("refresh_token");
         _jwtService.Setup(x => x.HashRefreshToken(It.IsAny<string>())).Returns("hashed");
+        _aiMotivationClient
+            .Setup(x => x.GenerateMotivation(It.IsAny<AiGenerateMotivationRequest>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new AiGenerateMotivationResult
+            {
+                UsedAi = false,
+                FallbackReason = "disabled"
+            });
 
         var settings = Options.Create(new AuthSettings { RefreshTokenLifetime = "1.00:00:00" }); // 1 day
         var useCase = new LoginUserUseCase(
-            _userDal.Object, _refreshTokenDal.Object, _jwtService.Object, settings, _logger.Object);
+            _userDal.Object, _refreshTokenDal.Object, _aiMotivationClient.Object, _jwtService.Object, settings, _logger.Object);
 
         var request = new LoginUserBlRequest { UserName = user.UserName, Password = "Password1!" };
         var before = DateTimeOffset.UtcNow.AddHours(23);

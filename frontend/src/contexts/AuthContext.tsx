@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react'
 import { authApi, type LoginRequest, type RegisterRequest } from '@/api/auth'
+import { toast } from 'sonner'
 
 interface AuthContextValue {
   isAuthenticated: boolean
@@ -31,9 +32,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = useCallback(async (data: LoginRequest) => {
-    await authApi.login(data)
+    const response = await authApi.login(data)
     setIsAuthenticated(true)
     localStorage.setItem('isAuthenticated', 'true')
+    const motivationMessage = response.data?.payload?.motivationMessage?.trim()
+    if (motivationMessage) {
+      toast.success(motivationMessage)
+    }
   }, [])
 
   const register = useCallback(async (data: RegisterRequest) => {

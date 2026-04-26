@@ -89,6 +89,7 @@ public sealed class TaskExecutionController : ToDoAiControllerBase
             StressAfter = result.TaskExecutionResult.StressAfter,
             EnergyAfter = result.TaskExecutionResult.EnergyAfter,
             CreatedAt = result.TaskExecutionResult.CreatedAt,
+            MotivationMessage = result.TaskExecutionResult.MotivationMessage,
         };
         return Ok(response);
     }

@@ -8,6 +8,7 @@ export interface TaskExecution {
   stressAfter: number
   energyAfter: number
   createdAt: string
+  motivationMessage: string
 }
 
 export interface CreateTaskExecutionRequest {

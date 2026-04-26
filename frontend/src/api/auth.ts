@@ -5,6 +5,10 @@ export interface LoginRequest {
   password: string
 }
 
+export interface LoginResponse {
+  motivationMessage: string
+}
+
 export interface RegisterRequest {
   userName: string
   firstName: string
@@ -26,7 +30,7 @@ export interface ResetPasswordRequest {
 
 export const authApi = {
   login: (data: LoginRequest) =>
-    apiClient.post('/auth/login', data),
+    apiClient.post<{ payload: LoginResponse }>('/auth/login', data),
 
   register: (data: RegisterRequest) =>
     apiClient.post('/auth/register', data),

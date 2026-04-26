@@ -148,7 +148,7 @@ public sealed class AuthController : ToDoAiControllerBase
     }
 
     [HttpPost("login")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PayloadApiResponse<LoginResponse>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
     {
@@ -194,7 +194,10 @@ public sealed class AuthController : ToDoAiControllerBase
 
        SetCsrfCookie();
        
-       return Ok();
+       return Ok(new LoginResponse
+       {
+           MotivationMessage = result.MotivationMessage ?? string.Empty
+       });
     }
 
     [HttpPost("refresh")]

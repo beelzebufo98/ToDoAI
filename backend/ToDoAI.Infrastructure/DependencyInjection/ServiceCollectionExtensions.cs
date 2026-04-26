@@ -75,6 +75,19 @@ public static class ServiceCollectionExtensions
         )
             .AddPolicyHandler((serviceProvider, _) => CreateAiServiceRetryPolicy(
                 serviceProvider.GetRequiredService<ILogger<AiServiceClient>>()));
+        services.AddHttpClient<IAiMotivationClient, AiMotivationClient>((serviceProvider, client) =>
+            {
+                var settings = serviceProvider.GetRequiredService<IOptions<AiServiceSettings>>().Value;
+                if (!string.IsNullOrWhiteSpace(settings.BaseUrl))
+                {
+                    client.BaseAddress = new Uri(settings.BaseUrl);
+                }
+
+                client.Timeout = TimeSpan.FromSeconds(settings.TimeoutSeconds);
+            }
+        )
+            .AddPolicyHandler((serviceProvider, _) => CreateAiServiceRetryPolicy(
+                serviceProvider.GetRequiredService<ILogger<AiMotivationClient>>()));
 
         return services;
     }

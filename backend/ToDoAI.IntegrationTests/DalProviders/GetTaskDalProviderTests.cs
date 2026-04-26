@@ -67,9 +67,7 @@ public sealed class GetTaskDalProviderTests : IAsyncLifetime
         return new TaskFiltersBlRequest { PageSize = 10 };
     }
 
-    //  GetTask
-
-    [Fact]
+    [Fact(DisplayName = "Задача существует — возвращает задачу с корректными полями")]
     public async Task GetTask_WhenTaskExists_ShouldReturnMappedTask()
     {
         // Arrange
@@ -91,7 +89,7 @@ public sealed class GetTaskDalProviderTests : IAsyncLifetime
         result.WorkStatus.Should().Be(WorkStatus.New);
     }
 
-    [Fact]
+    [Fact(DisplayName = "Несуществующий ID задачи — возвращает null")]
     public async Task GetTask_WhenTaskIdDoesNotExist_ShouldReturnNull()
     {
         // Act
@@ -101,7 +99,7 @@ public sealed class GetTaskDalProviderTests : IAsyncLifetime
         result.Should().BeNull();
     }
 
-    [Fact]
+    [Fact(DisplayName = "Задача принадлежит другому пользователю — возвращает null")]
     public async Task GetTask_WhenTaskBelongsToDifferentUser_ShouldReturnNull()
     {
         // Arrange
@@ -129,7 +127,7 @@ public sealed class GetTaskDalProviderTests : IAsyncLifetime
         }
     }
 
-    [Fact]
+    [Fact(DisplayName = "Задача со статусом Deleted — возвращает null")]
     public async Task GetTask_WhenTaskIsDeleted_ShouldReturnNull()
     {
         // Arrange
@@ -147,9 +145,7 @@ public sealed class GetTaskDalProviderTests : IAsyncLifetime
         result.Should().BeNull();
     }
 
-    //  GetTasks ──
-
-    [Fact]
+    [Fact(DisplayName = "Без фильтра статуса — включает New/Todo/Running, исключает Completed/Deleted")]
     public async Task GetTasks_WhenNoStatusFilter_ShouldIncludeNewTodoRunningAndExcludeCompletedDeleted()
     {
         // Arrange
@@ -174,7 +170,7 @@ public sealed class GetTaskDalProviderTests : IAsyncLifetime
         result.Select(t => t.Id).Should().NotContain([completedTask.Id, deletedTask.Id]);
     }
 
-    [Theory]
+    [Theory(DisplayName = "Фильтр по статусу — возвращает только задачи с указанным статусом")]
     [InlineData(TaskWorkStatusBlFilters.New, WorkStatus.New)]
     [InlineData(TaskWorkStatusBlFilters.Todo, WorkStatus.Todo)]
     [InlineData(TaskWorkStatusBlFilters.Running, WorkStatus.Running)]
@@ -202,7 +198,7 @@ public sealed class GetTaskDalProviderTests : IAsyncLifetime
         result.Should().NotContain(t => t.Id == notMatching.Id);
     }
 
-    [Fact]
+    [Fact(DisplayName = "Результаты изолированы по userId — задачи других пользователей не попадают")]
     public async Task GetTasks_ShouldIsolateResultsByUserId()
     {
         // Arrange
@@ -232,7 +228,7 @@ public sealed class GetTaskDalProviderTests : IAsyncLifetime
         }
     }
 
-    [Fact]
+    [Fact(DisplayName = "Постраничная выборка — страницы не пересекаются")]
     public async Task GetTasks_WhenPaged_ShouldReturnNonOverlappingPages()
     {
         // Arrange — staggered CreatedAt for deterministic default (CreatedAt asc) ordering
@@ -269,7 +265,7 @@ public sealed class GetTaskDalProviderTests : IAsyncLifetime
         pageOne.Select(t => t.Id).Intersect(pageTwo.Select(t => t.Id)).Should().BeEmpty();
     }
 
-    [Fact]
+    [Fact(DisplayName = "Сортировка по сложности убыванием — первой идёт задача с наибольшей сложностью")]
     public async Task GetTasks_WhenSortedByComplexityLevelDescending_ShouldReturnHighestComplexityFirst()
     {
         // Arrange

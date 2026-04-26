@@ -1,0 +1,91 @@
+services:
+  db:
+    image: postgres:16
+    container_name: todoai-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - todoai_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: docker/Dockerfile
+      target: production
+    image: todoai-ai-service
+    container_name: todoai-ai-service
+    restart: unless-stopped
+    environment:
+      ENV: production
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      RELOAD: false
+      WORKERS: 1
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      OPENROUTER_UX_MODEL: ${OPENROUTER_UX_MODEL:-google/gemini-2.5-flash-lite}
+      OPENROUTER_PLANNING_MODEL: ${OPENROUTER_PLANNING_MODEL:-google/gemini-2.5-flash}
+      OPENROUTER_TIMEOUT_SECONDS: ${OPENROUTER_TIMEOUT_SECONDS:-60}
+      OPENROUTER_HTTP_REFERER: ${OPENROUTER_HTTP_REFERER:-}
+      OPENROUTER_APP_TITLE: ${OPENROUTER_APP_TITLE:-ToDoAI}
+    expose:
+      - "8000"
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: todoai-api
+    container_name: todoai-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      ai-service:
+        condition: service_started
+    environment:
+      ASPNETCORE_URLS: http://+:5114
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      AuthSettings__SecretKey: ${AUTHSETTINGS__SECRETKEY}
+      AuthSettings__AccessTokenLifetime: ${AUTHSETTINGS__ACCESSTOKENLIFETIME:-00:10:00}
+      AuthSettings__RefreshTokenLifetime: ${AUTHSETTINGS__REFRESHTOKENLIFETIME:-30.00:00:00}
+      AiService__Enabled: "true"
+      AiService__BaseUrl: http://ai-service:8000
+      AiService__GenerateSchedulePath: /api/v1/ai/schedule/generate
+      AiService__GenerateMotivationPath: /api/v1/ai/motivation/generate
+      EmailSettings__Enabled: "true"
+      EmailSettings__Host: ${EMAIL_SETTINGS_HOST}
+      EmailSettings__Port: ${EMAIL_SETTINGS_PORT}
+      EmailSettings__SocketSecurityMode: ${EMAIL_SETTINGS_SOCKET_SECURITY_MODE}
+      EmailSettings__UserName: ${EMAIL_SETTINGS_USERNAME}
+      EmailSettings__Password: ${EMAIL_SETTINGS_PASSWORD}
+      EmailSettings__FromAddress: ${EMAIL_SETTINGS_FROM_ADDRESS}
+      EmailSettings__FromName: ${EMAIL_SETTINGS_FROM_NAME}
+    ports:
+      - "${API_PORT:-5114}:5114"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+    image: todoai-frontend
+    container_name: todoai-frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+
+volumes:
+  todoai_pg:

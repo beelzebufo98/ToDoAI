@@ -26,6 +26,11 @@ public sealed class AiServiceSettingsValidator : IValidateOptions<AiServiceSetti
             return ValidateOptionsResult.Fail("AiService:GenerateSchedulePath is required.");
         }
 
+        if (string.IsNullOrWhiteSpace(options.GenerateMotivationPath))
+        {
+            return ValidateOptionsResult.Fail("AiService:GenerateMotivationPath is required.");
+        }
+
         if (options.TimeoutSeconds <= 0)
         {
             return ValidateOptionsResult.Fail("AiService:TimeoutSeconds must be greater than zero.");
