@@ -66,11 +66,13 @@ services:
       AiService__GenerateSchedulePath: "/api/v1/ai/schedule/generate"
       AiService__GenerateMotivationPath: "/api/v1/ai/motivation/generate"
       EmailSettings__Enabled: "true"
+      EmailSettings__Provider: "Smtp"
       EmailSettings__Host: "mailpit"
       EmailSettings__Port: "1025"
       EmailSettings__SocketSecurityMode: "None"
       EmailSettings__UserName: ""
       EmailSettings__Password: ""
+      EmailSettings__ApiKey: ""
       EmailSettings__FromAddress: "noreply@todoai.local"
       EmailSettings__FromName: "ToDoAI"
     ports:

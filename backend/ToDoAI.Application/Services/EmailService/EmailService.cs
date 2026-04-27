@@ -1,3 +1,7 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
@@ -8,11 +12,18 @@ namespace ToDoAI.Application.Services.EmailService;
 
 public sealed class EmailService : IEmailService
 {
-    private readonly EmailSettings _settings;
+    private static readonly JsonSerializerOptions ResendJsonOptions = new()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
 
-    public EmailService(IOptions<EmailSettings> settings)
+    private readonly EmailSettings _settings;
+    private readonly HttpClient _httpClient;
+
+    public EmailService(IOptions<EmailSettings> settings, HttpClient httpClient)
     {
         _settings = settings.Value;
+        _httpClient = httpClient;
     }
 
     public Task SendEmailConfirmationAsync(string toEmail, string code, CancellationToken ct)
@@ -29,13 +40,23 @@ public sealed class EmailService : IEmailService
             body: $"Ваш код для сброса пароля: <b>{code}</b><br/>Код действителен 15 минут.",
             ct);
 
-    private async Task SendAsync(string toEmail, string subject, string body, CancellationToken ct)
+    private Task SendAsync(string toEmail, string subject, string body, CancellationToken ct)
     {
         if (!_settings.Enabled)
         {
             throw new InvalidOperationException("Отправка email отключена в настройках.");
         }
 
+        return _settings.Provider switch
+        {
+            EmailProvider.Smtp => SendViaSmtpAsync(toEmail, subject, body, ct),
+            EmailProvider.Resend => SendViaResendAsync(toEmail, subject, body, ct),
+            _ => throw new InvalidOperationException($"Неподдерживаемый email provider: {_settings.Provider}.")
+        };
+    }
+
+    private async Task SendViaSmtpAsync(string toEmail, string subject, string body, CancellationToken ct)
+    {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_settings.FromName, _settings.FromAddress));
         message.To.Add(MailboxAddress.Parse(toEmail));
@@ -59,6 +80,49 @@ public sealed class EmailService : IEmailService
         await client.DisconnectAsync(quit: true, ct);
     }
 
+    private async Task SendViaResendAsync(string toEmail, string subject, string body, CancellationToken ct)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.resend.com/emails")
+        {
+            Content = JsonContent.Create(new ResendSendEmailRequest
+            {
+                From = FormatFromAddress(),
+                To = [toEmail],
+                Subject = subject,
+                Html = BuildHtmlDocument(body)
+            }, options: ResendJsonOptions)
+        };
+
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _settings.ApiKey);
+
+        using var response = await _httpClient.SendAsync(request, ct);
+        if (response.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        var responseBody = await response.Content.ReadAsStringAsync(ct);
+        throw new InvalidOperationException($"Resend вернул ошибку {(int)response.StatusCode}: {responseBody}");
+    }
+
+    private string FormatFromAddress()
+    {
+        return string.IsNullOrWhiteSpace(_settings.FromName)
+            ? _settings.FromAddress
+            : $"{_settings.FromName} <{_settings.FromAddress}>";
+    }
+
+    private static string BuildHtmlDocument(string body)
+    {
+        return $"""
+                <html lang="ru">
+                  <body>
+                    {body}
+                  </body>
+                </html>
+                """;
+    }
+
     private static SecureSocketOptions MapSocketSecurityMode(EmailSocketSecurityMode socketSecurityMode) =>
         socketSecurityMode switch
         {
@@ -67,4 +131,15 @@ public sealed class EmailService : IEmailService
             EmailSocketSecurityMode.SslOnConnect => SecureSocketOptions.SslOnConnect,
             _ => throw new ArgumentOutOfRangeException(nameof(socketSecurityMode), socketSecurityMode, null)
         };
+
+    private sealed record ResendSendEmailRequest
+    {
+        public required string From { get; init; }
+
+        public required IReadOnlyCollection<string> To { get; init; }
+
+        public required string Subject { get; init; }
+
+        public required string Html { get; init; }
+    }
 }
