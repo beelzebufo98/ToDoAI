@@ -1,10 +1,21 @@
+using System.IO;
 using ToDoAI.API.DependencyInjection;
 using ToDoAI.API.Extensions;
 using ToDoAI.Application.DependencyInjection;
 using ToDoAI.Infrastructure.DependencyInjection;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var dataProtection = builder.Services.AddDataProtection()
+    .SetApplicationName("ToDoAI");
+
+var dataProtectionKeysPath = builder.Configuration["DataProtection:KeysPath"];
+if (!string.IsNullOrWhiteSpace(dataProtectionKeysPath))
+{
+    dataProtection.PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
+}
 
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication(builder.Configuration);
