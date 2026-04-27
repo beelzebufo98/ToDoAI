@@ -92,7 +92,11 @@ public static class WebApplicationExtensions
         {
             var tail = remaining.Value ?? string.Empty;
             if (tail.Contains("/auth/login", StringComparison.OrdinalIgnoreCase) ||
-                tail.Contains("/auth/register", StringComparison.OrdinalIgnoreCase))
+                tail.Contains("/auth/register", StringComparison.OrdinalIgnoreCase) ||
+                tail.Contains("/auth/confirm-email", StringComparison.OrdinalIgnoreCase) ||
+                tail.Contains("/auth/forgot-password", StringComparison.OrdinalIgnoreCase) ||
+                tail.Contains("/auth/resend-confirmation-code", StringComparison.OrdinalIgnoreCase) ||
+                tail.Contains("/auth/reset-password", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
