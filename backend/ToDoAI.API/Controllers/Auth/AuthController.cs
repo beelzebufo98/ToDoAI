@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -192,8 +193,6 @@ public sealed class AuthController : ToDoAiControllerBase
            Expires = refreshCookieExpiration
         });
 
-       SetCsrfCookie();
-       
        return Ok(new LoginResponse
        {
            MotivationMessage = result.MotivationMessage ?? string.Empty
@@ -252,8 +251,17 @@ public sealed class AuthController : ToDoAiControllerBase
         }, cancellationToken);
 
         SetAuthCookies(accessToken, newRefreshToken, refreshTokenExpiresAt);
-        SetCsrfCookie();
         return Ok();
+    }
+
+    [Authorize]
+    [HttpGet("csrf")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    public ActionResult IssueCsrfToken()
+    {
+        SetCsrfCookie();
+        return NoContent();
     }
 
     [HttpPost("logout")]

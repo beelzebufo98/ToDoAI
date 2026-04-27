@@ -26,13 +26,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     authApi.refresh()
-      .then(() => setIsAuthenticated(true))
+      .then(async () => {
+        await authApi.csrf()
+        setIsAuthenticated(true)
+      })
       .catch(() => localStorage.removeItem('isAuthenticated'))
       .finally(() => setIsLoading(false))
   }, [])
 
   const login = useCallback(async (data: LoginRequest) => {
     const response = await authApi.login(data)
+    await authApi.csrf()
     setIsAuthenticated(true)
     localStorage.setItem('isAuthenticated', 'true')
     const motivationMessage = response.data?.payload?.motivationMessage?.trim()

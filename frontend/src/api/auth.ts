@@ -32,6 +32,9 @@ export const authApi = {
   login: (data: LoginRequest) =>
     apiClient.post<{ payload: LoginResponse }>('/auth/login', data),
 
+  csrf: () =>
+    apiClient.get('/auth/csrf'),
+
   register: (data: RegisterRequest) =>
     apiClient.post('/auth/register', data),
 
