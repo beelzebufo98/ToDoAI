@@ -14,6 +14,7 @@ public sealed class EmailService : IEmailService
 {
     private static readonly JsonSerializerOptions ResendJsonOptions = new()
     {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
