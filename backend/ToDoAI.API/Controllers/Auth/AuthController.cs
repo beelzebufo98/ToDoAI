@@ -315,7 +315,8 @@ public sealed class AuthController : ToDoAiControllerBase
         {
             HttpOnly = true,
             Secure = HttpContext.Request.IsHttps,
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            Path = "/"
         };
 
         HttpContext.Response.Cookies.Delete("accessToken", cookieOptions);
@@ -324,13 +325,15 @@ public sealed class AuthController : ToDoAiControllerBase
         {
             HttpOnly = false,
             Secure = HttpContext.Request.IsHttps,
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            Path = "/"
         });
         HttpContext.Response.Cookies.Delete("XSRF-COOKIE", new CookieOptions
         {
             HttpOnly = true,
             Secure = HttpContext.Request.IsHttps,
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            Path = "/"
         });
     }
 
@@ -347,7 +350,8 @@ public sealed class AuthController : ToDoAiControllerBase
         {
             HttpOnly = false,
             Secure = HttpContext.Request.IsHttps,
-            SameSite = SameSiteMode.Lax
+            SameSite = SameSiteMode.Lax,
+            Path = "/"
         });
     }
 }
