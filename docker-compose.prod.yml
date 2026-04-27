@@ -63,11 +63,13 @@ services:
       AiService__GenerateSchedulePath: /api/v1/ai/schedule/generate
       AiService__GenerateMotivationPath: /api/v1/ai/motivation/generate
       EmailSettings__Enabled: "true"
-      EmailSettings__Host: ${EMAIL_SETTINGS_HOST}
-      EmailSettings__Port: ${EMAIL_SETTINGS_PORT}
-      EmailSettings__SocketSecurityMode: ${EMAIL_SETTINGS_SOCKET_SECURITY_MODE}
-      EmailSettings__UserName: ${EMAIL_SETTINGS_USERNAME}
-      EmailSettings__Password: ${EMAIL_SETTINGS_PASSWORD}
+      EmailSettings__Provider: ${EMAIL_SETTINGS_PROVIDER:-Resend}
+      EmailSettings__Host: ${EMAIL_SETTINGS_HOST:-}
+      EmailSettings__Port: ${EMAIL_SETTINGS_PORT:-587}
+      EmailSettings__SocketSecurityMode: ${EMAIL_SETTINGS_SOCKET_SECURITY_MODE:-StartTls}
+      EmailSettings__UserName: ${EMAIL_SETTINGS_USERNAME:-}
+      EmailSettings__Password: ${EMAIL_SETTINGS_PASSWORD:-}
+      EmailSettings__ApiKey: ${EMAIL_SETTINGS_API_KEY}
       EmailSettings__FromAddress: ${EMAIL_SETTINGS_FROM_ADDRESS}
       EmailSettings__FromName: ${EMAIL_SETTINGS_FROM_NAME}
     ports:

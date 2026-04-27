@@ -75,13 +75,22 @@ docker compose up --build
 - `AiService__GenerateSchedulePath`
 - `AiService__GenerateMotivationPath`
 - `EmailSettings__Enabled`
+- `EmailSettings__Provider`
 - `EmailSettings__Host`
 - `EmailSettings__Port`
 - `EmailSettings__SocketSecurityMode`
 - `EmailSettings__UserName`
 - `EmailSettings__Password`
+- `EmailSettings__ApiKey`
 - `EmailSettings__FromAddress`
 - `EmailSettings__FromName`
+
+Для production на хостингах, где SMTP-порты режутся, используй:
+- `EmailSettings__Provider=Resend`
+- `EmailSettings__ApiKey=<your_resend_api_key>`
+
+Локально с `Mailpit` оставляй:
+- `EmailSettings__Provider=Smtp`
 
 ## Полезно
 

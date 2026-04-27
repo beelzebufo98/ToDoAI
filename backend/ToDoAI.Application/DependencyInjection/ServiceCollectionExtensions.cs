@@ -51,7 +51,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICancelTaskWorkSessionUseCase, CancelTaskWorkSessionUseCase>();
         services.AddScoped<IGetTaskWorkSessionUseCase, GetTaskWorkSessionUseCase>();
         services.AddScoped<IJwtService, JwtService>();
-        services.AddScoped<IEmailService, EmailService>();
+        services.AddHttpClient<IEmailService, EmailService>();
 
         services.AddSingleton<IValidateOptions<AiServiceSettings>, AiServiceSettingsValidator>();
         services.AddOptions<AiServiceSettings>()
