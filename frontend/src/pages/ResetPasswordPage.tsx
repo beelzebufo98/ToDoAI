@@ -11,6 +11,7 @@ import { authApi } from '@/api/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { PasswordInput } from '@/components/ui/password-input'
 
 const INCORRECT_VALUE = 'incorrect_value'
 
@@ -164,9 +165,8 @@ export function ResetPasswordPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="newPassword" className="text-sm font-medium">Новый пароль</Label>
-              <Input
+              <PasswordInput
                 id="newPassword"
-                type="password"
                 autoComplete="new-password"
                 className="bg-background/80 h-10 rounded-lg border-border/60"
                 {...register('newPassword')}

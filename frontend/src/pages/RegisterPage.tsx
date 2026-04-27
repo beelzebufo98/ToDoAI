@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { PasswordInput } from '@/components/ui/password-input'
 
 const schema = z.object({
   userName: z.string()
@@ -157,9 +158,8 @@ export function RegisterPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="password" className="text-sm font-medium">Пароль</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 autoComplete="new-password"
                 className="bg-background/80 h-10 rounded-lg border-border/60"
                 {...register('password')}
@@ -171,9 +171,8 @@ export function RegisterPage() {
 
             <div className="space-y-1.5">
               <Label htmlFor="confirmPassword" className="text-sm font-medium">Подтверждение пароля</Label>
-              <Input
+              <PasswordInput
                 id="confirmPassword"
-                type="password"
                 autoComplete="new-password"
                 className="bg-background/80 h-10 rounded-lg border-border/60"
                 {...register('confirmPassword')}

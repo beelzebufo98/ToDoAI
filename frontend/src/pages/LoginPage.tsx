@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { PasswordInput } from '@/components/ui/password-input'
 
 const EMAIL_NOT_CONFIRMED = 'email_not_confirmed'
 
@@ -62,7 +63,6 @@ export function LoginPage() {
         transition={{ duration: 0.35, ease: 'easeOut' }}
         className="w-full max-w-[400px]"
       >
-        {/* Logo */}
         <div className="flex flex-col items-center mb-8 gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-foreground shadow-sm">
             <Sparkles className="h-5 w-5 text-background" />
@@ -73,7 +73,6 @@ export function LoginPage() {
           </div>
         </div>
 
-        {/* Card */}
         <div className="bg-card rounded-2xl shadow-sm border border-border/50 p-6">
           <div className="mb-5">
             <h2 className="text-base font-semibold text-foreground">Вход в аккаунт</h2>
@@ -144,9 +143,8 @@ export function LoginPage() {
                   Забыли пароль?
                 </Link>
               </div>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 autoComplete="current-password"
                 className="bg-background/80 h-10 rounded-lg border-border/60 focus-visible:ring-foreground/20"
                 {...register('password')}
