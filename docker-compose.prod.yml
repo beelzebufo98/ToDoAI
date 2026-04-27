@@ -54,7 +54,7 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:5114
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__Default: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      ConnectionStrings__Default: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGR>
       AuthSettings__SecretKey: ${AUTHSETTINGS__SECRETKEY}
       AuthSettings__AccessTokenLifetime: ${AUTHSETTINGS__ACCESSTOKENLIFETIME:-00:10:00}
       AuthSettings__RefreshTokenLifetime: ${AUTHSETTINGS__REFRESHTOKENLIFETIME:-30.00:00:00}
@@ -64,14 +64,14 @@ services:
       AiService__GenerateMotivationPath: /api/v1/ai/motivation/generate
       EmailSettings__Enabled: "true"
       EmailSettings__Provider: ${EMAIL_SETTINGS_PROVIDER:-Resend}
-      EmailSettings__Host: ${EMAIL_SETTINGS_HOST:-}
-      EmailSettings__Port: ${EMAIL_SETTINGS_PORT:-587}
-      EmailSettings__SocketSecurityMode: ${EMAIL_SETTINGS_SOCKET_SECURITY_MODE:-StartTls}
-      EmailSettings__UserName: ${EMAIL_SETTINGS_USERNAME:-}
-      EmailSettings__Password: ${EMAIL_SETTINGS_PASSWORD:-}
       EmailSettings__ApiKey: ${EMAIL_SETTINGS_API_KEY}
       EmailSettings__FromAddress: ${EMAIL_SETTINGS_FROM_ADDRESS}
       EmailSettings__FromName: ${EMAIL_SETTINGS_FROM_NAME}
+      Cors__AllowedOrigins__0: http://206.189.57.44
+      Cors__AllowedOrigins__1: http://206.189.57.44:80
+      Cors__AllowedOrigins__2: http://localhost:5173
+      Cors__AllowedOrigins__3: http://todoai.info
+      Cors__AllowedOrigins__4: http://www.todoai.info
     ports:
       - "${API_PORT:-5114}:5114"
 
