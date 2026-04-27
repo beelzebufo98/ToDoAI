@@ -54,6 +54,7 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:5114
       ASPNETCORE_ENVIRONMENT: Production
+      DataProtection__KeysPath: /app/data-protection-keys
       ConnectionStrings__Default: "Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       AuthSettings__SecretKey: ${AUTHSETTINGS__SECRETKEY}
       AuthSettings__AccessTokenLifetime: ${AUTHSETTINGS__ACCESSTOKENLIFETIME:-00:10:00}
@@ -72,6 +73,8 @@ services:
       Cors__AllowedOrigins__2: http://localhost:5173
       Cors__AllowedOrigins__3: http://todoai.info
       Cors__AllowedOrigins__4: http://www.todoai.info
+    volumes:
+      - todoai_dp:/app/data-protection-keys
     ports:
       - "${API_PORT:-5114}:5114"
 
@@ -91,3 +94,4 @@ services:
 
 volumes:
   todoai_pg:
+  todoai_dp:
