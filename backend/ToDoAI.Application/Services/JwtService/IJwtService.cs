@@ -4,9 +4,9 @@ namespace ToDoAI.Application.Services.JwtService;
 
 public interface IJwtService
 {
-    string GenerateAccessToken(LoginUserDal account);
+    string GenerateAccessToken(UserDal account);
 
-    string GenerateRefreshToken(LoginUserDal account);
+    string GenerateRefreshToken(UserDal account);
 
     string HashRefreshToken(string token);
     

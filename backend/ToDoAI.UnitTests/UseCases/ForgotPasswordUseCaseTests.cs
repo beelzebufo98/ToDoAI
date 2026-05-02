@@ -25,7 +25,7 @@ public sealed class ForgotPasswordUseCaseTests
             Options.Create(new EmailSettings { Enabled = emailEnabled }),
             _logger.Object);
 
-    private static LoginUserDal MakeUser(bool isEmailConfirmed = true) => new()
+    private static UserDal MakeUser(bool isEmailConfirmed = true) => new()
     {
         UserId = Guid.NewGuid(),
         UserName = "john_doe",
@@ -53,7 +53,7 @@ public sealed class ForgotPasswordUseCaseTests
         // Arrange
         _userDal
             .Setup(x => x.GetUserByEmail(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((LoginUserDal?)null);
+            .ReturnsAsync((UserDal?)null);
 
         var useCase = CreateUseCase();
 
@@ -214,7 +214,7 @@ public sealed class ForgotPasswordUseCaseTests
         // Arrange
         _userDal
             .Setup(x => x.GetUserByEmail("john@example.com", It.IsAny<CancellationToken>()))
-            .ReturnsAsync((LoginUserDal?)null);
+            .ReturnsAsync((UserDal?)null);
 
         var useCase = CreateUseCase();
 

@@ -23,6 +23,7 @@ using ToDoAI.Application.UseCases.TaskWorkSession;
 using ToDoAI.Application.UseCases.UpdateTask;
 using ToDoAI.Application.UseCases.UpdateTaskStatus;
 using ToDoAI.Application.UseCases.UserStateUseCase;
+using ToDoAI.Application.UseCases.UserUseCase;
 
 namespace ToDoAI.Application.DependencyInjection;
 
@@ -50,6 +51,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IStopTaskWorkSessionUseCase, StopTaskWorkSessionUseCase>();
         services.AddScoped<ICancelTaskWorkSessionUseCase, CancelTaskWorkSessionUseCase>();
         services.AddScoped<IGetTaskWorkSessionUseCase, GetTaskWorkSessionUseCase>();
+        services.AddScoped<IUserUseCase, UserUseCase>(); 
         services.AddScoped<IJwtService, JwtService>();
         services.AddHttpClient<IEmailService, EmailService>();
 

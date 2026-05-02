@@ -11,13 +11,15 @@ namespace ToDoAI.Infrastructure.DalProviders.TaskWorkSessionDalProvider;
 public sealed class TaskWorkSessionDalProvider(IDbContextFactory<ToDoAIDbContext> dbContextFactory)
     : ITaskWorkSessionDalProvider
 {
+    private static readonly TimeSpan UserLocalOffset = TimeSpan.FromHours(3);
 
     public async Task<GetTaskWorkSessionsDalResult> GetTaskWorkSessions(Guid userId, DateOnly sessionDate, CancellationToken ct)
     {
         await using var dbContext = await dbContextFactory.CreateDbContextAsync(ct);
 
-        var dayStartUtc = sessionDate.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
-        var nextDayStartUtc = dayStartUtc.AddDays(1);
+        var localDayStart = new DateTimeOffset(sessionDate.ToDateTime(TimeOnly.MinValue), UserLocalOffset);
+        var dayStartUtc = localDayStart.ToUniversalTime();
+        var nextDayStartUtc = localDayStart.AddDays(1).ToUniversalTime();
 
         var sessionEntities = await dbContext.TaskWorkSessions
             .AsNoTracking()

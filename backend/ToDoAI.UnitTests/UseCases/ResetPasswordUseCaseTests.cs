@@ -19,7 +19,7 @@ public sealed class ResetPasswordUseCaseTests
     private ResetPasswordUseCase CreateUseCase() =>
         new(_userDal.Object, _passwordResetDal.Object, _refreshTokenDal.Object);
 
-    private static LoginUserDal MakeUser() => new()
+    private static UserDal MakeUser() => new()
     {
         UserId = Guid.NewGuid(),
         UserName = "john_doe",
@@ -47,7 +47,7 @@ public sealed class ResetPasswordUseCaseTests
         // Arrange
         _userDal
             .Setup(x => x.GetUserByEmail(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((LoginUserDal?)null);
+            .ReturnsAsync((UserDal?)null);
 
         var useCase = CreateUseCase();
         var request = new ResetPasswordBlRequest

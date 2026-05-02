@@ -18,7 +18,7 @@ public sealed class ConfirmEmailUseCaseTests
     private ConfirmEmailUseCase CreateUseCase() =>
         new(_userDal.Object, _confirmationDal.Object);
 
-    private static LoginUserDal MakeUser(bool isEmailConfirmed = false) => new()
+    private static UserDal MakeUser(bool isEmailConfirmed = false) => new()
     {
         UserId = Guid.NewGuid(),
         UserName = "john_doe",
@@ -48,7 +48,7 @@ public sealed class ConfirmEmailUseCaseTests
         // Arrange
         _userDal
             .Setup(x => x.GetUserByEmail(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((LoginUserDal?)null);
+            .ReturnsAsync((UserDal?)null);
 
         var useCase = CreateUseCase();
         var request = new ConfirmEmailBlRequest { Email = "ghost@example.com", Code = "123456" };

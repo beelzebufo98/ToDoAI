@@ -28,7 +28,7 @@ public sealed class TaskExecutionUseCaseTests
     private static readonly Guid UserId = Guid.NewGuid();
     private static readonly Guid TaskId = Guid.NewGuid();
 
-    private static LoginUserDal MakeUser() => new()
+    private static UserDal MakeUser() => new()
     {
         UserId = UserId,
         UserName = "john_doe",
@@ -77,7 +77,7 @@ public sealed class TaskExecutionUseCaseTests
         // Arrange
         _userDal
             .Setup(x => x.GetUser(UserId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((LoginUserDal?)null);
+            .ReturnsAsync((UserDal?)null);
 
         var useCase = CreateUseCase();
 
