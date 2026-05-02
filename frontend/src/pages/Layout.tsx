@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, CheckSquare, User, LogOut, Sparkles } from 'lucide-react'
+import { LayoutDashboard, CheckSquare, User, LogOut, Sparkles, ChartColumn } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
@@ -10,6 +10,7 @@ import { ActiveSessionBanner } from '@/components/session/ActiveSessionBanner'
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Главная' },
   { to: '/tasks', icon: CheckSquare, label: 'Задачи' },
+  { to: '/statistics', icon: ChartColumn, label: 'Статистика' },
   { to: '/profile', icon: User, label: 'Профиль' },
 ]
 
@@ -25,9 +26,7 @@ export function Layout() {
 
   return (
     <div className="flex h-screen bg-background">
-      {/* Sidebar */}
       <aside className="w-56 flex flex-col border-r border-border/60 bg-sidebar shrink-0">
-        {/* Logo */}
         <div className="flex items-center gap-2.5 px-4 py-5">
           <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
             <Sparkles className="h-4 w-4 text-primary-foreground" />
@@ -37,7 +36,6 @@ export function Layout() {
 
         <Separator className="bg-sidebar-border" />
 
-        {/* Nav */}
         <nav className="flex flex-col gap-1 p-3 flex-1">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
@@ -65,12 +63,10 @@ export function Layout() {
 
         <Separator className="bg-sidebar-border" />
 
-        {/* Active session */}
         <div className="pt-2">
           <ActiveSessionBanner />
         </div>
 
-        {/* Logout */}
         <div className="p-3">
           <Button
             variant="ghost"
@@ -83,7 +79,6 @@ export function Layout() {
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 overflow-y-auto">
         <motion.div
           key={location.pathname}

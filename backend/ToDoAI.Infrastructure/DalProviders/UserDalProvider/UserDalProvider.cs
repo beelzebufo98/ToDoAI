@@ -57,7 +57,7 @@ public sealed class UserDalProvider : IUserDalProvider
         await toDoAiDb.SaveChangesAsync(cancellationToken);
     }
     
-    public async Task<LoginUserDal?> GetUser(string userName, CancellationToken cancellationToken)
+    public async Task<UserDal?> GetUser(string userName, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
         var normalizedUserName = userName.ToLowerInvariant();
@@ -71,7 +71,7 @@ public sealed class UserDalProvider : IUserDalProvider
         return GetLoginUserDal(user);
     }
 
-    public async Task<LoginUserDal?> GetUser(Guid userId, CancellationToken cancellationToken)
+    public async Task<UserDal?> GetUser(Guid userId, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
         var user = await toDoAiDb.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
@@ -83,7 +83,7 @@ public sealed class UserDalProvider : IUserDalProvider
         return GetLoginUserDal(user);
     }
 
-    public async Task<LoginUserDal?> GetUserByEmail(string email, CancellationToken cancellationToken)
+    public async Task<UserDal?> GetUserByEmail(string email, CancellationToken cancellationToken)
     {
         await using var toDoAiDb = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
         var normalizedEmail = email.ToLowerInvariant();
@@ -125,13 +125,14 @@ public sealed class UserDalProvider : IUserDalProvider
         await toDoAiDb.SaveChangesAsync(cancellationToken);
     }
     
-    private static LoginUserDal GetLoginUserDal(UserEntity user)
+    private static UserDal GetLoginUserDal(UserEntity user)
     {
-        return new LoginUserDal
+        return new UserDal
         {
             UserId = user.Id,
             UserName = user.UserName,
             FirstName = user.FirstName,
+            LastName = user.LastName,
             Email = user.Email,
             IsEmailConfirmed = user.IsEmailConfirmed,
             PasswordHash = user.PasswordHash,

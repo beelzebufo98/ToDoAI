@@ -14,6 +14,7 @@ import { ResetPasswordPage } from '@/pages/ResetPasswordPage'
 import { HomePage } from '@/pages/HomePage'
 import { TasksPage } from '@/pages/TasksPage'
 import { ProfilePage } from '@/pages/ProfilePage'
+import { StatisticsPage } from '@/pages/StatisticsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +44,7 @@ export function App() {
                 <Route element={<Layout />}>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/tasks" element={<TasksPage />} />
+                  <Route path="/statistics" element={<StatisticsPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
                 </Route>
               </Route>

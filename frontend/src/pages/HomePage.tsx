@@ -19,10 +19,6 @@ function todayLocalString() {
 }
 
 // UTC date for session history — backend filters task-work-sessions by UTC day range
-function todayUtcString() {
-  return new Date().toISOString().slice(0, 10)
-}
-
 function isToday(iso: string) {
   const d = new Date(iso)
   const now = new Date()
@@ -68,7 +64,6 @@ function SessionHistoryItem({ session }: { session: TaskWorkSession }) {
 
 export function HomePage() {
   const today = todayLocalString()
-  const todayUtc = todayUtcString()
   const queryClient = useQueryClient()
   const [showGenerate, setShowGenerate] = useState(false)
   const [generatedSchedule, setGeneratedSchedule] = useState<DaySchedule | null>(null)
@@ -86,8 +81,8 @@ export function HomePage() {
   })
 
   const { data: sessionsData } = useQuery({
-    queryKey: ['sessions', 'day', todayUtc],
-    queryFn: () => taskWorkSessionsApi.getByDate(todayUtc).then(r => r.data.payload.taskWorkSessionResponses),
+    queryKey: ['sessions', 'day', today],
+    queryFn: () => taskWorkSessionsApi.getByDate(today).then(r => r.data.payload.taskWorkSessionResponses),
     staleTime: 0,
     retry: false,
   })

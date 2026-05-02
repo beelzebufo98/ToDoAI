@@ -18,7 +18,7 @@ public sealed class JwtService : IJwtService
         _settings = settings;
     }
 
-    public string GenerateAccessToken(LoginUserDal account)
+    public string GenerateAccessToken(UserDal account)
     {
         var claims = new List<Claim>
         {
@@ -39,7 +39,7 @@ public sealed class JwtService : IJwtService
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
 
-    public string GenerateRefreshToken(LoginUserDal account)
+    public string GenerateRefreshToken(UserDal account)
     {
         var claims = new List<Claim>
         {

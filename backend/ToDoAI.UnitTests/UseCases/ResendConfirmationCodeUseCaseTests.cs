@@ -25,7 +25,7 @@ public sealed class ResendConfirmationCodeUseCaseTests
             Options.Create(new EmailSettings { Enabled = emailEnabled }),
             _logger.Object);
 
-    private static LoginUserDal MakeUser(bool isEmailConfirmed = false) => new()
+    private static UserDal MakeUser(bool isEmailConfirmed = false) => new()
     {
         UserId = Guid.NewGuid(),
         UserName = "john_doe",
@@ -53,7 +53,7 @@ public sealed class ResendConfirmationCodeUseCaseTests
         // Arrange
         _userDal
             .Setup(x => x.GetUserByEmail(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync((LoginUserDal?)null);
+            .ReturnsAsync((UserDal?)null);
 
         var useCase = CreateUseCase();
 

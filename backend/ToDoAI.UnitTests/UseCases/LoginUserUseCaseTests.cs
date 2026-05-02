@@ -39,10 +39,10 @@ public sealed class LoginUserUseCaseTests
         return new PasswordHasher<UserHash>().HashPassword(userHash, plain);
     }
 
-    private static LoginUserDal MakeUser(bool isEmailConfirmed = true, string? passwordHash = null)
+    private static UserDal MakeUser(bool isEmailConfirmed = true, string? passwordHash = null)
     {
         var userId = Guid.NewGuid();
-        return new LoginUserDal
+        return new UserDal
         {
             UserId = userId,
             UserName = "john_doe",
@@ -62,7 +62,7 @@ public sealed class LoginUserUseCaseTests
         // Arrange
         _userDal
             .Setup(x => x.GetUser("john_doe", It.IsAny<CancellationToken>()))
-            .ReturnsAsync((LoginUserDal?)null);
+            .ReturnsAsync((UserDal?)null);
 
         var useCase = CreateUseCase();
         var request = new LoginUserBlRequest { UserName = "john_doe", Password = "Password1!" };
@@ -183,8 +183,8 @@ public sealed class LoginUserUseCaseTests
             .Setup(x => x.GetUser(user.UserName, It.IsAny<CancellationToken>()))
             .ReturnsAsync(user);
 
-        _jwtService.Setup(x => x.GenerateAccessToken(It.IsAny<LoginUserDal>())).Returns("access_token");
-        _jwtService.Setup(x => x.GenerateRefreshToken(It.IsAny<LoginUserDal>())).Returns("refresh_token");
+        _jwtService.Setup(x => x.GenerateAccessToken(It.IsAny<UserDal>())).Returns("access_token");
+        _jwtService.Setup(x => x.GenerateRefreshToken(It.IsAny<UserDal>())).Returns("refresh_token");
         _jwtService.Setup(x => x.HashRefreshToken(It.IsAny<string>())).Returns("hashed");
         _aiMotivationClient
             .Setup(x => x.GenerateMotivation(It.IsAny<AiGenerateMotivationRequest>(), It.IsAny<CancellationToken>()))

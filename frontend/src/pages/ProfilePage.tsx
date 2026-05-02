@@ -1,31 +1,49 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Loader2, Mail, UserRound } from 'lucide-react'
 import { z } from 'zod'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { userApi } from '@/api/user'
 import { userStateApi } from '@/api/userState'
-import type { UserState } from '@/api/userState'
+import { UserAvatar } from '@/components/profile/UserAvatar'
+import { StateCard } from '@/components/user-state/StateCard'
+import { shouldUpdateLatestState } from '@/components/user-state/state-utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import {
+  avatarVariantLabels,
+  avatarVariants,
+  getAvatarVariant,
+  setAvatarVariant,
+  type AvatarVariant,
+} from '@/lib/avatar-preferences'
 import { cn } from '@/lib/utils'
 
 const LEVELS = [
-  { label: '1–2', value: 2  },
-  { label: '3–4', value: 4  },
-  { label: '5–6', value: 6  },
-  { label: '7–8', value: 8  },
+  { label: '1–2', value: 2 },
+  { label: '3–4', value: 4 },
+  { label: '5–6', value: 6 },
+  { label: '7–8', value: 8 },
   { label: '9–10', value: 10 },
 ]
 
+const defaultFormValues = {
+  sleepHours: 8,
+  energyLevel: 6,
+  stressLevel: 4,
+  motivationLevel: 6,
+  concentrationLevel: 6,
+}
+
 const schema = z.object({
-  sleepHours:          z.number().min(0, 'Минимум 0').max(24, 'Максимум 24'),
-  energyLevel:         z.number().min(1).max(10),
-  stressLevel:         z.number().min(1).max(10),
-  motivationLevel:     z.number().min(1).max(10),
-  concentrationLevel:  z.number().min(1).max(10),
+  sleepHours: z.number().min(0, 'Минимум 0').max(24, 'Максимум 24'),
+  energyLevel: z.number().min(1).max(10),
+  stressLevel: z.number().min(1).max(10),
+  motivationLevel: z.number().min(1).max(10),
+  concentrationLevel: z.number().min(1).max(10),
 })
 
 type FormData = z.infer<typeof schema>
@@ -37,7 +55,7 @@ function LevelSelector({
 }: {
   label: string
   value: number
-  onChange: (v: number) => void
+  onChange: (value: number) => void
 }) {
   return (
     <div className="space-y-1.5">
@@ -46,19 +64,19 @@ function LevelSelector({
         <span className="ml-1.5 font-normal text-muted-foreground">({value}/10)</span>
       </Label>
       <div className="flex gap-1.5">
-        {LEVELS.map(l => (
+        {LEVELS.map((level) => (
           <button
-            key={l.value}
+            key={level.value}
             type="button"
-            onClick={() => onChange(l.value)}
+            onClick={() => onChange(level.value)}
             className={cn(
               'flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors border',
-              value === l.value
+              value === level.value
                 ? 'bg-foreground text-background border-foreground'
                 : 'bg-background border-border text-muted-foreground hover:border-foreground/40'
             )}
           >
-            {l.label}
+            {level.label}
           </button>
         ))}
       </div>
@@ -66,75 +84,33 @@ function LevelSelector({
   )
 }
 
-function isWithin3Hours(iso: string) {
-  return Date.now() - new Date(iso).getTime() < 3 * 60 * 60 * 1000
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('ru-RU', {
-    day: 'numeric', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit',
-  })
-}
-
-function StateCard({ state }: { state: UserState }) {
-  const h = Math.floor(state.sleepMinutes / 60)
-  const m = state.sleepMinutes % 60
-  const sleepLabel = m > 0 ? `${h} ч ${m} мин` : `${h} ч`
-
-  return (
-    <div className="bg-card border border-border/50 rounded-xl p-4">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-muted-foreground">{formatDate(state.createdAt)}</span>
-        <span className="text-xs font-medium text-foreground">Сон: {sleepLabel}</span>
-      </div>
-      <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
-        <Metric label="Энергия"       value={state.energyLevel} />
-        <Metric label="Стресс"        value={state.stressLevel} colorInvert />
-        <Metric label="Мотивация"     value={state.motivationLevel} />
-        <Metric label="Концентрация"  value={state.concentrationLevel} />
-      </div>
-    </div>
-  )
-}
-
-function Metric({ label, value, colorInvert }: { label: string; value: number; colorInvert?: boolean }) {
-  const isLow  = value <= 3
-  const isHigh = value >= 8
-  const good   = colorInvert ? isLow : isHigh
-  const bad    = colorInvert ? isHigh : isLow
-
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-xs text-muted-foreground">{label}</span>
-      <span className={cn(
-        'text-xs font-semibold tabular-nums',
-        good ? 'text-green-600' : bad ? 'text-red-500' : 'text-foreground'
-      )}>
-        {value}/10
-      </span>
-    </div>
-  )
-}
-
 export function ProfilePage() {
   const queryClient = useQueryClient()
+  const [avatarVariant, setSelectedAvatarVariant] = useState<AvatarVariant>('bot-1')
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(true)
 
-  const { register, handleSubmit, formState: { errors }, setValue, watch, reset } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    reset,
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      sleepHours: 8,
-      energyLevel: 6,
-      stressLevel: 4,
-      motivationLevel: 6,
-      concentrationLevel: 6,
-    },
+    defaultValues: defaultFormValues,
   })
 
-  const energyLevel        = watch('energyLevel')
-  const stressLevel        = watch('stressLevel')
-  const motivationLevel    = watch('motivationLevel')
+  const energyLevel = watch('energyLevel')
+  const stressLevel = watch('stressLevel')
+  const motivationLevel = watch('motivationLevel')
   const concentrationLevel = watch('concentrationLevel')
+
+  const { data: userData, isLoading: userLoading } = useQuery({
+    queryKey: ['user', 'me'],
+    queryFn: () => userApi.getMe(),
+    retry: false,
+  })
 
   const { data: latestData, isLoading: latestLoading } = useQuery({
     queryKey: ['userState', 'latest'],
@@ -142,96 +118,167 @@ export function ProfilePage() {
     retry: false,
   })
 
-  const { data: historyData, isLoading: historyLoading } = useQuery({
-    queryKey: ['userState', 'history'],
-    queryFn: () => userStateApi.getHistory(30),
-    retry: false,
-  })
+  const user = userData?.data.payload
+  const latest = latestData?.data.payload
+  const isUpdate = !!latest && shouldUpdateLatestState(latest.createdAt)
 
-  const latest  = latestData?.data.payload
-  const allHistory = historyData?.data.payload.history ?? []
-  const today = new Date().toDateString()
-  const history = Object.entries(
-    allHistory.reduce<Record<string, typeof allHistory>>((acc, s) => {
-      const day = new Date(s.createdAt).toDateString()
-      if (day !== today) { (acc[day] ??= []).push(s) }
-      return acc
-    }, {})
-  )
-    .map(([day, entries]) => {
-      const avg = (fn: (s: typeof entries[0]) => number) =>
-        Math.round(entries.reduce((sum, s) => sum + fn(s), 0) / entries.length)
-      return {
-        day,
-        date: entries[0].createdAt,
-        sleepMinutes:       avg(s => s.sleepMinutes),
-        energyLevel:        avg(s => s.energyLevel),
-        stressLevel:        avg(s => s.stressLevel),
-        motivationLevel:    avg(s => s.motivationLevel),
-        concentrationLevel: avg(s => s.concentrationLevel),
-        count: entries.length,
-      }
-    })
-    .sort((a, b) => b.date.localeCompare(a.date))
-  const isUpdate = !!latest && isWithin3Hours(latest.createdAt)
+  const avatarSeed = useMemo(() => {
+    if (!user) {
+      return 'todoai-user'
+    }
 
-  // Pre-fill once when the record first loads (or a new record appears).
-  // Intentionally excludes `isUpdate` — it can briefly toggle during refetch
-  // and would re-run the effect with stale cache data, overwriting user edits.
+    return [user.userId, user.userName, user.firstName, user.lastName].filter(Boolean).join(':')
+  }, [user])
+
   useEffect(() => {
-    if (latest && isWithin3Hours(latest.createdAt)) {
+    if (!user) {
+      return
+    }
+
+    const savedVariant = getAvatarVariant(user.userId)
+    setSelectedAvatarVariant(savedVariant)
+    setIsAvatarPickerOpen(savedVariant === 'bot-1')
+  }, [user])
+
+  useEffect(() => {
+    if (latest && shouldUpdateLatestState(latest.createdAt)) {
       reset({
-        sleepHours:         latest.sleepMinutes / 60,
-        energyLevel:        latest.energyLevel,
-        stressLevel:        latest.stressLevel,
-        motivationLevel:    latest.motivationLevel,
+        sleepHours: latest.sleepMinutes / 60,
+        energyLevel: latest.energyLevel,
+        stressLevel: latest.stressLevel,
+        motivationLevel: latest.motivationLevel,
         concentrationLevel: latest.concentrationLevel,
       })
+      return
     }
-  }, [latest?.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    reset(defaultFormValues)
+  }, [latest?.id, latest, reset])
 
   const mutation = useMutation({
     mutationFn: (data: FormData) =>
       userStateApi.create({
-        sleepMinutes:       Math.round(data.sleepHours * 60),
-        energyLevel:        data.energyLevel,
-        stressLevel:        data.stressLevel,
-        motivationLevel:    data.motivationLevel,
+        sleepMinutes: Math.round(data.sleepHours * 60),
+        energyLevel: data.energyLevel,
+        stressLevel: data.stressLevel,
+        motivationLevel: data.motivationLevel,
         concentrationLevel: data.concentrationLevel,
       }),
     onSuccess: () => {
       toast.success(isUpdate ? 'Состояние обновлено' : 'Состояние сохранено')
       queryClient.invalidateQueries({ queryKey: ['userState'] })
-      if (!isUpdate) reset()
     },
-    onError: () => toast.error('Не удалось сохранить состояние'),
+    onError: () => {
+      toast.error('Не удалось сохранить состояние')
+    },
   })
 
+  const handleAvatarChange = (variant: AvatarVariant) => {
+    if (!user) {
+      return
+    }
+
+    setSelectedAvatarVariant(variant)
+    setAvatarVariant(user.userId, variant)
+    setIsAvatarPickerOpen(false)
+    toast.success(`Выбран робот ${avatarVariantLabels[variant].toLowerCase()}`)
+  }
+
   return (
-    <div className="p-6 max-w-2xl mx-auto w-full">
-      {/* Header */}
+    <div className="p-6 max-w-4xl mx-auto w-full">
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-foreground">Профиль</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">Ваше состояние на сегодня</p>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Общая информация, аватар и состояние на сегодня
+        </p>
       </div>
 
       <div className="space-y-6">
-        {/* Latest state */}
+        <section className="bg-card border border-border/50 rounded-xl p-5">
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center gap-4">
+              <UserAvatar seed={avatarSeed} variant={avatarVariant} size={84} className="shrink-0" />
+              <div>
+                <p className="text-lg font-semibold text-foreground">
+                  {userLoading ? 'Загрузка…' : [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.userName}
+                </p>
+                <div className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <UserRound className="h-4 w-4" />
+                    <span>@{user?.userName ?? '—'}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    <span>{user?.email ?? 'Email не указан'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-3">
+                <p className="text-sm font-medium text-foreground">Робот-напарник</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Выберите визуальный образ помощника ToDoAI. Выбор сохранится для этого аккаунта на текущем устройстве.
+                </p>
+              </div>
+              <div className="flex items-center justify-between rounded-xl border border-border/50 bg-muted/20 px-3 py-2">
+                <div className="flex items-center gap-3">
+                  <UserAvatar seed={avatarSeed} variant={avatarVariant} size={40} />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{avatarVariantLabels[avatarVariant]}</p>
+                    <p className="text-xs text-muted-foreground">Активный напарник профиля</p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-8"
+                  onClick={() => setIsAvatarPickerOpen((value) => !value)}
+                >
+                  {isAvatarPickerOpen ? 'Скрыть' : 'Сменить'}
+                </Button>
+              </div>
+
+              {isAvatarPickerOpen && (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6 mt-3">
+                  {avatarVariants.map((variant) => (
+                    <button
+                      key={variant}
+                      type="button"
+                      onClick={() => handleAvatarChange(variant)}
+                      className={cn(
+                        'rounded-xl border p-3 transition-colors text-left',
+                        avatarVariant === variant
+                          ? 'border-primary bg-primary/5'
+                          : 'border-border/60 hover:border-foreground/30'
+                      )}
+                    >
+                      <UserAvatar seed={avatarSeed} variant={variant} size={56} className="mx-auto" />
+                      <p className="mt-2 text-xs font-medium text-foreground text-center">
+                        {avatarVariantLabels[variant]}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
         {!latestLoading && latest && (
-          <div>
+          <section>
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
               Последнее состояние
             </p>
-            <StateCard state={latest} />
-          </div>
+            <StateCard state={latest} compact />
+          </section>
         )}
 
-        {/* Create form */}
-        <div className="bg-card border border-border/50 rounded-xl p-5">
+        <section className="bg-card border border-border/50 rounded-xl p-5">
           <h2 className="text-sm font-semibold mb-4">{isUpdate ? 'Обновить состояние' : 'Добавить состояние'}</h2>
 
-          <form onSubmit={handleSubmit(d => mutation.mutate(d))} className="space-y-4">
-            {/* Sleep */}
+          <form onSubmit={handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
             <div className="space-y-1.5">
               <Label className="text-sm font-medium">Сон (часов)</Label>
               <Input
@@ -242,15 +289,21 @@ export function ProfilePage() {
                 className="h-10 bg-background/80"
                 {...register('sleepHours', { valueAsNumber: true })}
               />
-              {errors.sleepHours && (
-                <p className="text-xs text-destructive">{errors.sleepHours.message}</p>
-              )}
+              {errors.sleepHours && <p className="text-xs text-destructive">{errors.sleepHours.message}</p>}
             </div>
 
-            <LevelSelector label="Энергия"      value={energyLevel}        onChange={v => setValue('energyLevel', v)} />
-            <LevelSelector label="Стресс"        value={stressLevel}        onChange={v => setValue('stressLevel', v)} />
-            <LevelSelector label="Мотивация"     value={motivationLevel}    onChange={v => setValue('motivationLevel', v)} />
-            <LevelSelector label="Концентрация"  value={concentrationLevel} onChange={v => setValue('concentrationLevel', v)} />
+            <LevelSelector label="Энергия" value={energyLevel} onChange={(value) => setValue('energyLevel', value)} />
+            <LevelSelector label="Стресс" value={stressLevel} onChange={(value) => setValue('stressLevel', value)} />
+            <LevelSelector
+              label="Мотивация"
+              value={motivationLevel}
+              onChange={(value) => setValue('motivationLevel', value)}
+            />
+            <LevelSelector
+              label="Концентрация"
+              value={concentrationLevel}
+              onChange={(value) => setValue('concentrationLevel', value)}
+            />
 
             <Button
               type="submit"
@@ -261,43 +314,7 @@ export function ProfilePage() {
               {isUpdate ? 'Обновить' : 'Сохранить'}
             </Button>
           </form>
-        </div>
-
-        {/* History */}
-        {!historyLoading && history.length > 0 && (
-          <div>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-              История ({history.length})
-            </p>
-            <div className="space-y-3">
-              {history.map(entry => (
-                <div key={entry.day} className="bg-card border border-border/50 rounded-xl p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(entry.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      {entry.count > 1 && <span className="ml-1.5 text-muted-foreground/60">· ср. за {entry.count} записи</span>}
-                    </span>
-                    <span className="text-xs font-medium text-foreground">
-                      Сон: {Math.floor(entry.sleepMinutes / 60)} ч{entry.sleepMinutes % 60 > 0 ? ` ${entry.sleepMinutes % 60} мин` : ''}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
-                    <Metric label="Энергия"      value={entry.energyLevel} />
-                    <Metric label="Стресс"        value={entry.stressLevel} colorInvert />
-                    <Metric label="Мотивация"     value={entry.motivationLevel} />
-                    <Metric label="Концентрация"  value={entry.concentrationLevel} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {!historyLoading && history.length === 0 && !latestLoading && !latest && (
-          <p className="text-center text-sm text-muted-foreground py-8">
-            Состояний пока нет — добавьте первое
-          </p>
-        )}
+        </section>
       </div>
     </div>
   )
