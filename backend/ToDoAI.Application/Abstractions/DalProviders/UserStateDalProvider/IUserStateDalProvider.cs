@@ -12,4 +12,7 @@ public interface IUserStateDalProvider
         CancellationToken cancellationToken);
 
     Task<UserStateDal> UpdateUserState(UpdateUserStateDalRequest request, CancellationToken cancellationToken);
+
+    Task<IReadOnlyCollection<UserStateDal>> GetUserStatesByDays(Guid userId, int days,
+        CancellationToken cancellationToken);
 }

@@ -15,7 +15,8 @@ namespace ToDoAI.API.Controllers.UserStateController;
 [Route("api/v{version:apiVersion}/user-state/")]
 public sealed class UserStateController : ToDoAiControllerBase
 {
-    private const int DefaultDaysCount = 7;
+    private const int DefaultDaysCount = 30;
+    private const int MaxDaysCount = 90;
     
     private readonly IUserStateUseCase  _userStateUseCase;
     
@@ -95,6 +96,35 @@ public sealed class UserStateController : ToDoAiControllerBase
         }
 
         var response = result.UserState.ToUserStateResponse();
+        return Ok(response);
+    }
+
+    [HttpGet("statistics")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserStateStatisticsResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    public async Task<ActionResult> GetStatistics([FromQuery] int? days, CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst("id")?.Value;
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.NotAuthorized), StatusCodes.Status401Unauthorized);
+        }
+        
+        if (days.HasValue && (days.Value <= 0 || days.Value > MaxDaysCount))
+        {
+            return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.IncorrectValue));
+        }
+
+        var result = await _userStateUseCase.GetUserStateStatistics(userId, days ?? DefaultDaysCount, cancellationToken);
+        if (result.ErrorCode is not null)
+        {
+            return result.ErrorCode == ErrorCodes.NotAuthorized
+                ? ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode), StatusCodes.Status401Unauthorized)
+                : ClientError(new ErrorApi<ErrorCodes?>(result.ErrorCode));
+        }
+
+        var response = result.UserStateStatistics!.ToUserStateStatisticsResponse();
         return Ok(response);
     }
     
