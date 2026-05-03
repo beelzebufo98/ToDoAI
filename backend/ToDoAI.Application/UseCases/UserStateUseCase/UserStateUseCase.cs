@@ -19,6 +19,80 @@ public sealed class UserStateUseCase : IUserStateUseCase
         _userStateDalProvider = userStateDalProvider;
     }
 
+    public async Task<UserStateStatisticsBlResult> GetUserStateStatistics(Guid userId, int days,
+        CancellationToken cancellationToken)
+    {
+        var user = await _userDalProvider.GetUser(userId, cancellationToken);
+
+        if (user == null)
+        {
+            return new UserStateStatisticsBlResult
+            {
+                ErrorCode = ErrorCodes.NotAuthorized
+            };
+        }
+        
+        var userStates = await _userStateDalProvider.GetUserStatesByDays(userId, days, cancellationToken);
+        var orderedStates = userStates
+            .OrderBy(x => x.CreatedAt)
+            .ToList();
+
+        var entriesCount = orderedStates.Count;
+        var entriesByDayCount = orderedStates
+            .Select(x => x.CreatedAt.ToOffset(UserLocalOffset).Date)
+            .Distinct()
+            .Count();
+
+        var dailyStatistics = orderedStates
+            .GroupBy(x => DateOnly.FromDateTime(x.CreatedAt.ToOffset(UserLocalOffset).DateTime.Date))
+            .OrderBy(x => x.Key)
+            .Select(x => new DateStatistics
+            {
+                CreatedDate = x.Key,
+                EntriesCount = x.Count(),
+                SleepMinutes = RoundAverage(x.Select(y => y.SleepMinutes)),
+                EnergyLevel = RoundAverage(x.Select(y => y.EnergyLevel)),
+                StressLevel = RoundAverage(x.Select(y => y.StressLevel)),
+                MotivationLevel = RoundAverage(x.Select(y => y.MotivationLevel)),
+                ConcentrationLevel = RoundAverage(x.Select(y => y.ConcentrationLevel))
+            })
+            .ToList();
+
+        var statistics = new UserStateStatisticsResult
+        {
+            PeriodDays = days,
+            EntriesCount = entriesCount,
+            DaysWithEntries = entriesByDayCount,
+            Averages = CreateAggregateStatistics(
+                orderedStates,
+                values => RoundAverage(values.Select(x => x.SleepMinutes)),
+                values => RoundAverage(values.Select(x => x.EnergyLevel)),
+                values => RoundAverage(values.Select(x => x.StressLevel)),
+                values => RoundAverage(values.Select(x => x.MotivationLevel)),
+                values => RoundAverage(values.Select(x => x.ConcentrationLevel))),
+            Minimums = CreateAggregateStatistics(
+                orderedStates,
+                values => values.Min(x => x.SleepMinutes),
+                values => values.Min(x => x.EnergyLevel),
+                values => values.Min(x => x.StressLevel),
+                values => values.Min(x => x.MotivationLevel),
+                values => values.Min(x => x.ConcentrationLevel)),
+            Maximums = CreateAggregateStatistics(
+                orderedStates,
+                values => values.Max(x => x.SleepMinutes),
+                values => values.Max(x => x.EnergyLevel),
+                values => values.Max(x => x.StressLevel),
+                values => values.Max(x => x.MotivationLevel),
+                values => values.Max(x => x.ConcentrationLevel)),
+            DateStatistics = dailyStatistics
+        };
+
+        return new UserStateStatisticsBlResult
+        {
+            UserStateStatistics = statistics
+        };
+    }
+
     public async Task<UserStateHistoryBlResult> GetUserStateHistory(Guid userId, int limit,
         CancellationToken cancellationToken)
     {
@@ -122,5 +196,39 @@ public sealed class UserStateUseCase : IUserStateUseCase
         {
             UserState = result.ToUserStateResult()
         };
+    }
+
+    private static AggregateUserStateStatistics CreateAggregateStatistics(
+        IReadOnlyCollection<UserStateDal> states,
+        Func<IReadOnlyCollection<UserStateDal>, int> sleepSelector,
+        Func<IReadOnlyCollection<UserStateDal>, int> energySelector,
+        Func<IReadOnlyCollection<UserStateDal>, int> stressSelector,
+        Func<IReadOnlyCollection<UserStateDal>, int> motivationSelector,
+        Func<IReadOnlyCollection<UserStateDal>, int> concentrationSelector)
+    {
+        if (states.Count == 0)
+        {
+            return new AggregateUserStateStatistics();
+        }
+
+        return new AggregateUserStateStatistics
+        {
+            SleepMinutes = sleepSelector(states),
+            EnergyLevel = energySelector(states),
+            StressLevel = stressSelector(states),
+            MotivationLevel = motivationSelector(states),
+            ConcentrationLevel = concentrationSelector(states)
+        };
+    }
+
+    private static int RoundAverage(IEnumerable<int> values)
+    {
+        var materializedValues = values.ToList();
+        if (materializedValues.Count == 0)
+        {
+            return 0;
+        }
+
+        return (int)Math.Round(materializedValues.Average(), MidpointRounding.AwayFromZero);
     }
 }

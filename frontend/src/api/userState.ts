@@ -18,6 +18,34 @@ export interface CreateUserStateRequest {
   concentrationLevel: number // 1-10
 }
 
+export interface AggregateUserStateStatistics {
+  sleepMinutes: number
+  energyLevel: number
+  stressLevel: number
+  motivationLevel: number
+  concentrationLevel: number
+}
+
+export interface DailyUserStateStatistics {
+  createdDate: string
+  entriesCount: number
+  sleepMinutes: number
+  energyLevel: number
+  stressLevel: number
+  motivationLevel: number
+  concentrationLevel: number
+}
+
+export interface UserStateStatistics {
+  periodDays: number
+  entriesCount: number
+  daysWithEntries: number
+  averages: AggregateUserStateStatistics
+  minimums: AggregateUserStateStatistics
+  maximums: AggregateUserStateStatistics
+  dateStatistics: DailyUserStateStatistics[]
+}
+
 export const userStateApi = {
   create: (data: CreateUserStateRequest) =>
     apiClient.post<{ payload: UserState }>('/user-state/create', data),
@@ -28,5 +56,10 @@ export const userStateApi = {
   getHistory: (limit = 7) =>
     apiClient.get<{ payload: { history: UserState[] } }>('/user-state/history', {
       params: { limit },
+    }),
+
+  getStatistics: (days = 30) =>
+    apiClient.get<{ payload: UserStateStatistics }>('/user-state/statistics', {
+      params: { days },
     }),
 }

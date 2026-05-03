@@ -9,6 +9,9 @@ public interface IUserStateUseCase
 
     Task<UserStateBlResult> GetLatestUserState(Guid userId, CancellationToken cancellationToken);
 
+    Task<UserStateStatisticsBlResult> GetUserStateStatistics(Guid userId, int days,
+        CancellationToken cancellationToken);
+
     Task<UserStateHistoryBlResult> GetUserStateHistory(Guid userId, int limit,
         CancellationToken cancellationToken);
 }

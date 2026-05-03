@@ -20,12 +20,19 @@ export function shouldUpdateLatestState(iso: string) {
 }
 
 export function formatStateDate(iso: string) {
-  return new Date(iso).toLocaleDateString('ru-RU', {
+  const date = new Date(iso)
+  const hasTime = iso.includes('T')
+
+  return date.toLocaleDateString('ru-RU', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+    ...(hasTime
+      ? {
+          hour: '2-digit' as const,
+          minute: '2-digit' as const,
+        }
+      : {}),
   })
 }
 

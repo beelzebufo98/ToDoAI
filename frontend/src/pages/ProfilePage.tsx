@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Mail, UserRound } from 'lucide-react'
+import { ChevronUp, Loader2, Mail, PencilLine, UserRound } from 'lucide-react'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { userApi } from '@/api/user'
@@ -70,10 +70,10 @@ function LevelSelector({
             type="button"
             onClick={() => onChange(level.value)}
             className={cn(
-              'flex-1 rounded-lg py-1.5 text-xs font-medium transition-colors border',
+              'flex-1 rounded-lg border py-1.5 text-xs font-medium transition-colors',
               value === level.value
-                ? 'bg-foreground text-background border-foreground'
-                : 'bg-background border-border text-muted-foreground hover:border-foreground/40'
+                ? 'border-foreground bg-foreground text-background'
+                : 'border-border bg-background text-muted-foreground hover:border-foreground/40'
             )}
           >
             {level.label}
@@ -88,6 +88,7 @@ export function ProfilePage() {
   const queryClient = useQueryClient()
   const [avatarVariant, setSelectedAvatarVariant] = useState<AvatarVariant>('bot-1')
   const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(true)
+  const [isStateFormOpen, setIsStateFormOpen] = useState(true)
 
   const {
     register,
@@ -149,10 +150,12 @@ export function ProfilePage() {
         motivationLevel: latest.motivationLevel,
         concentrationLevel: latest.concentrationLevel,
       })
+      setIsStateFormOpen(false)
       return
     }
 
     reset(defaultFormValues)
+    setIsStateFormOpen(true)
   }, [latest?.id, latest, reset])
 
   const mutation = useMutation({
@@ -166,6 +169,9 @@ export function ProfilePage() {
       }),
     onSuccess: () => {
       toast.success(isUpdate ? 'Состояние обновлено' : 'Состояние сохранено')
+      if (isUpdate) {
+        setIsStateFormOpen(false)
+      }
       queryClient.invalidateQueries({ queryKey: ['userState'] })
     },
     onError: () => {
@@ -184,24 +190,25 @@ export function ProfilePage() {
     toast.success(`Выбран робот ${avatarVariantLabels[variant].toLowerCase()}`)
   }
 
+  const profileTitle =
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.userName || 'Профиль'
+
   return (
-    <div className="p-6 max-w-4xl mx-auto w-full">
+    <div className="mx-auto w-full max-w-4xl p-6">
       <div className="mb-6">
         <h1 className="text-xl font-semibold text-foreground">Профиль</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Общая информация, аватар и состояние на сегодня
+        <p className="mt-0.5 text-sm text-muted-foreground">
+          Общая информация, робот-напарник и состояние на сегодня
         </p>
       </div>
 
       <div className="space-y-6">
-        <section className="bg-card border border-border/50 rounded-xl p-5">
+        <section className="rounded-xl border border-border/50 bg-card p-5">
           <div className="flex flex-col gap-6">
             <div className="flex items-center gap-4">
               <UserAvatar seed={avatarSeed} variant={avatarVariant} size={84} className="shrink-0" />
               <div>
-                <p className="text-lg font-semibold text-foreground">
-                  {userLoading ? 'Загрузка…' : [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.userName}
-                </p>
+                <p className="text-lg font-semibold text-foreground">{userLoading ? 'Загрузка…' : profileTitle}</p>
                 <div className="mt-2 space-y-1.5 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <UserRound className="h-4 w-4" />
@@ -218,10 +225,12 @@ export function ProfilePage() {
             <div>
               <div className="mb-3">
                 <p className="text-sm font-medium text-foreground">Робот-напарник</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Выберите визуальный образ помощника ToDoAI. Выбор сохранится для этого аккаунта на текущем устройстве.
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Выберите визуальный образ помощника ToDoAI. Выбор сохранится для этого аккаунта на текущем
+                  устройстве.
                 </p>
               </div>
+
               <div className="flex items-center justify-between rounded-xl border border-border/50 bg-muted/20 px-3 py-2">
                 <div className="flex items-center gap-3">
                   <UserAvatar seed={avatarSeed} variant={avatarVariant} size={40} />
@@ -241,21 +250,21 @@ export function ProfilePage() {
               </div>
 
               {isAvatarPickerOpen && (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6 mt-3">
+                <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
                   {avatarVariants.map((variant) => (
                     <button
                       key={variant}
                       type="button"
                       onClick={() => handleAvatarChange(variant)}
                       className={cn(
-                        'rounded-xl border p-3 transition-colors text-left',
+                        'rounded-xl border p-3 text-left transition-colors',
                         avatarVariant === variant
                           ? 'border-primary bg-primary/5'
                           : 'border-border/60 hover:border-foreground/30'
                       )}
                     >
                       <UserAvatar seed={avatarSeed} variant={variant} size={56} className="mx-auto" />
-                      <p className="mt-2 text-xs font-medium text-foreground text-center">
+                      <p className="mt-2 text-center text-xs font-medium text-foreground">
                         {avatarVariantLabels[variant]}
                       </p>
                     </button>
@@ -268,52 +277,91 @@ export function ProfilePage() {
 
         {!latestLoading && latest && (
           <section>
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-              Последнее состояние
-            </p>
+            <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Последнее состояние</p>
             <StateCard state={latest} compact />
           </section>
         )}
 
-        <section className="bg-card border border-border/50 rounded-xl p-5">
-          <h2 className="text-sm font-semibold mb-4">{isUpdate ? 'Обновить состояние' : 'Добавить состояние'}</h2>
-
-          <form onSubmit={handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label className="text-sm font-medium">Сон (часов)</Label>
-              <Input
-                type="number"
-                min={0}
-                max={24}
-                step={0.5}
-                className="h-10 bg-background/80"
-                {...register('sleepHours', { valueAsNumber: true })}
-              />
-              {errors.sleepHours && <p className="text-xs text-destructive">{errors.sleepHours.message}</p>}
+        <section className="rounded-xl border border-border/50 bg-card p-5">
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">
+                {isUpdate ? 'Обновление состояния' : 'Состояние на сегодня'}
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {isUpdate
+                  ? 'Текущее состояние уже сохранено. Раскройте форму, если хотите скорректировать данные.'
+                  : 'Заполните форму, чтобы сохранить текущее состояние на сегодня.'}
+              </p>
             </div>
 
-            <LevelSelector label="Энергия" value={energyLevel} onChange={(value) => setValue('energyLevel', value)} />
-            <LevelSelector label="Стресс" value={stressLevel} onChange={(value) => setValue('stressLevel', value)} />
-            <LevelSelector
-              label="Мотивация"
-              value={motivationLevel}
-              onChange={(value) => setValue('motivationLevel', value)}
-            />
-            <LevelSelector
-              label="Концентрация"
-              value={concentrationLevel}
-              onChange={(value) => setValue('concentrationLevel', value)}
-            />
+            {isUpdate ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="h-8 shrink-0"
+                onClick={() => setIsStateFormOpen((value) => !value)}
+              >
+                {isStateFormOpen ? (
+                  <>
+                    <ChevronUp className="h-4 w-4" />
+                    Скрыть
+                  </>
+                ) : (
+                  <>
+                    <PencilLine className="h-4 w-4" />
+                    Изменить
+                  </>
+                )}
+              </Button>
+            ) : null}
+          </div>
 
-            <Button
-              type="submit"
-              disabled={mutation.isPending}
-              className="w-full bg-indigo-600 text-white hover:bg-indigo-500 mt-2"
-            >
-              {mutation.isPending && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isUpdate ? 'Обновить' : 'Сохранить'}
-            </Button>
-          </form>
+          {!isStateFormOpen && isUpdate ? (
+            <div className="rounded-xl border border-border/50 bg-muted/20 px-4 py-3">
+              <p className="text-sm text-muted-foreground">
+                Данные уже заполнены. Форма скрыта, чтобы не отвлекать. При необходимости вы можете раскрыть ее и
+                обновить запись.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium">Сон (часов)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  max={24}
+                  step={0.5}
+                  className="h-10 bg-background/80"
+                  {...register('sleepHours', { valueAsNumber: true })}
+                />
+                {errors.sleepHours ? <p className="text-xs text-destructive">{errors.sleepHours.message}</p> : null}
+              </div>
+
+              <LevelSelector label="Энергия" value={energyLevel} onChange={(value) => setValue('energyLevel', value)} />
+              <LevelSelector label="Стресс" value={stressLevel} onChange={(value) => setValue('stressLevel', value)} />
+              <LevelSelector
+                label="Мотивация"
+                value={motivationLevel}
+                onChange={(value) => setValue('motivationLevel', value)}
+              />
+              <LevelSelector
+                label="Концентрация"
+                value={concentrationLevel}
+                onChange={(value) => setValue('concentrationLevel', value)}
+              />
+
+              <Button
+                type="submit"
+                disabled={mutation.isPending}
+                className="mt-2 w-full bg-indigo-600 text-white hover:bg-indigo-500"
+              >
+                {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {isUpdate ? 'Обновить' : 'Сохранить'}
+              </Button>
+            </form>
+          )}
         </section>
       </div>
     </div>

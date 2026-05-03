@@ -9,6 +9,7 @@ namespace ToDoAI.Infrastructure.DalProviders.UserStateDalProvider;
 
 public sealed class UserStateDalProvider : IUserStateDalProvider
 {
+    private static readonly TimeSpan UserLocalOffset = TimeSpan.FromHours(3);
     private readonly IDbContextFactory<ToDoAIDbContext>  _dbContextFactory;
 
     public UserStateDalProvider(IDbContextFactory<ToDoAIDbContext> dbContextFactory)
@@ -58,6 +59,25 @@ public sealed class UserStateDalProvider : IUserStateDalProvider
         await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
         var stateEntity = await dbContext.States.AsNoTracking().Where(s => s.UserId == userId).OrderByDescending(x => x.CreatedAt).Take(limit).ToListAsync(cancellationToken);
         var result = stateEntity.Select(s => s.ToUserStateDal()).ToList();
+        return result;
+    }
+
+    public async Task<IReadOnlyCollection<UserStateDal>> GetUserStatesByDays(Guid userId, int days,
+        CancellationToken cancellationToken)
+    {
+        await using var dbContext = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var currentLocalDate = DateTimeOffset.UtcNow.ToOffset(UserLocalOffset).Date;
+        var periodStartLocal = currentLocalDate.AddDays(-(days - 1));
+        var periodStartUtc = new DateTimeOffset(periodStartLocal, UserLocalOffset)
+            .ToUniversalTime();
+
+        var stateList = await dbContext.States.AsNoTracking()
+            .Where(s => s.UserId == userId && s.CreatedAt >= periodStartUtc)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+        var result = stateList.Select(s => s.ToUserStateDal()).ToList();
+        
         return result;
     }
 }
