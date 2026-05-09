@@ -44,6 +44,21 @@ export interface UpdateTaskRequest {
   deadlineAt?: string
 }
 
+export interface TaskAssistRequest {
+  title: string
+  description: string
+  deadlineAt: string
+}
+
+export interface TaskAssistResponse {
+  suggestedTitle: string
+  suggestedDescription: string
+  suggestedEstimatedMinutes: number
+  suggestedComplexityLevel: ComplexityLevel
+  suggestedPriority: Priority
+  reasoning: string
+}
+
 export interface TaskFilters {
   workStatus?: Exclude<WorkStatus, 'deleted'>
   sortBy?: SortBy
@@ -59,6 +74,9 @@ export interface GetTasksResponse {
 export const tasksApi = {
   create: (data: CreateTaskRequest) =>
     apiClient.post<{ payload: { taskId: string } }>('/task/create', data),
+
+  assist: (data: TaskAssistRequest) =>
+    apiClient.post<{ payload: TaskAssistResponse }>('/task/assist', data),
 
   getAll: (filters?: TaskFilters) =>
     apiClient.get<{ payload: GetTasksResponse }>('/task/get', { params: filters }),

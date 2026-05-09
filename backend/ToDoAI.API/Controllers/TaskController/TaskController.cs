@@ -1,8 +1,11 @@
+using System.Text.Json;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToDoAI.API.Controllers.TaskController.Mappers;
 using ToDoAI.API.Controllers.TaskController.Models;
+using ToDoAI.Application.UseCases.AssistTask;
+using ToDoAI.Application.UseCases.AssistTask.Models;
 using ToDoAI.Application.UseCases.CreateTask;
 using ToDoAI.Application.UseCases.CreateTask.Models;
 using ToDoAI.Application.UseCases.DeleteTask;
@@ -23,6 +26,7 @@ namespace ToDoAI.API.Controllers.TaskController;
 [Route("api/v{version:apiVersion}/task/")]
 public sealed class TaskController : ToDoAiControllerBase
 {
+    private readonly IAssistUseCase _assistUseCase;
     private readonly ICreateTaskUseCase _createTaskUseCase;
     private readonly IGetTaskUseCase _getTaskUseCase;
     private readonly IDeleteTaskUseCase _deleteTaskUseCase;
@@ -30,21 +34,85 @@ public sealed class TaskController : ToDoAiControllerBase
     private readonly IUpdateTaskUseCase _updateTaskUseCase;
 
     public TaskController(
+        IAssistUseCase assistUseCase,
         ICreateTaskUseCase createTaskUseCase, 
         IGetTaskUseCase getTaskUseCase,
         IDeleteTaskUseCase deleteTaskUseCase,
         IUpdateTaskStatusUseCase updateTaskStatusUseCase,
         IUpdateTaskUseCase updateTaskUseCase)
     {
+        _assistUseCase = assistUseCase;
         _createTaskUseCase = createTaskUseCase;
         _getTaskUseCase = getTaskUseCase;
         _deleteTaskUseCase = deleteTaskUseCase;
         _updateTaskStatusUseCase = updateTaskStatusUseCase;
         _updateTaskUseCase = updateTaskUseCase;
     }
-    
+
+    [HttpPost("assist")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(TaskAssistResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    [ProducesResponseType(StatusCodes.Status502BadGateway, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
+    public async Task<ActionResult> AssistTask([FromBody] TaskAssistRequest assistRequest,
+        CancellationToken cancellationToken)
+    {
+        var userIdClaim = User.FindFirst("id")?.Value;
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.NotAuthorized), StatusCodes.Status401Unauthorized);
+        }
+
+        try
+        {
+            var result = await _assistUseCase.GetAssistTask(
+                new AssistTaskBlRequest
+                {
+                    UserId = userId,
+                    Title = assistRequest.Title,
+                    Description = assistRequest.Description,
+                    DeadlineAt = assistRequest.DeadlineAt
+                },
+                cancellationToken);
+
+            if (result.Error is not null)
+            {
+                var statusCode = result.Error == ErrorCodes.NotAuthorized
+                    ? StatusCodes.Status401Unauthorized
+                    : StatusCodes.Status400BadRequest;
+                return ClientError(new ErrorApi<ErrorCodes?>(result.Error), statusCode);
+            }
+
+            return Ok(new TaskAssistResponse
+            {
+                SuggestedTitle = result.SuggestedTitle,
+                SuggestedDescription = result.SuggestedDescription,
+                SuggestedEstimatedMinutes = result.SuggestedEstimatedMinutes,
+                SuggestedComplexityLevel = result.SuggestedComplexityLevel,
+                SuggestedPriority = result.SuggestedPriority,
+                Reasoning = result.Reasoning
+            });
+        }
+        catch (InvalidOperationException)
+        {
+            return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.AiServiceUnavailable), StatusCodes.Status502BadGateway);
+        }
+        catch (HttpRequestException)
+        {
+            return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.AiServiceUnavailable), StatusCodes.Status502BadGateway);
+        }
+        catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.AiServiceTimeout), StatusCodes.Status502BadGateway);
+        }
+        catch (JsonException)
+        {
+            return ClientError(new ErrorApi<ErrorCodes>(ErrorCodes.AiServiceInvalidResponse), StatusCodes.Status502BadGateway);
+        }
+    }
+
     [HttpPost("create")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetTaskResponse))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CreateTaskResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ClientErrorApiResponse<ErrorCodes>))]
     public async Task<ActionResult> CreateTask([FromBody] CreateTaskRequest  request, CancellationToken cancellationToken)

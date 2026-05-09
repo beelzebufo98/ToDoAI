@@ -9,6 +9,8 @@ public sealed class AiServiceSettings
     public string GenerateSchedulePath { get; init; } = "/api/v1/ai/schedule/generate";
 
     public string GenerateMotivationPath { get; init; } = "/api/v1/ai/motivation/generate";
+    
+    public string GenerateTaskAssistPath { get; init; } = "/api/v1/ai/task-assist";
 
     public int TimeoutSeconds { get; init; } = 15;
 }
