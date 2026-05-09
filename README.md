@@ -1,6 +1,6 @@
 # ToDoAI
 
-`ToDoAI` — это full-stack приложение для задач, расписания дня и AI-подсказок.
+`ToDoAI` — это веб-приложение для задач, расписания дня и AI-подсказок.
 
 Состав:
 - `backend` — ASP.NET Core API, auth, бизнес-логика, PostgreSQL.
@@ -39,12 +39,6 @@ docker compose up --build
 
 ```powershell
 docker compose down
-```
-
-С очисткой volume базы:
-
-```powershell
-docker compose down -v
 ```
 
 ## Локальный запуск без Docker
@@ -100,6 +94,6 @@ docker compose --env-file .env.prod -f docker-compose.prod.yml up --build -d
 
 ## Где смотреть подробнее
 
-- [Backend README](D:\NET\Ideas\todoai-project\backend\README.md)
-- [AI service README](D:\NET\Ideas\todoai-project\ai-service\README.md)
-- [Frontend README](D:\NET\Ideas\todoai-project\frontend\README.md)
+- [Backend README](https://github.com/beelzebufo98/ToDoAI/tree/main/backend)
+- [AI service README](https://github.com/beelzebufo98/ToDoAI/tree/main/ai-service)
+- [Frontend README](https://github.com/beelzebufo98/ToDoAI/tree/main/frontend)
