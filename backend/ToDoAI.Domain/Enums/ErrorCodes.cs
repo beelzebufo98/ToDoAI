@@ -4,51 +4,60 @@ namespace ToDoAI.Domain.Enums;
 
 public enum ErrorCodes
 {
-    [Description("Не авторизованный запрос")]
+    [Description("Unauthorized request")]
     NotAuthorized = 0,
-    
-    [Description("Пользователь с таким никнеймом уже существует")]
+
+    [Description("User with this username already exists")]
     UserExists = 1,
-    
-    [Description("Пользователь с таким никнеймом не существует")]
+
+    [Description("User with this username does not exist")]
     UserDoesNotExist = 2,
-    
-    [Description("Задача отсутствует")]
+
+    [Description("Task not found")]
     TaskNotFound = 3,
-    
-    [Description("Нет состояний по текущему пользователю")]
+
+    [Description("User state not found")]
     UserStateNotFound = 4,
-    
-    [Description("Некорретное значение параметров")]
+
+    [Description("Incorrect parameter value")]
     IncorrectValue = 5,
 
-    [Description("Некорретное изменение статуса задачи")]
+    [Description("Invalid task status transition")]
     InvalidTaskStatusTransition = 6,
-    
-    [Description("Обратная связь по задаче уже существует")]
+
+    [Description("Task execution feedback already exists")]
     TaskExecutionAlreadyExists = 7,
-    
-    [Description("Задача должна быть выполнена")]
+
+    [Description("Task should be completed")]
     TaskShouldBeCompleted = 8,
-    
-    [Description("Расписание для задачи не найдено")]
+
+    [Description("Schedule not found for task")]
     ScheduleNotFound = 10,
 
-    [Description("Расписание не связано с задачей")]
+    [Description("Schedule does not match task")]
     ScheduleDoesNotMatchTask = 11,
-    
-    [Description("Расписание на указанную дату не найдено")]
+
+    [Description("Day schedule not found")]
     DayScheduleNotFound = 12,
-    
-    [Description("У пользователя не может быть несколько открытых сессий")]
+
+    [Description("User cannot have multiple open work sessions")]
     TaskWorkSessionAlreadyExists = 13,
-    
-    [Description("Открытая сессия отсутствует")]
+
+    [Description("Open session not found")]
     SessionNotFound = 14,
-    
+
     [Description("Invalid task work session status")]
     InvalidTaskWorkSessionStatus = 15,
 
-    [Description("Email пользователя не подтвержден")]
+    [Description("Email is not confirmed")]
     EmailNotConfirmed = 16,
+
+    [Description("AI service is unavailable")]
+    AiServiceUnavailable = 17,
+
+    [Description("AI service request timed out")]
+    AiServiceTimeout = 18,
+
+    [Description("AI service returned an invalid response")]
+    AiServiceInvalidResponse = 19,
 }

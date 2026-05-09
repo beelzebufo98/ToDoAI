@@ -46,6 +46,7 @@ public static class ApiServiceCollectionExtensions
         services.AddScoped<IValidator<CreateUserStateRequest>, CreateUserStateValidator>();
         services.AddScoped<IValidator<CreateTaskExecutionRequest>, TaskExecutionValidator>();
         services.AddScoped<IValidator<GenerateScheduleRequest>, GenerateScheduleValidator>();
+        services.AddScoped<IValidator<TaskAssistRequest>, AssistTaskValidator>();
         services.AddFluentValidationAutoValidation();
         services.AddAuthorization();
 

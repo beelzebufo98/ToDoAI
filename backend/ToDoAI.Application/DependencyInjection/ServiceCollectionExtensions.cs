@@ -6,6 +6,7 @@ using ToDoAI.Application.Services.EmailService;
 using ToDoAI.Application.Services.EmailService.Settings;
 using ToDoAI.Application.Services.JwtService;
 using ToDoAI.Application.Services.JwtService.Settings;
+using ToDoAI.Application.UseCases.AssistTask;
 using ToDoAI.Application.UseCases.ConfirmEmail;
 using ToDoAI.Application.UseCases.CreateTask;
 using ToDoAI.Application.UseCases.CreateUser;
@@ -39,6 +40,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ILoginUserUseCase, LoginUserUseCase>();
         services.AddScoped<IRefreshTokenUseCase, RefreshTokenUseCase>();
         services.AddScoped<ICreateTaskUseCase, CreateTaskUseCase>();
+        services.AddScoped<IAssistUseCase, AssistUseCase>();
         services.AddScoped<IGetTaskUseCase, GetTaskUseCase>();
         services.AddScoped<IUpdateTaskStatusUseCase, UpdateTaskStatusUseCase>();
         services.AddScoped<IUpdateTaskUseCase,  UpdateTaskUseCase>();

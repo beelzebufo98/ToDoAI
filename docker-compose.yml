@@ -63,6 +63,7 @@ services:
       AiService__BaseUrl: "http://ai-service:8000"
       AiService__GenerateSchedulePath: "/api/v1/ai/schedule/generate"
       AiService__GenerateMotivationPath: "/api/v1/ai/motivation/generate"
+      AiService__GenerateTaskAssistPath: /api/v1/ai/task-assist
       EmailSettings__Enabled: "true"
       EmailSettings__Provider: "Smtp"
       EmailSettings__Host: "mailpit"
