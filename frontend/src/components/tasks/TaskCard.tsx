@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Calendar, ChevronRight, Clock, Pencil, Play, Square, Trash2, X } from 'lucide-react'
 import type { ComplexityLevel, Priority, Task, WorkStatus } from '@/api/tasks'
 import { cn } from '@/lib/utils'
 
 const CANCEL_TIMEOUT_SECONDS = 120
+const DESCRIPTION_PREVIEW_LIMIT = 220
 
 const STATUS_CONFIG: Record<Exclude<WorkStatus, 'deleted'>, { label: string; cls: string }> = {
   new: { label: 'Новая', cls: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400' },
@@ -55,6 +56,22 @@ function isOverdue(iso: string, status: WorkStatus) {
   return status !== 'completed' && status !== 'deleted' && new Date(iso) < new Date()
 }
 
+function normalizeDescription(text: string) {
+  return text.replace(/\s+/g, ' ').trim()
+}
+
+function buildDescriptionPreview(text: string, limit: number) {
+  if (text.length <= limit) {
+    return text
+  }
+
+  const slice = text.slice(0, limit)
+  const lastSpace = slice.lastIndexOf(' ')
+  const safeSlice = lastSpace > Math.floor(limit * 0.65) ? slice.slice(0, lastSpace) : slice
+
+  return `${safeSlice.trimEnd()}...`
+}
+
 export type SessionState = 'none' | 'active' | 'other'
 
 interface Props {
@@ -87,12 +104,21 @@ export function TaskCard({
   onCancelSession,
 }: Props) {
   const [elapsed, setElapsed] = useState(0)
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false)
+
   const statusInfo = STATUS_CONFIG[task.workStatus as Exclude<WorkStatus, 'deleted'>]
   const priorityInfo = getPriorityInfo(task.priority)
   const next = NEXT_STATUS[task.workStatus]
   const overdue = isOverdue(task.deadlineAt, task.workStatus)
   const canStartSession = task.workStatus === 'todo' || task.workStatus === 'running'
   const canCancelSession = sessionState === 'active' && elapsed < CANCEL_TIMEOUT_SECONDS
+
+  const normalizedDescription = useMemo(() => normalizeDescription(task.description), [task.description])
+  const hasLongDescription = normalizedDescription.length > DESCRIPTION_PREVIEW_LIMIT
+  const descriptionPreview = useMemo(
+    () => buildDescriptionPreview(normalizedDescription, DESCRIPTION_PREVIEW_LIMIT),
+    [normalizedDescription]
+  )
 
   useEffect(() => {
     if (sessionState !== 'active' || !activeSessionStartedAt) {
@@ -108,6 +134,10 @@ export function TaskCard({
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
   }, [activeSessionStartedAt, sessionState])
+
+  useEffect(() => {
+    setDescriptionExpanded(false)
+  }, [task.description, task.id])
 
   return (
     <motion.div
@@ -133,7 +163,27 @@ export function TaskCard({
       </div>
 
       <h3 className="text-sm font-medium leading-snug text-foreground">{task.title}</h3>
-      <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{task.description}</p>
+
+      <div className="mt-1">
+        <p
+          className={cn(
+            'text-xs leading-6 text-muted-foreground',
+            !descriptionExpanded && 'line-clamp-3'
+          )}
+        >
+          {descriptionExpanded || !hasLongDescription ? normalizedDescription : descriptionPreview}
+        </p>
+
+        {hasLongDescription && (
+          <button
+            type="button"
+            onClick={() => setDescriptionExpanded((value) => !value)}
+            className="mt-1 text-xs font-medium text-indigo-600 transition-colors hover:text-indigo-700"
+          >
+            {descriptionExpanded ? 'Свернуть описание' : 'Показать полностью'}
+          </button>
+        )}
+      </div>
 
       <div className="mt-3 flex items-center gap-3">
         <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -148,7 +198,7 @@ export function TaskCard({
         >
           <Calendar className="h-3 w-3" />
           {formatDeadline(task.deadlineAt)}
-          {overdue && ' · просрочено'}
+          {overdue && ' · Просрочено'}
         </span>
       </div>
 
