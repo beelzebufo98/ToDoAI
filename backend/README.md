@@ -3,10 +3,10 @@
 `backend` — это ASP.NET Core API для `ToDoAI`.
 
 Что делает:
-- регистрация, логин, refresh token flow
+- регистрация, логин, флоу обновления токена без перелогина
 - подтверждение email и сброс пароля
 - CRUD задач
-- task execution и дневное расписание
+- фидбек после выполнения задач и дневное расписание
 - интеграция с `ai-service`
 - отправка email через SMTP
 
@@ -93,7 +93,6 @@ docker compose up --build
 - `EmailSettings__Provider=Smtp`
 
 ## Полезно
-
 - dev email endpoint доступен только в `Development`
 - для локальной проверки писем удобнее использовать `Mailpit`
 - AI-запросы backend отправляет не напрямую в OpenRouter, а в `ai-service`
